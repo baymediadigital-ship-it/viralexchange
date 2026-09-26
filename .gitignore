@@ -36,6 +36,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# exported legacy data for the one-time migration (real business data, never commit)
+/data/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
