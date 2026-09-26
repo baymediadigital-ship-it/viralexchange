@@ -99,7 +99,8 @@ create table listings (
   monthly_views bigint,                             -- split from the legacy overloaded column
   monthly_revenue_usd numeric(12,2),                 -- split from the legacy overloaded column
   raw_monthly_metric_legacy text,                    -- original string, audit-only
-  engagement_rate numeric(5,2),
+  engagement_rate numeric(7,2), -- legacy sheet's engagement metric is miscalculated for many rows
+                                 -- (seen values over 1900%) -- widened rather than rejecting real data
   monetization text,
   account_age_months integer,
   language text,
