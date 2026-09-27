@@ -2,9 +2,7 @@
 
 import { useEffect } from "react";
 import "../acquire.css";
-
-const SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbz5bGgiuAOCggW7yhyQZnHjZbsaxRBlyLWuby3iMA9OnyZFSEWgFUG4SkNzCghC3JeE/exec";
+import { submitAcquisitionApplication } from "@/lib/actions/acquisitionApplications";
 
 export default function AcquireClient() {
   useEffect(() => {
@@ -44,23 +42,23 @@ export default function AcquireClient() {
       btn.innerHTML =
         '<div style="width:16px;height:16px;border:2px solid rgba(0,0,0,0.3);border-top-color:#050805;border-radius:50%;animation:spin 0.65s linear infinite;"></div> Submitting...';
 
-      try {
-        await fetch(SCRIPT_URL, {
-          method: "POST",
-          mode: "no-cors",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            type: "acquisition_application",
-            name: fname + " " + lname,
-            email,
-            contact,
-            budget,
-            niche,
-            experience,
-            goals,
-          }),
-        });
-      } catch {}
+      const result = await submitAcquisitionApplication({
+        name: fname + " " + lname,
+        email,
+        contact,
+        budgetLabel: budget,
+        niche,
+        experience,
+        goals,
+      });
+
+      if (result.error) {
+        alert(result.error);
+        btn.disabled = false;
+        btn.innerHTML =
+          'Submit my application <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 2L14 8L8 14M2 8H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+        return;
+      }
 
       document.getElementById("form-main")!.style.display = "none";
       document.getElementById("success-screen")!.style.display = "block";

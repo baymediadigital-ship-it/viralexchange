@@ -2,51 +2,12 @@
 
 import { useEffect } from "react";
 import "./home.css";
-
-const API_KEY = "AIzaSyAzTcAyZ0CGrnw2DZwG2Fk1NzhetalGDQY";
-const SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbz5bGgiuAOCggW7yhyQZnHjZbsaxRBlyLWuby3iMA9OnyZFSEWgFUG4SkNzCghC3JeE/exec";
-const BUYER_CSV =
-  "https://docs.google.com/spreadsheets/d/e/2PACX-1vSI1IjqNXOzxRYu-339b0KMc_N-r2nHnvPy0xHM8B5_f9EJxCciMS_apZqI6Qf9_Rf4VH4jpaurvtZO/pub?gid=1998923427&single=true&output=csv";
-const DEAL_CSV =
-  "https://docs.google.com/spreadsheets/d/e/2PACX-1vSI1IjqNXOzxRYu-339b0KMc_N-r2nHnvPy0xHM8B5_f9EJxCciMS_apZqI6Qf9_Rf4VH4jpaurvtZO/pub?gid=1265722642&single=true&output=csv";
+import { fmt, initials } from "@/lib/format";
+import { createClient } from "@/lib/supabase/client";
+import { submitListing as submitListingAction } from "@/lib/actions/listings";
 
 export default function HomeClient() {
   useEffect(() => {
-    function fmt(n: number) {
-      if (!n || isNaN(n)) return "—";
-      n = parseInt(String(n));
-      if (n >= 1e9) return (n / 1e9).toFixed(1) + "B";
-      if (n >= 1e6) return (n / 1e6).toFixed(1) + "M";
-      if (n >= 1e3) return (n / 1e3).toFixed(1) + "K";
-      return n.toLocaleString();
-    }
-    function initials(n: string) {
-      return (
-        n
-          .split(" ")
-          .slice(0, 2)
-          .map((w) => w[0] || "")
-          .join("")
-          .toUpperCase() || "VX"
-      );
-    }
-    function parseURL(raw: string) {
-      raw = raw.trim();
-      const p = [
-        /youtube\.com\/@([\w.-]+)/,
-        /youtube\.com\/c\/([\w.-]+)/,
-        /youtube\.com\/user\/([\w.-]+)/,
-        /youtube\.com\/channel\/(UC[\w-]+)/,
-      ];
-      for (const r of p) {
-        const m = raw.match(r);
-        if (m) return { type: m[1].startsWith("UC") ? "id" : "handle", value: m[1] };
-      }
-      if (/^UC[\w-]{22}$/.test(raw)) return { type: "id", value: raw };
-      if (raw.startsWith("@")) return { type: "handle", value: raw.slice(1) };
-      return { type: "handle", value: raw.replace(/^@/, "") };
-    }
     function setStatus(msg: string, loading = false) {
       const el = document.getElementById("status-msg");
       if (!el) return;
@@ -65,23 +26,10 @@ export default function HomeClient() {
       setStatus("Fetching channel data...", true);
       (document.getElementById("fetch-btn") as HTMLButtonElement).disabled = true;
       try {
-        const parsed = parseURL(url);
-        let cid = parsed.value;
-        if (parsed.type !== "id") {
-          const r = await fetch(
-            `https://www.googleapis.com/youtube/v3/search?part=snippet&type=channel&q=${encodeURIComponent(parsed.value)}&maxResults=1&key=${API_KEY}`,
-          );
-          const d = await r.json();
-          if (d.error) throw new Error(d.error.message);
-          if (!d.items?.length) throw new Error("Channel not found.");
-          cid = d.items[0].snippet.channelId;
-        }
-        const r2 = await fetch(
-          `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=${cid}&key=${API_KEY}`,
-        );
-        const d2 = await r2.json();
-        if (!d2.items?.length) throw new Error("Could not load channel data.");
-        renderChannel(d2.items[0], url);
+        const r = await fetch(`/api/youtube/channel-stats?url=${encodeURIComponent(url)}`);
+        const d = await r.json();
+        if (d.error) throw new Error(d.error);
+        renderChannel(d, url);
         setStatus("");
       } catch (e) {
         setStatus("Error: " + (e as Error).message);
@@ -89,38 +37,32 @@ export default function HomeClient() {
       (document.getElementById("fetch-btn") as HTMLButtonElement).disabled = false;
     }
 
-    function renderChannel(ch: any, originalUrl: string) {
-      const s = ch.snippet,
-        st = ch.statistics;
-      const subs = parseInt(st.subscriberCount || 0),
-        vids = parseInt(st.videoCount || 0),
-        views = parseInt(st.viewCount || 0);
-      const avgV = vids > 0 ? Math.round(views / vids) : 0;
+    function renderChannel(d: any, originalUrl: string) {
+      const subs = d.subscribers || 0;
+      const vids = d.videos || 0;
+      const views = d.views || 0;
+      const avgV = d.avgViewsPerVideo || 0;
       const eng = subs > 0 ? ((avgV / subs) * 100).toFixed(1) + "%" : "—";
-      const created = s.publishedAt ? new Date(s.publishedAt) : null;
-      const ageMonths = created
-        ? Math.max(1, Math.round((Date.now() - created.getTime()) / (1000 * 60 * 60 * 24 * 30.44)))
-        : null;
-      const estMonthly = ageMonths && views ? Math.round(views / ageMonths) : null;
-      const thumb = s.thumbnails?.high?.url || s.thumbnails?.default?.url;
-      document.getElementById("ch-name")!.textContent = s.title;
-      document.getElementById("ch-handle")!.textContent = s.customUrl || originalUrl;
-      if (thumb) {
+      const ageMonths = d.ageMonths || null;
+      const estMonthly = d.estimatedMonthlyViews || null;
+      document.getElementById("ch-name")!.textContent = d.name;
+      document.getElementById("ch-handle")!.textContent = d.handle || originalUrl;
+      if (d.thumbnail) {
         document.getElementById("ch-avatar")!.innerHTML =
-          `<img src="${thumb}" alt="" style="width:100%;height:100%;object-fit:cover;">`;
+          `<img src="${d.thumbnail}" alt="" style="width:100%;height:100%;object-fit:cover;">`;
       } else {
-        document.getElementById("ch-init")!.textContent = initials(s.title);
+        document.getElementById("ch-init")!.textContent = initials(d.name);
       }
       document.getElementById("f-subs")!.textContent = fmt(subs);
       document.getElementById("f-vids")!.textContent = fmt(vids);
       document.getElementById("f-views")!.textContent = fmt(views);
       document.getElementById("f-avg")!.textContent = fmt(avgV);
       document.getElementById("f-eng")!.textContent = eng;
-      if (created) document.getElementById("f-age")!.textContent = (ageMonths! / 12).toFixed(1) + " yrs";
+      if (ageMonths) document.getElementById("f-age")!.textContent = (ageMonths / 12).toFixed(1) + " yrs";
       document.getElementById("mv-val")!.textContent = estMonthly ? fmt(estMonthly) + "/mo" : "—";
       (window as any)._ch = {
-        name: s.title,
-        handle: s.customUrl || originalUrl,
+        name: d.name,
+        handle: d.handle || originalUrl,
         subs,
         vids,
         views,
@@ -128,7 +70,6 @@ export default function HomeClient() {
         eng,
         ageMonths,
         estMonthly,
-        created: created?.toISOString().split("T")[0] || "",
         confirmedMonthly: null,
       };
       document.getElementById("fetched-panel")!.style.display = "block";
@@ -162,44 +103,34 @@ export default function HomeClient() {
       btn.disabled = true;
       btn.innerHTML =
         '<div class="spinner" style="border-top-color:#050805;width:14px;height:14px;border-width:2px;"></div> Submitting...';
-      const monthly = d.confirmedMonthly ? fmt(d.confirmedMonthly) : d.estMonthly ? fmt(d.estMonthly) + " (est.)" : "—";
-      const ageYrs = d.ageMonths ? (d.ageMonths / 12).toFixed(1) + " years" : "—";
-      const row = [
-        "",
-        d.name || "",
-        (document.getElementById("f-niche") as HTMLInputElement).value,
-        (document.getElementById("f-subniche") as HTMLInputElement).value,
-        fmt(d.subs),
-        monthly,
-        d.eng || "",
-        (document.getElementById("f-mono") as HTMLSelectElement).value,
-        ageYrs,
-        (document.getElementById("f-lang") as HTMLInputElement).value || "English",
-        (document.getElementById("f-price") as HTMLInputElement).value
-          ? "$" + parseInt((document.getElementById("f-price") as HTMLInputElement).value).toLocaleString()
-          : "",
-        "",
-        (document.getElementById("url-input") as HTMLInputElement).value.trim(),
-      ];
-      try {
-        await fetch(SCRIPT_URL, {
-          method: "POST",
-          mode: "no-cors",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            row,
-            sellerEmail: (document.getElementById("f-contact") as HTMLInputElement).value.includes("@")
-              ? (document.getElementById("f-contact") as HTMLInputElement).value.trim()
-              : "",
-            sellerName: (document.getElementById("f-name") as HTMLInputElement).value.trim(),
-          }),
-        });
-        document.getElementById("form-main")!.style.display = "none";
-        document.getElementById("success-screen")!.style.display = "block";
-      } catch {
+
+      const result = await submitListingAction({
+        channelName: d.name,
+        channelUrl: (document.getElementById("url-input") as HTMLInputElement).value.trim(),
+        niche: (document.getElementById("f-niche") as HTMLInputElement).value,
+        subNiche: (document.getElementById("f-subniche") as HTMLInputElement).value,
+        subscribers: d.subs,
+        monthlyViews: d.confirmedMonthly || d.estMonthly || undefined,
+        engagementRate: parseFloat(d.eng) || undefined,
+        monetization: (document.getElementById("f-mono") as HTMLSelectElement).value,
+        accountAgeMonths: d.ageMonths || undefined,
+        language: (document.getElementById("f-lang") as HTMLInputElement).value || "English",
+        askingPriceUsd: (document.getElementById("f-price") as HTMLInputElement).value
+          ? parseInt((document.getElementById("f-price") as HTMLInputElement).value)
+          : undefined,
+        sellerContactName: (document.getElementById("f-name") as HTMLInputElement).value.trim(),
+        sellerContactEmail: (document.getElementById("f-contact") as HTMLInputElement).value.trim(),
+      });
+
+      if (result.error) {
+        alert(result.error);
         btn.disabled = false;
         btn.innerHTML = submitBtnIcon;
+        return;
       }
+
+      document.getElementById("form-main")!.style.display = "none";
+      document.getElementById("success-screen")!.style.display = "block";
     }
 
     function resetAll() {
@@ -214,26 +145,6 @@ export default function HomeClient() {
         btn.disabled = false;
         btn.innerHTML = submitBtnIcon;
       }
-    }
-
-    function parseCSV(text: string) {
-      const rows: string[][] = [];
-      for (const line of text.trim().split("\n")) {
-        const cols: string[] = [];
-        let cur = "",
-          inQ = false;
-        for (let i = 0; i < line.length; i++) {
-          const ch = line[i];
-          if (ch === '"') inQ = !inQ;
-          else if (ch === "," && !inQ) {
-            cols.push(cur.trim());
-            cur = "";
-          } else cur += ch;
-        }
-        cols.push(cur.trim());
-        rows.push(cols);
-      }
-      return rows;
     }
 
     function animateCount(id: string, target: number, prefix: string) {
@@ -259,30 +170,22 @@ export default function HomeClient() {
     }
 
     async function loadData() {
+      const supabase = createClient();
       try {
-        const [dr, br] = await Promise.all([
-          fetch(DEAL_CSV + "&t=" + Date.now()),
-          fetch(BUYER_CSV + "&t=" + Date.now()),
+        const [listingsRes, dealsRes] = await Promise.all([
+          supabase.from("listings").select("id", { count: "exact", head: true }).eq("status", "available"),
+          supabase
+            .from("deals_public_pipeline")
+            .select("channel_name,niche,subscribers_snapshot,closed_price_usd,stage,close_date")
+            .eq("stage", "closed"),
         ]);
-        const dealRows = parseCSV(await dr.text())
-          .slice(3)
-          .map((c) => ({
-            channel: c[0],
-            niche: c[1],
-            subs: c[2],
-            price: c[3],
-            stage: (c[5] || "").toLowerCase().replace(/ /g, "_"),
-            closed: c[6],
-            date: c[7],
-          }))
-          .filter((r) => r.channel);
-        const buyerRows = parseCSV(await br.text())
-          .slice(7)
-          .map((c) => ({ avail: c[11] || "" }))
-          .filter((r) => r.avail);
-        const closed = dealRows.filter((r) => r.stage === "closed");
-        const vol = closed.reduce((s, r) => s + (parseFloat((r.closed || "").replace(/[^0-9.]/g, "")) || 0), 0);
-        const listed = buyerRows.filter((r) => r.avail.includes("Available")).length;
+        if (listingsRes.error) throw listingsRes.error;
+        if (dealsRes.error) throw dealsRes.error;
+
+        const listed = listingsRes.count || 0;
+        const closed = dealsRes.data || [];
+        const vol = closed.reduce((s, d) => s + (Number(d.closed_price_usd) || 0), 0);
+
         animateCount("t-sold", closed.length, "");
         animateCount("t-vol", vol, "$");
         animateCount("t-listed", listed, "");
@@ -301,7 +204,7 @@ export default function HomeClient() {
           grid.innerHTML = closed
             .map(
               (d) =>
-                `<div class="deal-card lg"><div class="deal-niche">${d.niche}</div><div class="deal-channel">${d.channel}</div><div class="deal-stats"><div class="deal-stat"><div class="dsl">Subscribers</div><div class="dsv">${d.subs}</div></div><div class="deal-stat"><div class="dsl">Closed price</div><div class="dsv price">${d.closed}</div></div></div><div class="sold-badge">✓ Sold${d.date ? " · " + d.date : ""}</div></div>`,
+                `<div class="deal-card lg"><div class="deal-niche">${d.niche || ""}</div><div class="deal-channel">${d.channel_name || ""}</div><div class="deal-stats"><div class="deal-stat"><div class="dsl">Subscribers</div><div class="dsv">${fmt(d.subscribers_snapshot)}</div></div><div class="deal-stat"><div class="dsl">Closed price</div><div class="dsv price">${d.closed_price_usd ? "$" + Number(d.closed_price_usd).toLocaleString() : "—"}</div></div></div><div class="sold-badge">✓ Sold${d.close_date ? " · " + d.close_date : ""}</div></div>`,
             )
             .join("");
         }
@@ -311,11 +214,15 @@ export default function HomeClient() {
     }
 
     async function loadMarquee() {
+      const supabase = createClient();
       try {
-        const r = await fetch(DEAL_CSV + "&t=" + Date.now());
-        const text = await r.text();
-        const rows = parseCSV(text).slice(3);
-        const closed = rows.filter((r) => r.length > 5 && (r[5] || "").toLowerCase().includes("closed") && (r[0] || "").trim());
+        const { data, error } = await supabase
+          .from("deals_public_pipeline")
+          .select("channel_name,closed_price_usd")
+          .eq("stage", "closed")
+          .order("created_at", { ascending: false })
+          .limit(20);
+        if (error) throw error;
         const track = document.getElementById("marquee-track");
         if (!track) return;
         const fallback: [string, string, string][] = [
@@ -327,11 +234,10 @@ export default function HomeClient() {
           ["C", "Celebrix", "$35,000"],
         ];
         const items: [string, string, string][] =
-          closed.length > 0
-            ? closed.map((r) => {
-                const name = (r[0] || "").trim();
-                const raw = (r[6] || "").toString().trim();
-                const price = raw ? (raw.startsWith("$") ? raw : "$" + raw) : "—";
+          data && data.length > 0
+            ? data.map((d) => {
+                const name = (d.channel_name || "").trim();
+                const price = d.closed_price_usd ? "$" + Number(d.closed_price_usd).toLocaleString() : "—";
                 return [name.charAt(0).toUpperCase(), name, price];
               })
             : fallback;

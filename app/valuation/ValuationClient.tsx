@@ -2,10 +2,9 @@
 
 import { useEffect } from "react";
 import "../valuation.css";
-
-const API_KEY = "AIzaSyAzTcAyZ0CGrnw2DZwG2Fk1NzhetalGDQY";
-const SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbwCNJ8nhsnYnXkXay2Z99ami-rbP8HmOHJbOr0MvkNSfUOwapQjkIpwL4Bhc8EX4EVY/exec";
+import { fmt, usd, initials } from "@/lib/format";
+import { submitValuationLead } from "@/lib/actions/valuationLeads";
+import { submitListing as submitListingAction } from "@/lib/actions/listings";
 
 const NM: Record<string, number> = { finance: 1.4, tech: 1.3, health: 1.25, education: 1.2, entertainment: 1.0, gaming: 0.95, lifestyle: 0.9, food: 0.9, other: 1.0 };
 const NL: Record<string, string> = {
@@ -31,40 +30,6 @@ export default function ValuationClient() {
   useEffect(() => {
     let _ch: any = null;
 
-    function fmt(n: number) {
-      if (!n || isNaN(n)) return "—";
-      n = parseInt(String(n));
-      if (n >= 1e9) return (n / 1e9).toFixed(1) + "B";
-      if (n >= 1e6) return (n / 1e6).toFixed(1) + "M";
-      if (n >= 1e3) return (n / 1e3).toFixed(1) + "K";
-      return n.toLocaleString();
-    }
-    function usd(n: number) {
-      return "$" + Math.round(n).toLocaleString();
-    }
-    function initials(n: string) {
-      return (
-        n.split(" ").slice(0, 2).map((w) => w[0] || "").join("").toUpperCase() || "VX"
-      );
-    }
-
-    function parseURL(raw: string) {
-      raw = raw.trim();
-      const p = [
-        /youtube\.com\/@([\w.-]+)/,
-        /youtube\.com\/c\/([\w.-]+)/,
-        /youtube\.com\/user\/([\w.-]+)/,
-        /youtube\.com\/channel\/(UC[\w-]+)/,
-      ];
-      for (const r of p) {
-        const m = raw.match(r);
-        if (m) return { type: m[1].startsWith("UC") ? "id" : "handle", value: m[1] };
-      }
-      if (/^UC[\w-]{22}$/.test(raw)) return { type: "id", value: raw };
-      if (raw.startsWith("@")) return { type: "handle", value: raw.slice(1) };
-      return { type: "handle", value: raw.replace(/^@/, "") };
-    }
-
     function setStatus(msg: string, loading = false) {
       const el = document.getElementById("status-msg");
       if (!el) return;
@@ -80,21 +45,10 @@ export default function ValuationClient() {
       setStatus("Fetching channel data...", true);
       (document.getElementById("fetch-btn") as HTMLButtonElement).disabled = true;
       try {
-        const parsed = parseURL(url);
-        let cid = parsed.value;
-        if (parsed.type !== "id") {
-          const r = await fetch(
-            `https://www.googleapis.com/youtube/v3/search?part=snippet&type=channel&q=${encodeURIComponent(parsed.value)}&maxResults=1&key=${API_KEY}`,
-          );
-          const d = await r.json();
-          if (d.error) throw new Error(d.error.message);
-          if (!d.items?.length) throw new Error("Channel not found — try the full URL.");
-          cid = d.items[0].snippet.channelId;
-        }
-        const r2 = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=${cid}&key=${API_KEY}`);
-        const d2 = await r2.json();
-        if (!d2.items?.length) throw new Error("Could not load channel data.");
-        renderCh(d2.items[0]);
+        const r = await fetch(`/api/youtube/channel-stats?url=${encodeURIComponent(url)}`);
+        const d = await r.json();
+        if (d.error) throw new Error(d.error);
+        renderCh(d, url);
         setStatus("");
       } catch (e) {
         setStatus("Error: " + (e as Error).message);
@@ -102,26 +56,20 @@ export default function ValuationClient() {
       (document.getElementById("fetch-btn") as HTMLButtonElement).disabled = false;
     }
 
-    function renderCh(ch: any) {
-      const s = ch.snippet,
-        st = ch.statistics;
-      const subs = parseInt(st.subscriberCount || 0),
-        vids = parseInt(st.videoCount || 0),
-        views = parseInt(st.viewCount || 0);
-      const avgV = vids > 0 ? Math.round(views / vids) : 0;
-      const eng = subs > 0 ? (avgV / subs) * 100 : 0;
-      const created = s.publishedAt ? new Date(s.publishedAt) : null;
-      const ageMonths = created ? Math.max(1, Math.round((Date.now() - created.getTime()) / (1000 * 60 * 60 * 24 * 30.44))) : 0;
-      const thumb = s.thumbnails?.high?.url || s.thumbnails?.default?.url;
-      document.getElementById("ch-name")!.textContent = s.title;
-      document.getElementById("ch-handle")!.textContent = s.customUrl || "";
-      if (thumb) document.getElementById("ch-avatar")!.innerHTML = `<img src="${thumb}" alt="">`;
-      else document.getElementById("ch-init")!.textContent = initials(s.title);
+    function renderCh(d: any, originalUrl: string) {
+      const subs = d.subscribers || 0;
+      const views = d.views || 0;
+      const eng = d.engagementPct || 0;
+      const ageMonths = d.ageMonths || 0;
+      document.getElementById("ch-name")!.textContent = d.name;
+      document.getElementById("ch-handle")!.textContent = d.handle || "";
+      if (d.thumbnail) document.getElementById("ch-avatar")!.innerHTML = `<img src="${d.thumbnail}" alt="">`;
+      else document.getElementById("ch-init")!.textContent = initials(d.name);
       document.getElementById("f-subs")!.textContent = fmt(subs);
       document.getElementById("f-views")!.textContent = fmt(views);
       document.getElementById("f-eng")!.textContent = eng.toFixed(1) + "%";
       document.getElementById("f-age")!.textContent = ageMonths >= 12 ? (ageMonths / 12).toFixed(1) + " yrs" : ageMonths + " mo";
-      _ch = { name: s.title, handle: s.customUrl || "", subs, vids, views, avgV, eng, ageMonths, url: (document.getElementById("url-input") as HTMLInputElement).value.trim() };
+      _ch = { name: d.name, handle: d.handle || "", subs, views, eng, ageMonths, url: originalUrl.trim() };
       document.getElementById("ch-panel")!.style.display = "block";
       setTimeout(() => document.getElementById("ch-panel")?.scrollIntoView({ behavior: "smooth", block: "nearest" }), 200);
     }
@@ -153,30 +101,17 @@ export default function ValuationClient() {
         return;
       }
       const r = calcVal();
-      try {
-        await fetch(SCRIPT_URL, {
-          method: "POST",
-          mode: "no-cors",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            type: "valuation_lead",
-            email,
-            channelName: _ch.name,
-            channelUrl: _ch.url,
-            subs: fmt(_ch.subs),
-            valLow: usd(r.low),
-            valHigh: usd(r.high),
-            tier: r.tierLabel,
-            niche: (document.getElementById("f-niche") as HTMLSelectElement).value,
-          }),
-        });
-        await fetch(SCRIPT_URL, {
-          method: "POST",
-          mode: "no-cors",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ type: "valuation_confirm", email, channelName: _ch.name, valLow: usd(r.low), valHigh: usd(r.high), tier: r.tierLabel, conf: r.conf }),
-        });
-      } catch {}
+      await submitValuationLead({
+        email,
+        channelName: _ch.name,
+        channelUrl: _ch.url,
+        subscribers: _ch.subs,
+        valuationLowUsd: r.low,
+        valuationHighUsd: r.high,
+        tier: r.tierLabel,
+        niche: (document.getElementById("f-niche") as HTMLSelectElement).value,
+        confidence: r.conf,
+      });
       showStep("step3");
       renderResult(r);
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -264,31 +199,22 @@ export default function ValuationClient() {
       const mono = (document.getElementById("s4-mono") as HTMLSelectElement).value;
       const rev = parseFloat((document.getElementById("f-rev") as HTMLInputElement).value) || 0;
       const priceFormatted = "$" + parseInt(price).toLocaleString();
-      const sellerEmail = contact.includes("@") && contact.includes(".") ? contact : "";
       const name = (document.getElementById("s4-name") as HTMLInputElement).value.trim();
-      const row = [
-        "",
-        _ch.name || "",
+      await submitListingAction({
+        channelName: _ch.name || "",
+        channelUrl: _ch.url || "",
         niche,
-        subniche,
-        fmt(_ch.subs),
-        rev ? "~$" + Math.round(rev).toLocaleString() + "/mo" : "—",
-        _ch.eng.toFixed(1) + "%",
-        mono,
-        _ch.ageMonths >= 12 ? (_ch.ageMonths / 12).toFixed(1) + " years" : _ch.ageMonths + " months",
-        "English",
-        priceFormatted,
-        "",
-        _ch.url || "",
-      ];
-      try {
-        await fetch(SCRIPT_URL, {
-          method: "POST",
-          mode: "no-cors",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ row, sellerEmail, sellerName: name || "Seller" }),
-        });
-      } catch {}
+        subNiche: subniche,
+        subscribers: _ch.subs,
+        monthlyRevenueUsd: rev || undefined,
+        engagementRate: _ch.eng,
+        monetization: mono,
+        accountAgeMonths: _ch.ageMonths,
+        language: "English",
+        askingPriceUsd: parseInt(price),
+        sellerContactName: name || "Seller",
+        sellerContactEmail: contact,
+      });
       const r = calcVal();
       document.getElementById("success-card")!.innerHTML = `
     <div class="sc-row"><span class="sc-label">Channel</span><span class="sc-val">${_ch.name}</span></div>

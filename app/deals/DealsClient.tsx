@@ -2,40 +2,27 @@
 
 import { useEffect } from "react";
 import "../deals.css";
+import { createClient } from "@/lib/supabase/client";
+import { fmt, usd } from "@/lib/format";
 
-const BUYER_CSV =
-  "https://docs.google.com/spreadsheets/d/e/2PACX-1vSI1IjqNXOzxRYu-339b0KMc_N-r2nHnvPy0xHM8B5_f9EJxCciMS_apZqI6Qf9_Rf4VH4jpaurvtZO/pub?gid=1998923427&single=true&output=csv";
-const DEAL_CSV =
-  "https://docs.google.com/spreadsheets/d/e/2PACX-1vSI1IjqNXOzxRYu-339b0KMc_N-r2nHnvPy0xHM8B5_f9EJxCciMS_apZqI6Qf9_Rf4VH4jpaurvtZO/pub?gid=1265722642&single=true&output=csv";
 const TG = "https://t.me/+uM8whHPwYFhjY2Y8";
 
-type Listing = { name: string; niche: string; subs: string; views: string; eng: string; mono: string; age: string; price: string; avail: string };
-type Deal = { channel: string; niche: string; subs: string; price: string; offer: string; stage: string; closed: string; date: string };
+type Listing = {
+  name: string;
+  niche: string;
+  subs: string;
+  views: string;
+  eng: string;
+  mono: string;
+  age: string;
+  price: string;
+  avail: string;
+};
+type Deal = { channel: string; niche: string; subs: string; price: string; stage: string; closed: string; date: string };
 
 export default function DealsClient() {
   useEffect(() => {
     let allListings: Listing[] = [];
-    let allDeals: Deal[] = [];
-
-    function parseCSV(text: string) {
-      const rows: string[][] = [];
-      for (const line of text.trim().split("\n")) {
-        const cols: string[] = [];
-        let cur = "",
-          inQ = false;
-        for (let i = 0; i < line.length; i++) {
-          const ch = line[i];
-          if (ch === '"') inQ = !inQ;
-          else if (ch === "," && !inQ) {
-            cols.push(cur.trim());
-            cur = "";
-          } else cur += ch;
-        }
-        cols.push(cur.trim());
-        rows.push(cols);
-      }
-      return rows;
-    }
 
     function stageClass(s: string) {
       const sl = (s || "").toLowerCase();
@@ -134,63 +121,55 @@ export default function DealsClient() {
     }
 
     async function loadData() {
+      const supabase = createClient();
       try {
-        const [br, dr] = await Promise.all([
-          fetch(BUYER_CSV + "&t=" + Date.now() + "&r=" + Math.random()),
-          fetch(DEAL_CSV + "&t=" + Date.now() + "&r=" + Math.random()),
+        const [listingsRes, dealsRes] = await Promise.all([
+          supabase
+            .from("listings")
+            .select("channel_name,niche,subscribers,monthly_views,engagement_rate,asking_price_usd,status")
+            .eq("status", "available")
+            .order("created_at", { ascending: false }),
+          supabase
+            .from("deals_public_pipeline")
+            .select("channel_name,niche,subscribers_snapshot,asking_price_usd,stage,closed_price_usd,close_date")
+            .order("created_at", { ascending: false }),
         ]);
-        const buyerRows = parseCSV(await br.text());
-        const dealRows = parseCSV(await dr.text());
+        if (listingsRes.error) throw listingsRes.error;
+        if (dealsRes.error) throw dealsRes.error;
 
-        const listings = (() => {
-          const hi = buyerRows.findIndex((r) => r[1] && r[1].trim() === "Channel Name");
-          const start = hi >= 0 ? hi + 1 : 7;
-          return buyerRows
-            .slice(start)
-            .map((r) => {
-              if (!r[1] || !r[1].trim()) return null;
-              const n = r[0] ? r[0].toString() : "";
-              const n2 = r[1] ? r[1].toString() : "";
-              if (n.match(/HOW|Express|Due|Deal|verify/i) || n2.match(/HOW|Express|Due|Deal|verify/i)) return null;
-              if (!r[2] && !r[11]) return null;
-              return r.length >= 11
-                ? { name: r[1], niche: r[2], subs: r[4], views: r[5], eng: r[6], mono: r[7], age: r[8], price: r[10], avail: r[11] || "" }
-                : null;
-            })
-            .filter((r): r is Listing => !!r)
-            .filter((r) => r.name && r.name.trim() && r.name !== "Channel Name");
-        })();
+        const listings: Listing[] = (listingsRes.data || []).map((r) => ({
+          name: r.channel_name,
+          niche: r.niche || "",
+          subs: fmt(r.subscribers),
+          views: fmt(r.monthly_views),
+          eng: r.engagement_rate != null ? `${r.engagement_rate}%` : "—",
+          mono: "",
+          age: "",
+          price: usd(r.asking_price_usd),
+          avail: "available",
+        }));
 
         allListings = listings;
         renderListings(listings);
 
-        const deals = dealRows
-          .slice(3)
-          .map((r) =>
-            r.length >= 6
-              ? {
-                  channel: (r[0] || "").trim(),
-                  niche: (r[1] || "").trim(),
-                  subs: (r[2] || "").trim(),
-                  price: (r[3] || "").trim(),
-                  offer: (r[4] || "").trim(),
-                  stage: (r[5] || "").trim(),
-                  closed: (r[6] || "").trim(),
-                  date: (r[7] || "").trim(),
-                }
-              : null,
-          )
-          .filter((r): r is Deal => !!r)
-          .filter((r) => r.channel);
-        allDeals = deals;
+        const deals: Deal[] = (dealsRes.data || []).map((d) => ({
+          channel: d.channel_name || "",
+          niche: d.niche || "",
+          subs: fmt(d.subscribers_snapshot),
+          price: usd(d.asking_price_usd),
+          stage: d.stage,
+          closed: d.stage === "closed" ? usd(d.closed_price_usd) : "",
+          date: d.close_date || "",
+        }));
         renderPipeline(deals);
 
-        const closed = deals.filter((d) => (d.stage || "").toLowerCase().includes("closed"));
-        const active = deals.filter((d) => !["closed", ""].includes((d.stage || "").toLowerCase()));
-        const vol = closed.reduce((s, d) => s + (parseFloat((d.closed || "").replace(/[^0-9.]/g, "")) || 0), 0);
-        const avail = listings.filter((r) => (r.avail || "").toLowerCase().includes("available")).length;
+        const closed = deals.filter((d) => d.stage === "closed");
+        const active = deals.filter((d) => d.stage !== "closed");
+        const vol = (dealsRes.data || [])
+          .filter((d) => d.stage === "closed")
+          .reduce((s, d) => s + (Number(d.closed_price_usd) || 0), 0);
 
-        document.getElementById("stat-listed")!.textContent = String(avail || "0");
+        document.getElementById("stat-listed")!.textContent = String(listings.length || "0");
         document.getElementById("stat-active")!.textContent = String(active.length || "0");
         document.getElementById("stat-closed")!.textContent = String(closed.length || "0");
         document.getElementById("stat-vol")!.textContent = vol ? "$" + Math.round(vol).toLocaleString() : "$0";
