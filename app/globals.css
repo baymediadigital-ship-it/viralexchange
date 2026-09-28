@@ -15,9 +15,25 @@
 html{scroll-behavior:smooth;}
 body{background:var(--bg);color:var(--fg);font-family:var(--font-sans),sans-serif;font-size:16px;line-height:1.6;overflow-x:hidden;}
 
-/* LIQUID GLASS (shared across all pages) */
-.lg{background:rgba(255,255,255,0.015);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);position:relative;overflow:hidden;}
-.lg::before{content:'';position:absolute;inset:0;border-radius:inherit;padding:1px;background:linear-gradient(180deg,rgba(255,255,255,0.28) 0%,rgba(255,255,255,0.06) 30%,rgba(255,255,255,0) 50%,rgba(255,255,255,0.06) 80%,rgba(255,255,255,0.18) 100%);-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;}
+/* SURFACE -- flat bordered card, not heavy glassmorphism. Kept the .lg
+   class name (used across every page) so this is a single-point change;
+   blur is reserved for the nav bar only, restored separately below. */
+.lg{background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.08);position:relative;}
+
+/* Nav keeps a real blur -- the one legitimate, common use of the effect. */
+nav{backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);}
+
+/* Emphasis treatment: an outlined box around the key phrase instead of
+   plain colored italic text -- used consistently across every h1/h2/h3. */
+h1 em,h2 em,h3 em{
+  font-style:normal;
+  color:var(--green);
+  border:1.5px solid var(--border2);
+  border-radius:8px;
+  padding:1px 12px;
+  display:inline-block;
+  line-height:1.2;
+}
 
 /* DOT GRID BG (shared) */
 .dot-grid{position:fixed;inset:0;background-image:radial-gradient(rgba(34,197,94,0.15) 1px,transparent 1px);background-size:32px 32px;pointer-events:none;z-index:0;mask-image:radial-gradient(ellipse 80% 80% at 50% 40%,black 30%,transparent 100%);}

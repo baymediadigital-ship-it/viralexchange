@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import "../valuation.css";
 import { fmt, usd, initials } from "@/lib/format";
 import { submitValuationLead } from "@/lib/actions/valuationLeads";
+import { IconClock, IconCheck } from "@/components/Icon";
 import { submitListing as submitListingAction } from "@/lib/actions/listings";
 
 const NM: Record<string, number> = { finance: 1.4, tech: 1.3, health: 1.25, education: 1.2, entertainment: 1.0, gaming: 0.95, lifestyle: 0.9, food: 0.9, other: 1.0 };
@@ -220,7 +221,7 @@ export default function ValuationClient() {
     <div class="sc-row"><span class="sc-label">Channel</span><span class="sc-val">${_ch.name}</span></div>
     <div class="sc-row"><span class="sc-label">Asking price</span><span class="sc-val green">${priceFormatted}</span></div>
     <div class="sc-row"><span class="sc-label">Estimated value</span><span class="sc-val green">${usd(r.low)} — ${usd(r.high)}</span></div>
-    <div class="sc-row"><span class="sc-label">Status</span><span class="sc-val">⏳ Pending verification</span></div>`;
+    <div class="sc-row"><span class="sc-label">Status</span><span class="sc-val">Pending verification</span></div>`;
       showStep("step-success");
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
@@ -445,7 +446,7 @@ export default function ValuationClient() {
         {/* STEP DQ */}
         <div className="step" id="step-dq">
           <div className="dq-wrap">
-            <div className="dq-ring">⏳</div>
+            <div className="dq-ring"><IconClock size={26} /></div>
             <div className="dq-t">Not quite ready yet.</div>
             <p className="dq-s">We only work with monetized channels — this ensures our buyers get quality, revenue-generating assets.</p>
             <div className="dq-tip">
@@ -549,7 +550,7 @@ export default function ValuationClient() {
         {/* SUCCESS */}
         <div className="step" id="step-success">
           <div className="success-wrap">
-            <div className="success-ring">✓</div>
+            <div className="success-ring"><IconCheck size={24} /></div>
             <div className="success-title">You&apos;re in the pipeline.</div>
             <p className="success-sub">Your channel has been submitted. Our team will verify it within 24 hours and reach out via your contact.</p>
             <div className="success-card" id="success-card"></div>

@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import "../acquire.css";
 import { submitAcquisitionApplication } from "@/lib/actions/acquisitionApplications";
+import { IconSearch, IconLock, IconTrendingUp, IconCheck } from "@/components/Icon";
 
 export default function AcquireClient() {
   useEffect(() => {
@@ -197,7 +198,7 @@ export default function AcquireClient() {
           <div className="offer-grid">
             <div className="offer-card">
               <div className="oc-num">01</div>
-              <div className="oc-icon">🔍</div>
+              <div className="oc-icon"><IconSearch /></div>
               <div className="oc-title">We source the channel</div>
               <div className="oc-desc">
                 We find a verified, monetized channel that matches what you&apos;re looking for. Revenue history, engagement,
@@ -206,7 +207,7 @@ export default function AcquireClient() {
             </div>
             <div className="offer-card">
               <div className="oc-num">02</div>
-              <div className="oc-icon">🔒</div>
+              <div className="oc-icon"><IconLock /></div>
               <div className="oc-title">You acquire it safely</div>
               <div className="oc-desc">
                 Every acquisition closes through secure escrow. Your money doesn&apos;t move until the channel transfer is
@@ -215,7 +216,7 @@ export default function AcquireClient() {
             </div>
             <div className="offer-card">
               <div className="oc-num">03</div>
-              <div className="oc-icon">📈</div>
+              <div className="oc-icon"><IconTrendingUp /></div>
               <div className="oc-title">A production team scales it</div>
               <div className="oc-desc">
                 We connect you with a production agency that knows how to grow monetized channels. Content goes out consistently.
@@ -424,7 +425,7 @@ export default function AcquireClient() {
             </div>
 
             <div id="success-screen">
-              <div className="success-ring">✓</div>
+              <div className="success-ring"><IconCheck size={24} /></div>
               <h3>Application received.</h3>
               <p>
                 We&apos;ll review it within 24 hours and reach out via your preferred contact. While you wait, join our private

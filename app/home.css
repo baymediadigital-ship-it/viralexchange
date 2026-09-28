@@ -68,8 +68,7 @@
 .home-page .proc-icon{font-size:24px;margin-bottom:14px;}
 .home-page .proc-title{font-size:15px;font-weight:800;color:var(--fg);margin-bottom:8px;}
 .home-page .proc-desc{font-size:12px;color:var(--fg-sub);line-height:1.6;}
-.home-page .proc-time{display:inline-flex;align-items:center;gap:5px;margin-top:14px;font-size:11px;font-weight:600;color:var(--green);font-family:var(--font-mono),monospace;}
-.home-page .proc-time::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--green);}
+.home-page .proc-time{display:inline-flex;align-items:center;gap:6px;margin-top:16px;font-size:11px;font-weight:600;color:var(--green);font-family:var(--font-mono),monospace;background:var(--green-dim);border:1px solid rgba(34,197,94,0.2);border-radius:100px;padding:5px 12px 5px 10px;}
 
 /* CLOSED DEALS */
 .home-page .deals-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:48px;}
@@ -161,7 +160,7 @@
 .home-page .submit-btn:hover{background:var(--green2);transform:translateY(-1px);}
 .home-page #fetched-panel{display:none;}
 .home-page #success-screen{display:none;text-align:center;padding:32px 0;}
-.home-page .success-ring{width:68px;height:68px;border-radius:50%;background:rgba(34,197,94,0.08);border:2px solid var(--green);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:26px;}
+.home-page .success-ring{width:68px;height:68px;border-radius:50%;background:rgba(34,197,94,0.08);border:2px solid var(--green);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;color:var(--green);}
 .home-page #success-screen h3{font-size:22px;font-weight:900;color:var(--green);margin-bottom:8px;letter-spacing:-0.02em;}
 .home-page #success-screen p{color:var(--fg-sub);font-size:14px;margin-bottom:22px;line-height:1.6;}
 .home-page .btn-ghost{background:rgba(255,255,255,0.05);color:var(--fg-sub);border:1px solid var(--border2);border-radius:12px;padding:11px 20px;font-family:var(--font-sans),sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;}

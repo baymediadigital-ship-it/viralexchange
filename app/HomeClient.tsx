@@ -5,6 +5,7 @@ import "./home.css";
 import { fmt, initials } from "@/lib/format";
 import { createClient } from "@/lib/supabase/client";
 import { submitListing as submitListingAction } from "@/lib/actions/listings";
+import { IconDocument, IconCheckCircle, IconHandshake, IconBanknote, IconLock, IconBolt, IconShieldCheck, IconCheck, IconClock } from "@/components/Icon";
 
 export default function HomeClient() {
   useEffect(() => {
@@ -390,40 +391,40 @@ export default function HomeClient() {
           <div className="process-grid">
             <div className="proc-card lg">
               <div className="proc-num">STEP 01</div>
-              <div className="proc-icon">📋</div>
+              <div className="proc-icon"><IconDocument /></div>
               <div className="proc-title">Submit your channel</div>
               <div className="proc-desc">
                 Paste your YouTube link and our tool auto-fetches all stats instantly. Fill in your asking price and we take it
                 from there.
               </div>
-              <div className="proc-time">Under 2 minutes</div>
+              <div className="proc-time"><IconClock size={12} />Under 2 minutes</div>
             </div>
             <div className="proc-card lg">
               <div className="proc-num">STEP 02</div>
-              <div className="proc-icon">✅</div>
+              <div className="proc-icon"><IconCheckCircle /></div>
               <div className="proc-title">We verify &amp; list</div>
               <div className="proc-desc">
                 Our team reviews your channel within 24 hours. Once verified, it goes live to our network of active buyers
                 immediately.
               </div>
-              <div className="proc-time">Within 24 hours</div>
+              <div className="proc-time"><IconClock size={12} />Within 24 hours</div>
             </div>
             <div className="proc-card lg">
               <div className="proc-num">STEP 03</div>
-              <div className="proc-icon">🤝</div>
+              <div className="proc-icon"><IconHandshake /></div>
               <div className="proc-title">Negotiate &amp; agree</div>
               <div className="proc-desc">
                 We handle all buyer inquiries and negotiations on your behalf. You only hear from us when there&apos;s an offer
                 worth considering.
               </div>
-              <div className="proc-time">Within 7 days</div>
+              <div className="proc-time"><IconClock size={12} />Within 7 days</div>
             </div>
             <div className="proc-card lg">
               <div className="proc-num">STEP 04</div>
-              <div className="proc-icon">💰</div>
+              <div className="proc-icon"><IconBanknote /></div>
               <div className="proc-title">Close via escrow</div>
               <div className="proc-desc">All deals close through secure escrow. Funds held safely until the channel transfer is complete.</div>
-              <div className="proc-time">Within 48 hours</div>
+              <div className="proc-time"><IconClock size={12} />Within 48 hours</div>
             </div>
           </div>
         </div>
@@ -447,7 +448,7 @@ export default function HomeClient() {
           <p className="section-sub">Every feature designed to protect your channel, your privacy, and your payout.</p>
           <div className="feat-grid">
             <div className="feat-card lg">
-              <div className="feat-icon">🔒</div>
+              <div className="feat-icon"><IconLock /></div>
               <div className="feat-title">Privacy First</div>
               <div className="feat-desc">
                 Your channel name and link stay completely private. Buyers see stats only until they are verified serious and
@@ -458,7 +459,7 @@ export default function HomeClient() {
               <div className="feat-stat-lbl">private until deal stage</div>
             </div>
             <div className="feat-card lg">
-              <div className="feat-icon">⚡</div>
+              <div className="feat-icon"><IconBolt /></div>
               <div className="feat-title">Instant Valuation</div>
               <div className="feat-desc">
                 Get a data-driven estimate in 60 seconds based on real market multiples — subscribers, engagement, niche, and
@@ -469,7 +470,7 @@ export default function HomeClient() {
               <div className="feat-stat-lbl">to get your valuation</div>
             </div>
             <div className="feat-card lg">
-              <div className="feat-icon">🛡️</div>
+              <div className="feat-icon"><IconShieldCheck /></div>
               <div className="feat-title">Secure Escrow</div>
               <div className="feat-desc">
                 Every deal closes through verified escrow. Funds are held safely by a neutral third party until the channel
@@ -537,65 +538,6 @@ export default function HomeClient() {
         </div>
       </div>
 
-      {/* TESTIMONIALS */}
-      <div className="section">
-        <div className="container">
-          <div style={{ textAlign: "center", marginBottom: 48 }}>
-            <div className="section-tag lg" style={{ display: "inline-flex" }}>
-              Testimonials <span className="st-accent">&nbsp;·&nbsp; From sellers</span>
-            </div>
-            <h2 style={{ marginTop: 16 }}>
-              Trusted by creators
-              <br />
-              <em>across every niche</em>
-            </h2>
-          </div>
-          <div className="test-grid">
-            <div className="test-card lg">
-              <div className="test-quote">
-                &quot;ViralExchange got my channel in front of serious buyers within 48 hours. Closed at asking price. The escrow
-                process was completely seamless.&quot;
-              </div>
-              <div className="test-div"></div>
-              <div className="test-author">
-                <div className="test-av">L</div>
-                <div>
-                  <div className="test-name">Leohavemercy</div>
-                  <div className="test-role">Finance &nbsp;·&nbsp; 5K subs &nbsp;·&nbsp; Sold for $8,000</div>
-                </div>
-              </div>
-            </div>
-            <div className="test-card lg mid">
-              <div className="test-quote">
-                &quot;I had no idea my channel was worth $230K. The free valuation tool changed everything. Listed on Tuesday, had
-                an offer by Thursday.&quot;
-              </div>
-              <div className="test-div"></div>
-              <div className="test-author">
-                <div className="test-av">K</div>
-                <div>
-                  <div className="test-name">Kaz</div>
-                  <div className="test-role">Celebrity Gossip &nbsp;·&nbsp; 284K subs</div>
-                </div>
-              </div>
-            </div>
-            <div className="test-card lg">
-              <div className="test-quote">
-                &quot;The privacy-first approach is what sold me. My audience never knew I was selling until the new owner took
-                over. Flawless handover.&quot;
-              </div>
-              <div className="test-div"></div>
-              <div className="test-author">
-                <div className="test-av">V</div>
-                <div>
-                  <div className="test-name">Vinesh</div>
-                  <div className="test-role">Cartoon Recaps &nbsp;·&nbsp; 47.5K subs &nbsp;·&nbsp; Sold for $12,000</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* BUYERS LOUNGE */}
       <div className="section">
@@ -792,7 +734,7 @@ export default function HomeClient() {
                 </div>
               </div>
               <div id="success-screen">
-                <div className="success-ring">✓</div>
+                <div className="success-ring"><IconCheck size={24} /></div>
                 <h3>You&apos;re in the pipeline.</h3>
                 <p>We&apos;ve received your channel and will be in touch within 24 hours via your preferred contact.</p>
                 <button className="btn-ghost" onClick={() => (window as any).resetAll()}>

@@ -50,7 +50,9 @@ export default function DealsClient() {
         .map((r) => {
           const avail = (r.avail || "").toLowerCase().includes("available");
           const sClass = avail ? "status-available" : "status-pending";
-          const sLabel = avail ? "🟢 Available" : "⏳ Pending";
+          const sLabel = avail
+            ? '<span class="status-dot"></span>Available'
+            : '<span class="status-dot pending"></span>Pending';
           const niche = (r.niche || "Channel").split("/")[0].trim();
           return `<div class="lt-row" data-niche="${(r.niche || "").toLowerCase()}">
       <div>
