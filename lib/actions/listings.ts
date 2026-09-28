@@ -24,7 +24,12 @@ export async function submitListing(input: SubmitListingInput) {
   if (!input.channelUrl?.trim()) return { error: "Missing channel URL." };
 
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   const { error } = await supabase.from("listings").insert({
+    seller_id: user?.id ?? null,
     channel_name: input.channelName.trim(),
     channel_url: input.channelUrl.trim(),
     niche: input.niche?.trim() || "Uncategorized",

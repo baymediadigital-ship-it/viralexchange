@@ -53,27 +53,34 @@
 .deals-page .search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--fg-hint);pointer-events:none;}
 
 /* LISTINGS */
-.deals-page .listings-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:48px;}
-.deals-page .listing-card{border-radius:22px;padding:24px;position:relative;overflow:hidden;transition:all 0.25s;cursor:default;}
-.deals-page .listing-card:hover{transform:translateY(-3px);background:rgba(255,255,255,0.03);}
-.deals-page .listing-card::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--green),transparent);opacity:0.3;}
-.deals-page .lc-status{position:absolute;top:18px;right:18px;font-family:var(--font-mono),monospace;font-size:9px;font-weight:700;padding:3px 8px;border-radius:6px;letter-spacing:0.08em;}
 .deals-page .status-available{background:rgba(34,197,94,0.1);color:var(--green);border:1px solid rgba(34,197,94,0.2);}
-.deals-page .status-negotiating{background:rgba(245,158,11,0.1);color:var(--amber);border:1px solid rgba(245,158,11,0.2);}
-.deals-page .status-closed{background:rgba(96,165,250,0.1);color:var(--blue);border:1px solid rgba(96,165,250,0.2);}
 .deals-page .status-pending{background:rgba(255,255,255,0.05);color:var(--fg-hint);border:1px solid var(--border);}
-.deals-page .lc-niche{font-size:10px;font-weight:700;color:var(--fg-hint);text-transform:uppercase;letter-spacing:0.08em;font-family:var(--font-mono),monospace;margin-bottom:6px;margin-right:60px;}
-.deals-page .lc-name{font-size:18px;font-weight:800;color:var(--fg);margin-bottom:18px;letter-spacing:-0.01em;line-height:1.2;}
-.deals-page .lc-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
-.deals-page .lcs-box{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;padding:10px;}
-.deals-page .lcs-label{font-size:9px;color:var(--fg-hint);font-weight:700;text-transform:uppercase;letter-spacing:0.06em;font-family:var(--font-mono),monospace;margin-bottom:3px;}
-.deals-page .lcs-val{font-size:14px;font-weight:700;font-family:var(--font-mono),monospace;color:var(--fg-sub);}
-.deals-page .lcs-val.price{color:var(--green);}
-.deals-page .lcs-val.sold{color:var(--blue);}
-.deals-page .lc-interest{width:100%;background:var(--green);color:#050805;border:none;border-radius:10px;padding:10px;font-family:var(--font-sans),sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:6px;}
-.deals-page .lc-interest:hover{background:var(--green2);}
-.deals-page .lc-tg{width:100%;background:transparent;color:var(--fg-sub);border:1px solid var(--border2);border-radius:10px;padding:9px;font-family:var(--font-sans),sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:6px;}
-.deals-page .lc-tg:hover{color:var(--fg);border-color:rgba(34,197,94,0.3);}
+
+/* LISTINGS TABLE */
+.deals-page .listings-table-wrap{overflow:hidden;border-radius:20px;margin-bottom:48px;}
+.deals-page .lt-header{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 0.9fr 1.3fr;gap:12px;padding:12px 20px;border-bottom:1px solid var(--border);}
+.deals-page .lt-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 0.9fr 1.3fr;gap:12px;padding:16px 20px;border-bottom:1px solid var(--border);transition:background 0.2s;align-items:center;}
+.deals-page .lt-row:last-child{border-bottom:none;}
+.deals-page .lt-row:hover{background:rgba(255,255,255,0.02);}
+.deals-page .lt-name-blurred{font-size:14px;font-weight:700;color:var(--fg);filter:blur(4px);user-select:none;}
+.deals-page .lt-niche{font-size:11px;color:var(--fg-hint);margin-top:2px;}
+.deals-page .lt-cell{font-size:13px;color:var(--fg-sub);font-family:var(--font-mono),monospace;}
+.deals-page .lt-price{color:var(--green);font-weight:700;font-size:15px;}
+.deals-page .lt-status{font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;font-family:var(--font-mono),monospace;display:inline-flex;align-items:center;gap:5px;width:fit-content;}
+.deals-page .lc-interest-sm{background:var(--green);color:#050805;border:none;border-radius:8px;padding:8px 14px;font-family:var(--font-sans),sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.2s;white-space:nowrap;display:inline-flex;align-items:center;gap:6px;}
+.deals-page .lc-interest-sm:hover{background:var(--green2);}
+.deals-page .filter-tab .fc{opacity:0.6;margin-left:2px;}
+
+@media(max-width:768px){
+  .deals-page .lt-header{display:none;}
+  .deals-page .lt-row{grid-template-columns:1fr 1fr;row-gap:10px;}
+  .deals-page .lt-row>*:nth-child(3),.deals-page .lt-row>*:nth-child(5){display:none;}
+  .deals-page .lt-row>*:nth-child(1){grid-column:1/-1;}
+  .deals-page .lt-row>*:nth-child(2){text-align:left;}
+  .deals-page .lt-row>*:nth-child(4){text-align:right;}
+  .deals-page .lt-row>*:nth-child(6){grid-column:1/-1;}
+  .deals-page .lc-interest-sm{width:100%;justify-content:center;}
+}
 
 /* PIPELINE TABLE */
 .deals-page .pipeline-wrap{overflow:hidden;border-radius:20px;margin-bottom:48px;}
@@ -108,10 +115,6 @@
 .deals-page .footer-links a:hover{color:var(--green);}
 
 .deals-page .empty{text-align:center;padding:60px 20px;color:var(--fg-hint);font-family:var(--font-mono),monospace;font-size:12px;grid-column:1/-1;}
-.deals-page .lc-name-wrap{display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap;}
-.deals-page .lc-name-blurred{font-size:18px;font-weight:800;color:var(--fg);letter-spacing:-0.01em;line-height:1.2;filter:blur(5px);user-select:none;flex:1;}
-.deals-page .lc-lock-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.15);border-radius:8px;padding:4px 10px;font-size:10px;font-weight:700;color:var(--fg-hint);white-space:nowrap;flex-shrink:0;}
-.deals-page .lc-privacy-note{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--fg-hint);justify-content:center;padding-top:2px;}
 .deals-page .loading{animation:pulse 1.5s infinite;}
 
 @media(max-width:768px){

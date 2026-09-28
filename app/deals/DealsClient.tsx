@@ -12,9 +12,6 @@ type Listing = {
   niche: string;
   subs: string;
   views: string;
-  eng: string;
-  mono: string;
-  age: string;
   price: string;
   avail: string;
 };
@@ -43,47 +40,46 @@ export default function DealsClient() {
     }
 
     function renderListings(items: Listing[]) {
-      const grid = document.getElementById("listings-grid");
-      if (!grid) return;
+      const body = document.getElementById("listings-table-body");
+      if (!body) return;
       if (!items.length) {
-        grid.innerHTML = '<div class="empty">No listings match your filter</div>';
+        body.innerHTML = '<div class="empty">No listings match your filter</div>';
         return;
       }
-      grid.innerHTML = items
+      body.innerHTML = items
         .map((r) => {
           const avail = (r.avail || "").toLowerCase().includes("available");
           const sClass = avail ? "status-available" : "status-pending";
           const sLabel = avail ? "🟢 Available" : "⏳ Pending";
           const niche = (r.niche || "Channel").split("/")[0].trim();
-          return `<div class="listing-card lg" data-niche="${(r.niche || "").toLowerCase()}">
-      <div class="lc-status ${sClass}">${sLabel}</div>
-      <div class="lc-niche">${r.niche || "—"}</div>
-      <div class="lc-name-wrap">
-        <div class="lc-name-blurred">Verified ${niche} Channel</div>
-        <div class="lc-lock-badge">
-          <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="8" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M5 7V5a3 3 0 016 0v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-          NDA required
-        </div>
+          return `<div class="lt-row" data-niche="${(r.niche || "").toLowerCase()}">
+      <div>
+        <div class="lt-name-blurred">Verified ${niche} Channel</div>
+        <div class="lt-niche">${r.niche || "—"}</div>
       </div>
-      <div class="lc-stats">
-        <div class="lcs-box"><div class="lcs-label">Subscribers</div><div class="lcs-val">${r.subs || "—"}</div></div>
-        <div class="lcs-box"><div class="lcs-label">Monthly views</div><div class="lcs-val">${r.views || "—"}</div></div>
-        <div class="lcs-box"><div class="lcs-label">Engagement</div><div class="lcs-val">${r.eng || "—"}</div></div>
-        <div class="lcs-box"><div class="lcs-label">Asking price</div><div class="lcs-val price">${r.price || "—"}</div></div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:8px;">
-        <button class="lc-interest" onclick="window.open('${TG}','_blank')">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.941z"/></svg>
+      <div class="lt-cell">${r.subs || "—"}</div>
+      <div class="lt-cell">${r.views || "—"}</div>
+      <div class="lt-cell lt-price">${r.price || "—"}</div>
+      <div class="lt-status ${sClass}">${sLabel}</div>
+      <div>
+        <button class="lc-interest-sm" onclick="window.open('${TG}','_blank')">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.941z"/></svg>
           Express interest
         </button>
-        <div class="lc-privacy-note">
-          <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="8" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M5 7V5a3 3 0 016 0v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-          Channel name revealed after NDA signing
-        </div>
       </div>
     </div>`;
         })
         .join("");
+    }
+
+    function updateFilterCounts(items: Listing[]) {
+      const niches = ["all", "finance", "tech", "health", "gaming", "lifestyle"];
+      niches.forEach((n) => {
+        const el = document.getElementById(`filter-count-${n}`);
+        if (!el) return;
+        const count = n === "all" ? items.length : items.filter((r) => (r.niche || "").toLowerCase().includes(n)).length;
+        el.textContent = `(${count})`;
+      });
     }
 
     function filterListings(niche: string, el: HTMLElement) {
@@ -126,7 +122,7 @@ export default function DealsClient() {
         const [listingsRes, dealsRes] = await Promise.all([
           supabase
             .from("listings")
-            .select("channel_name,niche,subscribers,monthly_views,engagement_rate,asking_price_usd,status")
+            .select("channel_name,niche,subscribers,monthly_views,asking_price_usd,status")
             .eq("status", "available")
             .order("created_at", { ascending: false }),
           supabase
@@ -142,15 +138,13 @@ export default function DealsClient() {
           niche: r.niche || "",
           subs: fmt(r.subscribers),
           views: fmt(r.monthly_views),
-          eng: r.engagement_rate != null ? `${r.engagement_rate}%` : "—",
-          mono: "",
-          age: "",
           price: usd(r.asking_price_usd),
           avail: "available",
         }));
 
         allListings = listings;
         renderListings(listings);
+        updateFilterCounts(listings);
 
         const deals: Deal[] = (dealsRes.data || []).map((d) => ({
           channel: d.channel_name || "",
@@ -175,7 +169,7 @@ export default function DealsClient() {
         document.getElementById("stat-vol")!.textContent = vol ? "$" + Math.round(vol).toLocaleString() : "$0";
       } catch (err) {
         console.error("loadData error:", err);
-        const grid = document.getElementById("listings-grid");
+        const grid = document.getElementById("listings-table-body");
         const body = document.getElementById("pipeline-body");
         if (grid) grid.innerHTML = '<div class="empty">Failed to load listings. Please refresh.</div>';
         if (body) body.innerHTML = '<div class="empty">Failed to load deals.</div>';
@@ -270,22 +264,22 @@ export default function DealsClient() {
           <div className="filters">
             <div className="filter-tabs">
               <div className="filter-tab on" onClick={(e) => (window as any).filterListings("all", e.currentTarget)}>
-                All niches
+                All niches <span className="fc" id="filter-count-all"></span>
               </div>
               <div className="filter-tab" onClick={(e) => (window as any).filterListings("finance", e.currentTarget)}>
-                Finance
+                Finance <span className="fc" id="filter-count-finance"></span>
               </div>
               <div className="filter-tab" onClick={(e) => (window as any).filterListings("tech", e.currentTarget)}>
-                Tech
+                Tech <span className="fc" id="filter-count-tech"></span>
               </div>
               <div className="filter-tab" onClick={(e) => (window as any).filterListings("health", e.currentTarget)}>
-                Health
+                Health <span className="fc" id="filter-count-health"></span>
               </div>
               <div className="filter-tab" onClick={(e) => (window as any).filterListings("gaming", e.currentTarget)}>
-                Gaming
+                Gaming <span className="fc" id="filter-count-gaming"></span>
               </div>
               <div className="filter-tab" onClick={(e) => (window as any).filterListings("lifestyle", e.currentTarget)}>
-                Lifestyle
+                Lifestyle <span className="fc" id="filter-count-lifestyle"></span>
               </div>
             </div>
             <div className="search-wrap">
@@ -301,8 +295,18 @@ export default function DealsClient() {
               />
             </div>
           </div>
-          <div className="listings-grid" id="listings-grid">
-            <div className="empty loading">Loading listings...</div>
+          <div className="listings-table-wrap lg">
+            <div className="lt-header">
+              <div className="ph-cell">Channel</div>
+              <div className="ph-cell">Subscribers</div>
+              <div className="ph-cell">Monthly Views</div>
+              <div className="ph-cell">Asking Price</div>
+              <div className="ph-cell">Status</div>
+              <div className="ph-cell"></div>
+            </div>
+            <div id="listings-table-body">
+              <div className="empty loading">Loading listings...</div>
+            </div>
           </div>
 
           {/* DEAL TRACKER */}

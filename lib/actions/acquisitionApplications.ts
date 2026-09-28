@@ -28,7 +28,12 @@ export async function submitAcquisitionApplication(input: SubmitAcquisitionAppli
   if (!input.experience?.trim()) return { error: "Please select your experience level." };
 
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   const { error } = await supabase.from("acquisition_applications").insert({
+    applicant_id: user?.id ?? null,
     name: input.name.trim(),
     email: input.email.trim(),
     contact: input.contact?.trim() || null,
