@@ -2,5 +2,14 @@
   command = "npm run build"
   publish = ".next"
 
+[build.environment]
+  # YOUTUBE_API_KEY is marked "secret" in Netlify (correctly -- it must never
+  # reach the browser). But it legitimately needs to exist inside the
+  # server-side function bundle for app/api/youtube/channel-stats/route.ts to
+  # read it at runtime -- that's not a leak, it's how server env vars work.
+  # Without this, Netlify's secret scanner flags its own presence in that
+  # server bundle as a false-positive "exposed secret" and fails every build.
+  SECRETS_SCAN_OMIT_KEYS = "YOUTUBE_API_KEY"
+
 [[plugins]]
   package = "@netlify/plugin-nextjs"
