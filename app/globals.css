@@ -54,6 +54,10 @@
 @theme {
   --color-vx-blue: #255ed3;
   --color-vx-blue-hover: #1d4fb8;
+  --color-vx-blue-deep: #1a47b8;
+  --color-vx-blue-bright: #3b78ec;
+  --color-vx-sky: #7fb2ff;
+  --color-vx-sky-soft: #e6efff;
   --color-vx-tint: #eef3fc;
   --color-vx-tint-strong: #dde7f9;
   --color-vx-ink: #101828;

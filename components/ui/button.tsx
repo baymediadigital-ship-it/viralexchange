@@ -18,7 +18,9 @@ const buttonCva = cva(
           "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
         link: "text-primary underline-offset-4 hover:underline",
         brand:
-          "bg-vx-blue text-white shadow-vx-cta hover:bg-vx-blue-hover focus-visible:border-transparent focus-visible:ring-vx-blue/30",
+          "bg-linear-to-b from-vx-blue-bright to-vx-blue text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_10px_24px_-10px_rgba(37,94,211,0.65)] hover:from-vx-blue hover:to-vx-blue-deep focus-visible:border-transparent focus-visible:ring-vx-blue/30",
+        light:
+          "bg-white text-vx-blue shadow-[0_10px_24px_-12px_rgba(10,20,60,0.45)] hover:bg-vx-sky-soft focus-visible:ring-white/40",
         brandOutline:
           "border-vx-line bg-white text-vx-ink hover:border-vx-faint/60 hover:bg-vx-subtle focus-visible:border-vx-blue focus-visible:ring-vx-blue/15",
       },

@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { GradientText } from "./Decor";
 
 export function Eyebrow({ label, detail, className }: { label: string; detail: string; className?: string }) {
   return (
@@ -33,7 +34,7 @@ export function SectionHeader({
     <div className="mx-auto mb-12 flex max-w-2xl flex-col items-center text-center">
       <Eyebrow label={eyebrow} detail={detail} />
       <h2 className="mt-5 text-[32px] leading-[1.12] font-extrabold tracking-[-0.025em] text-balance text-vx-ink sm:text-[44px]">
-        {title} <span className="text-vx-blue">{highlight}</span>
+        {title} <GradientText>{highlight}</GradientText>
       </h2>
       {sub && <p className="mt-4 max-w-xl text-[16px] leading-relaxed text-pretty text-vx-body">{sub}</p>}
     </div>
