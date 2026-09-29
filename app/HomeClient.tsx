@@ -75,7 +75,7 @@ function DealShowcase({ deal }: { deal: Deal | null }) {
     <div className="relative mx-auto w-full max-w-[420px]">
       <div aria-hidden className="absolute -inset-10 rounded-full bg-[radial-gradient(closest-side,rgba(91,141,239,0.35),transparent)] blur-2xl" />
 
-      <div className="relative overflow-hidden rounded-[28px] bg-white shadow-[0_40px_80px_-30px_rgba(26,71,184,0.45)] ring-1 ring-vx-blue/10">
+      <div className="relative overflow-hidden rounded-[28px] bg-vx-surface shadow-[0_40px_80px_-30px_rgba(26,71,184,0.45)] ring-1 ring-vx-blue/10">
         <div className="relative h-28 overflow-hidden bg-linear-to-br from-vx-blue-deep via-vx-blue-bright to-vx-sky">
           <div aria-hidden className="absolute -top-16 -right-10 size-56 rounded-full border border-white/25" />
           <div aria-hidden className="absolute -top-8 -right-2 size-40 rounded-full border border-white/20" />
@@ -86,7 +86,7 @@ function DealShowcase({ deal }: { deal: Deal | null }) {
         </div>
 
         <div className="px-6 pb-6">
-          <div className="relative -mt-8 flex size-16 items-center justify-center rounded-2xl bg-white text-[24px] font-extrabold text-vx-blue shadow-[0_10px_24px_-10px_rgba(16,24,40,0.35)] ring-4 ring-white">
+          <div className="relative -mt-8 flex size-16 items-center justify-center rounded-2xl bg-vx-surface text-[24px] font-extrabold text-vx-blue shadow-[0_10px_24px_-10px_rgba(16,24,40,0.35)] ring-4 ring-vx-surface">
             {deal?.channel_name?.trim().charAt(0).toUpperCase() ?? ""}
           </div>
           <div className="mt-4 text-[12px] font-semibold tracking-[0.06em] text-vx-blue uppercase">{deal?.niche || " "}</div>
@@ -109,7 +109,7 @@ function DealShowcase({ deal }: { deal: Deal | null }) {
             {DEAL_STEPS.map((s, i) => (
               <li key={s} className="relative flex flex-col items-center text-center">
                 {i > 0 && <span aria-hidden className="absolute top-3 right-1/2 h-0.5 w-full bg-linear-to-r from-vx-blue-bright to-vx-blue" />}
-                <span className="relative flex size-6 items-center justify-center rounded-full bg-linear-to-b from-vx-blue-bright to-vx-blue text-white ring-4 ring-white">
+                <span className="relative flex size-6 items-center justify-center rounded-full bg-linear-to-b from-vx-blue-bright to-vx-blue text-white ring-4 ring-vx-surface">
                   <IconCheck size={12} />
                 </span>
                 <span className="mt-2 text-[11px] leading-tight font-medium text-vx-muted">{s}</span>
@@ -119,13 +119,13 @@ function DealShowcase({ deal }: { deal: Deal | null }) {
         </div>
       </div>
 
-      <div className="absolute -top-6 -left-10 hidden items-center gap-2 rounded-2xl bg-white px-3.5 py-2.5 text-[13px] font-semibold text-vx-ink shadow-vx-float ring-1 ring-vx-line sm:flex">
+      <div className="absolute -top-6 -left-10 hidden items-center gap-2 rounded-2xl bg-vx-surface px-3.5 py-2.5 text-[13px] font-semibold text-vx-ink shadow-vx-float ring-1 ring-vx-line sm:flex">
         <span className="flex size-7 items-center justify-center rounded-full bg-vx-sky-soft text-vx-blue">
           <IconShieldCheck size={14} />
         </span>
         Escrow protected
       </div>
-      <div className="absolute -right-8 -bottom-8 hidden items-center gap-2 rounded-2xl bg-white px-3.5 py-2.5 text-[13px] font-semibold text-vx-ink shadow-vx-float ring-1 ring-vx-line sm:flex">
+      <div className="absolute -right-8 -bottom-8 hidden items-center gap-2 rounded-2xl bg-vx-surface px-3.5 py-2.5 text-[13px] font-semibold text-vx-ink shadow-vx-float ring-1 ring-vx-line sm:flex">
         <span className="flex size-7 items-center justify-center rounded-full bg-vx-green-bg text-vx-green">
           <IconBanknote size={14} />
         </span>
@@ -175,9 +175,9 @@ export default function HomeClient() {
       <SiteNav />
 
       {/* HERO */}
-      <header className="relative overflow-hidden bg-linear-to-b from-[#e3edff] via-[#f2f6ff] to-vx-canvas">
-        <div aria-hidden className="pointer-events-none absolute -top-40 -left-40 size-[560px] rounded-full bg-[#b9d2ff]/50 blur-3xl" />
-        <div aria-hidden className="pointer-events-none absolute -top-20 right-[-10%] size-[520px] rounded-full bg-[#cfe0ff]/70 blur-3xl" />
+      <header className="relative overflow-hidden bg-linear-to-b from-vx-hero-1 via-vx-hero-2 to-vx-canvas">
+        <div aria-hidden className="pointer-events-none absolute -top-40 -left-40 size-[560px] rounded-full bg-vx-glow-1 blur-3xl" />
+        <div aria-hidden className="pointer-events-none absolute -top-20 right-[-10%] size-[520px] rounded-full bg-vx-glow-2 blur-3xl" />
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(37,94,211,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(37,94,211,0.06)_1px,transparent_1px)] bg-size-[56px_56px] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_0%,black,transparent)]"
@@ -185,7 +185,7 @@ export default function HomeClient() {
 
         <div className="relative mx-auto grid max-w-6xl items-center gap-16 px-5 pt-16 pb-20 sm:px-6 sm:pt-20 lg:grid-cols-[1.1fr_0.9fr] lg:gap-12 lg:pt-24 lg:pb-28">
           <div className="text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 rounded-full bg-white/80 py-1.5 pr-3.5 pl-1.5 text-[13px] font-semibold text-vx-body shadow-[0_1px_2px_rgba(16,24,40,0.06)] ring-1 ring-vx-blue/10 backdrop-blur">
+            <div className="inline-flex items-center gap-2 rounded-full bg-vx-surface/80 py-1.5 pr-3.5 pl-1.5 text-[13px] font-semibold text-vx-body shadow-[0_1px_2px_rgba(16,24,40,0.06)] ring-1 ring-vx-blue/10 backdrop-blur">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-vx-green-bg px-2 py-0.5 text-[12px] text-vx-green">
                 <span className="size-1.5 animate-pulse rounded-full bg-vx-green motion-reduce:animate-none" />
                 Live
@@ -236,7 +236,7 @@ export default function HomeClient() {
 
       {/* RECENTLY SOLD */}
       {marquee.length > 0 && (
-        <div className="flex items-center border-y border-vx-line bg-white">
+        <div className="flex items-center border-y border-vx-line bg-vx-surface">
           <div className="hidden shrink-0 px-6 text-[12px] font-bold tracking-[0.08em] text-vx-muted uppercase sm:block">Recently sold</div>
           <div className="relative flex-1 overflow-hidden py-3.5 [mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)]">
             <div className="flex w-max animate-vx-marquee gap-8 hover:[animation-play-state:paused] motion-reduce:animate-none">
@@ -268,13 +268,13 @@ export default function HomeClient() {
             <span aria-hidden className="absolute top-6 right-[12%] left-[12%] hidden h-px bg-linear-to-r from-transparent via-vx-blue/35 to-transparent lg:block" />
             {STEPS.map((s, i) => (
               <li key={s.title} className="relative flex flex-col items-center text-center">
-                <IconTile className="bg-linear-to-b from-white to-vx-sky-soft">
+                <IconTile className="bg-linear-to-b from-vx-surface to-vx-sky-soft">
                   <s.icon size={20} />
                 </IconTile>
                 <div className="mt-5 font-mono text-[12px] font-semibold text-vx-blue">STEP 0{i + 1}</div>
                 <h3 className="mt-1.5 text-[17px] font-bold text-vx-ink">{s.title}</h3>
                 <p className="mt-2 max-w-[260px] text-[14px] leading-relaxed text-vx-body">{s.desc}</p>
-                <div className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-[12px] font-semibold text-vx-body ring-1 ring-vx-line">
+                <div className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-vx-surface px-3 py-1 text-[12px] font-semibold text-vx-body ring-1 ring-vx-line">
                   <IconClock size={12} />
                   {s.time}
                 </div>
@@ -285,7 +285,7 @@ export default function HomeClient() {
       </section>
 
       {/* FEATURES */}
-      <section className="bg-linear-to-b from-vx-canvas via-[#eef4ff] to-vx-canvas px-5 py-24 sm:px-6 sm:py-28">
+      <section className="bg-linear-to-b from-vx-canvas via-vx-band to-vx-canvas px-5 py-24 sm:px-6 sm:py-28">
         <div className="mx-auto max-w-6xl">
           <SectionHeader
             eyebrow="Why ViralExchange"
@@ -296,7 +296,7 @@ export default function HomeClient() {
           />
           <div className="grid gap-6 md:grid-cols-3">
             {FEATURES.map((ft) => (
-              <div key={ft.title} className="flex flex-col rounded-3xl bg-white p-8 shadow-vx-card ring-1 ring-vx-line/70">
+              <div key={ft.title} className="flex flex-col rounded-3xl bg-vx-surface p-8 shadow-vx-card ring-1 ring-vx-line/70">
                 <IconTile>
                   <ft.icon size={20} />
                 </IconTile>
@@ -328,7 +328,7 @@ export default function HomeClient() {
             {deals?.slice(0, 6).map((d, i) => (
               <article
                 key={i}
-                className="group rounded-3xl bg-white p-6 shadow-[0_1px_2px_rgba(16,24,40,0.04)] ring-1 ring-vx-line transition-all hover:-translate-y-0.5 hover:shadow-vx-card"
+                className="group rounded-3xl bg-vx-surface p-6 shadow-[0_1px_2px_rgba(16,24,40,0.04)] ring-1 ring-vx-line transition-all hover:-translate-y-0.5 hover:shadow-vx-card"
               >
                 <div className="flex items-center gap-3">
                   <span className="flex size-10 items-center justify-center rounded-xl bg-linear-to-br from-vx-blue-bright to-vx-sky text-[15px] font-bold text-white">
@@ -392,7 +392,7 @@ export default function HomeClient() {
       </section>
 
       {/* SELL FORM */}
-      <section id="submit" className="scroll-mt-20 border-t border-vx-line bg-linear-to-b from-white to-[#f0f5ff] px-5 py-24 sm:px-6 sm:py-28">
+      <section id="submit" className="scroll-mt-20 border-t border-vx-line bg-linear-to-b from-vx-surface to-vx-band px-5 py-24 sm:px-6 sm:py-28">
         <div className="mx-auto grid max-w-6xl items-start gap-12 lg:grid-cols-[1fr_1.1fr] lg:gap-16">
           <div className="lg:sticky lg:top-28">
             <Eyebrow label="Sell your channel" detail="Free listing" />
@@ -419,7 +419,7 @@ export default function HomeClient() {
               ))}
             </ul>
           </div>
-          <div className="rounded-[28px] bg-white p-6 shadow-[0_40px_80px_-40px_rgba(26,71,184,0.35)] ring-1 ring-vx-line/80 sm:p-8">
+          <div className="rounded-[28px] bg-vx-surface p-6 shadow-[0_40px_80px_-40px_rgba(26,71,184,0.35)] ring-1 ring-vx-line/80 sm:p-8">
             <SellForm />
           </div>
         </div>

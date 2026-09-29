@@ -22,7 +22,7 @@ const buttonCva = cva(
         light:
           "bg-white text-vx-blue shadow-[0_10px_24px_-12px_rgba(10,20,60,0.45)] hover:bg-vx-sky-soft focus-visible:ring-white/40",
         brandOutline:
-          "border-vx-line bg-white text-vx-ink hover:border-vx-faint/60 hover:bg-vx-subtle focus-visible:border-vx-blue focus-visible:ring-vx-blue/15",
+          "border-vx-line bg-vx-surface text-vx-ink hover:border-vx-faint/60 hover:bg-vx-subtle focus-visible:border-vx-blue focus-visible:ring-vx-blue/15",
       },
       size: {
         default:

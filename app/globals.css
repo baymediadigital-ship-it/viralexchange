@@ -49,36 +49,111 @@
   --color-brand-red: var(--red);
   --color-brand-blue: var(--blue);
 }
-/* Light theme (the #255ED3 redesign). Pages opt in with data-theme="light"
-   as they're migrated; the dark tokens above retire once every page has. */
+/* Redesign tokens (the #255ED3 direction). Pages opt in with
+   data-theme="light" or "dark" on their root as they're migrated; the legacy
+   dark-green tokens above retire once every page has. `inline` so each
+   utility resolves the var at the element, i.e. per theme. */
+[data-theme="light"] {
+  --vx-canvas: #fbfcfe;
+  --vx-surface: #ffffff;
+  --vx-subtle: #f5f7fb;
+  --vx-ink: #101828;
+  --vx-body: #475467;
+  --vx-muted: #667085;
+  --vx-faint: #98a2b3;
+  --vx-line: #eaecf0;
+  --vx-tint: #eef3fc;
+  --vx-tint-strong: #dde7f9;
+  --vx-sky-soft: #e6efff;
+  --vx-blue: #255ed3;
+  --vx-blue-hover: #1d4fb8;
+  --vx-blue-deep: #1a47b8;
+  --vx-blue-bright: #3b78ec;
+  --vx-sky: #7fb2ff;
+  --vx-green: #15803d;
+  --vx-green-bg: #e7f7ec;
+  --vx-red: #d92d20;
+  --vx-red-bg: #fef3f2;
+  --vx-hero-1: #e3edff;
+  --vx-hero-2: #f2f6ff;
+  --vx-band: #eef4ff;
+  --vx-glow-1: rgba(185,210,255,0.5);
+  --vx-glow-2: rgba(207,224,255,0.7);
+  --vx-grad-a: #1a47b8;
+  --vx-grad-b: #255ed3;
+  --vx-grad-c: #5b8def;
+}
+[data-theme="dark"] {
+  --vx-canvas: #070b16;
+  --vx-surface: #0d1324;
+  --vx-subtle: #131a2c;
+  --vx-ink: #eef2fb;
+  --vx-body: #a3adc2;
+  --vx-muted: #7c879c;
+  --vx-faint: #566077;
+  --vx-line: #1d2538;
+  --vx-tint: #111e3c;
+  --vx-tint-strong: #172850;
+  --vx-sky-soft: #14254a;
+  --vx-blue: #3b78ec;
+  --vx-blue-hover: #3470e4;
+  --vx-blue-deep: #255ed3;
+  --vx-blue-bright: #5b8def;
+  --vx-sky: #7fb2ff;
+  --vx-green: #4ade80;
+  --vx-green-bg: #0e2a1b;
+  --vx-red: #f97066;
+  --vx-red-bg: #2d1514;
+  --vx-hero-1: #0c1d45;
+  --vx-hero-2: #09122a;
+  --vx-band: #0b1633;
+  --vx-glow-1: rgba(37,94,211,0.35);
+  --vx-glow-2: rgba(59,120,236,0.22);
+  --vx-grad-a: #5b8def;
+  --vx-grad-b: #7fb2ff;
+  --vx-grad-c: #b3d1ff;
+  color-scheme: dark;
+}
+@theme inline {
+  --color-vx-canvas: var(--vx-canvas);
+  --color-vx-surface: var(--vx-surface);
+  --color-vx-subtle: var(--vx-subtle);
+  --color-vx-ink: var(--vx-ink);
+  --color-vx-body: var(--vx-body);
+  --color-vx-muted: var(--vx-muted);
+  --color-vx-faint: var(--vx-faint);
+  --color-vx-line: var(--vx-line);
+  --color-vx-tint: var(--vx-tint);
+  --color-vx-tint-strong: var(--vx-tint-strong);
+  --color-vx-sky-soft: var(--vx-sky-soft);
+  --color-vx-blue: var(--vx-blue);
+  --color-vx-blue-hover: var(--vx-blue-hover);
+  --color-vx-blue-deep: var(--vx-blue-deep);
+  --color-vx-blue-bright: var(--vx-blue-bright);
+  --color-vx-sky: var(--vx-sky);
+  --color-vx-green: var(--vx-green);
+  --color-vx-green-bg: var(--vx-green-bg);
+  --color-vx-red: var(--vx-red);
+  --color-vx-red-bg: var(--vx-red-bg);
+  --color-vx-hero-1: var(--vx-hero-1);
+  --color-vx-hero-2: var(--vx-hero-2);
+  --color-vx-band: var(--vx-band);
+  --color-vx-glow-1: var(--vx-glow-1);
+  --color-vx-glow-2: var(--vx-glow-2);
+  --color-vx-grad-a: var(--vx-grad-a);
+  --color-vx-grad-b: var(--vx-grad-b);
+  --color-vx-grad-c: var(--vx-grad-c);
+}
 @theme {
-  --color-vx-blue: #255ed3;
-  --color-vx-blue-hover: #1d4fb8;
-  --color-vx-blue-deep: #1a47b8;
-  --color-vx-blue-bright: #3b78ec;
-  --color-vx-sky: #7fb2ff;
-  --color-vx-sky-soft: #e6efff;
-  --color-vx-tint: #eef3fc;
-  --color-vx-tint-strong: #dde7f9;
-  --color-vx-ink: #101828;
-  --color-vx-body: #475467;
-  --color-vx-muted: #667085;
-  --color-vx-faint: #98a2b3;
-  --color-vx-line: #eaecf0;
-  --color-vx-canvas: #fbfcfe;
-  --color-vx-subtle: #f5f7fb;
-  --color-vx-green: #15803d;
-  --color-vx-green-bg: #e7f7ec;
-  --color-vx-red: #d92d20;
-  --color-vx-red-bg: #fef3f2;
   --shadow-vx-card: 0 1px 2px rgba(16, 24, 40, 0.04), 0 24px 48px -24px rgba(16, 24, 40, 0.14);
   --shadow-vx-float: 0 24px 48px -20px rgba(16, 24, 40, 0.2);
   --shadow-vx-cta: 0 14px 28px -12px rgba(37, 94, 211, 0.55);
   --animate-vx-marquee: marquee 40s linear infinite;
 }
-/* Unlayered on purpose: must beat the unlayered dark `body` rule below so
-   overscroll on a light page doesn't flash the dark background. */
-body:has([data-theme="light"]){background:var(--color-vx-canvas);color:var(--color-vx-ink);}
+/* Unlayered on purpose: must beat the unlayered legacy `body` rule below so
+   overscroll on a migrated page doesn't flash the old background. */
+body:has([data-theme="light"]){background:#fbfcfe;color:#101828;}
+body:has([data-theme="dark"]){background:#070b16;color:#eef2fb;}
 
 html{scroll-behavior:smooth;}
 body{background:var(--bg);color:var(--fg);font-family:var(--font-sans),sans-serif;font-size:16px;line-height:1.6;overflow-x:hidden;}

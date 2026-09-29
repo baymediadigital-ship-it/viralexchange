@@ -20,7 +20,7 @@ export function Rings({ size = 900, className }: { size?: number; className?: st
 
 export function GradientText({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <span className={cn("bg-linear-to-r from-vx-blue-deep via-vx-blue to-[#5b8def] box-decoration-clone bg-clip-text text-transparent", className)}>
+    <span className={cn("bg-linear-to-r from-vx-grad-a via-vx-grad-b to-vx-grad-c box-decoration-clone bg-clip-text text-transparent", className)}>
       {children}
     </span>
   );
@@ -30,7 +30,7 @@ export function IconTile({ children, className }: { children: React.ReactNode; c
   return (
     <div
       className={cn(
-        "flex size-12 items-center justify-center rounded-2xl bg-linear-to-b from-white to-vx-sky-soft text-vx-blue shadow-[0_8px_18px_-10px_rgba(37,94,211,0.55)] ring-1 ring-vx-blue/15",
+        "flex size-12 items-center justify-center rounded-2xl bg-linear-to-b from-vx-surface to-vx-sky-soft text-vx-blue shadow-[0_8px_18px_-10px_rgba(37,94,211,0.55)] ring-1 ring-vx-blue/15",
         className,
       )}
     >

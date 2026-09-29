@@ -17,7 +17,7 @@ export function Logo() {
 
 export function SiteNav() {
   return (
-    <nav className="sticky top-0 z-50 border-b border-vx-line/80 bg-white/85 backdrop-blur-lg backdrop-saturate-150">
+    <nav className="sticky top-0 z-50 border-b border-vx-line/80 bg-vx-surface/85 backdrop-blur-lg backdrop-saturate-150">
       <div className="mx-auto flex h-[72px] max-w-6xl items-center justify-between gap-4 px-5 sm:px-6">
         <Logo />
         <div className="hidden items-center gap-1 md:flex">

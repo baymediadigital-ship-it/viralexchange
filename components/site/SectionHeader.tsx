@@ -5,7 +5,7 @@ export function Eyebrow({ label, detail, className }: { label: string; detail: s
   return (
     <div
       className={cn(
-        "inline-flex items-center gap-2 rounded-full border border-vx-line bg-white py-1.5 pr-3.5 pl-3 text-[13px] font-medium text-vx-muted shadow-[0_1px_2px_rgba(16,24,40,0.04)]",
+        "inline-flex items-center gap-2 rounded-full border border-vx-line bg-vx-surface py-1.5 pr-3.5 pl-3 text-[13px] font-medium text-vx-muted shadow-[0_1px_2px_rgba(16,24,40,0.04)]",
         className,
       )}
     >
