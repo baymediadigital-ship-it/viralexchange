@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Logo } from "./SiteNav";
 import { CONTACT_EMAIL, TELEGRAM_URL, X_URL } from "./links";
 
-const colLink = "text-[14px] text-vx-body transition-colors hover:text-vx-blue";
+const colLink = "text-[14px] text-vx-body transition-colors hover:text-vx-accent";
 
 export function SiteFooter() {
   return (

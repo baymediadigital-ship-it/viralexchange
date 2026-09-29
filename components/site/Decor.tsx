@@ -9,7 +9,7 @@ export function Rings({ size = 900, className }: { size?: number; className?: st
       width={size}
       height={size}
       viewBox={`0 0 ${size} ${size}`}
-      className={cn("pointer-events-none absolute left-1/2 -translate-x-1/2 text-vx-blue", className)}
+      className={cn("pointer-events-none absolute left-1/2 -translate-x-1/2 text-vx-accent", className)}
     >
       {[0.45, 0.3, 0.18, 0.09].map((opacity, i) => (
         <circle key={i} cx={c} cy={c} r={step * (i + 1)} fill="none" stroke="currentColor" strokeWidth="1" opacity={opacity} />
@@ -30,7 +30,7 @@ export function IconTile({ children, className }: { children: React.ReactNode; c
   return (
     <div
       className={cn(
-        "flex size-12 items-center justify-center rounded-2xl bg-linear-to-b from-vx-surface to-vx-sky-soft text-vx-blue shadow-[0_8px_18px_-10px_rgba(37,94,211,0.55)] ring-1 ring-vx-blue/15",
+        "flex size-12 items-center justify-center rounded-2xl bg-linear-to-b from-vx-surface to-vx-accent-soft text-vx-accent shadow-[0_8px_18px_-10px_rgba(var(--vx-shadow-rgb),0.55)] ring-1 ring-vx-accent/15",
         className,
       )}
     >

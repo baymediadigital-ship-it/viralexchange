@@ -73,10 +73,10 @@ const DEAL_STEPS = ["Listed", "Buyer matched", "Escrow funded", "Transferred"];
 function DealShowcase({ deal }: { deal: Deal | null }) {
   return (
     <div className="relative mx-auto w-full max-w-[420px]">
-      <div aria-hidden className="absolute -inset-10 rounded-full bg-[radial-gradient(closest-side,rgba(91,141,239,0.35),transparent)] blur-2xl" />
+      <div aria-hidden className="absolute -inset-10 rounded-full bg-[radial-gradient(closest-side,rgba(var(--vx-shadow-rgb),0.35),transparent)] blur-2xl" />
 
-      <div className="relative overflow-hidden rounded-[28px] bg-vx-surface shadow-[0_40px_80px_-30px_rgba(26,71,184,0.45)] ring-1 ring-vx-blue/10">
-        <div className="relative h-28 overflow-hidden bg-linear-to-br from-vx-blue-deep via-vx-blue-bright to-vx-sky">
+      <div className="relative overflow-hidden rounded-[28px] bg-vx-surface shadow-[0_40px_80px_-30px_rgba(var(--vx-shadow-rgb),0.45)] ring-1 ring-vx-accent/10">
+        <div className="relative h-28 overflow-hidden bg-linear-to-br from-vx-bold-1 via-vx-bold-2 to-vx-bold-3">
           <div aria-hidden className="absolute -top-16 -right-10 size-56 rounded-full border border-white/25" />
           <div aria-hidden className="absolute -top-8 -right-2 size-40 rounded-full border border-white/20" />
           <div aria-hidden className="absolute top-0 left-0 h-full w-1/2 bg-[radial-gradient(ellipse_at_top_left,rgba(255,255,255,0.35),transparent_70%)]" />
@@ -86,11 +86,11 @@ function DealShowcase({ deal }: { deal: Deal | null }) {
         </div>
 
         <div className="px-6 pb-6">
-          <div className="relative -mt-8 flex size-16 items-center justify-center rounded-2xl bg-vx-surface text-[24px] font-extrabold text-vx-blue shadow-[0_10px_24px_-10px_rgba(16,24,40,0.35)] ring-4 ring-vx-surface">
+          <div className="relative -mt-8 flex size-16 items-center justify-center rounded-2xl bg-vx-surface text-[24px] font-semibold text-vx-accent shadow-[0_10px_24px_-10px_rgba(16,24,40,0.35)] ring-4 ring-vx-surface">
             {deal?.channel_name?.trim().charAt(0).toUpperCase() ?? ""}
           </div>
-          <div className="mt-4 text-[12px] font-semibold tracking-[0.06em] text-vx-blue uppercase">{deal?.niche || " "}</div>
-          <div className="mt-0.5 text-[22px] font-extrabold tracking-[-0.02em] text-vx-ink">
+          <div className="mt-4 text-[12px] font-semibold tracking-[0.06em] text-vx-accent uppercase">{deal?.niche || " "}</div>
+          <div className="mt-0.5 text-[22px] font-semibold tracking-[-0.02em] text-vx-ink">
             {deal ? deal.channel_name : <span className="inline-block h-6 w-40 animate-pulse rounded-md bg-vx-subtle" />}
           </div>
 
@@ -108,8 +108,8 @@ function DealShowcase({ deal }: { deal: Deal | null }) {
           <ol className="mt-6 grid grid-cols-4">
             {DEAL_STEPS.map((s, i) => (
               <li key={s} className="relative flex flex-col items-center text-center">
-                {i > 0 && <span aria-hidden className="absolute top-3 right-1/2 h-0.5 w-full bg-linear-to-r from-vx-blue-bright to-vx-blue" />}
-                <span className="relative flex size-6 items-center justify-center rounded-full bg-linear-to-b from-vx-blue-bright to-vx-blue text-white ring-4 ring-vx-surface">
+                {i > 0 && <span aria-hidden className="absolute top-3 right-1/2 h-0.5 w-full bg-linear-to-r from-vx-accent-bright to-vx-accent" />}
+                <span className="relative flex size-6 items-center justify-center rounded-full bg-linear-to-b from-vx-accent-bright to-vx-accent text-vx-on-accent ring-4 ring-vx-surface">
                   <IconCheck size={12} />
                 </span>
                 <span className="mt-2 text-[11px] leading-tight font-medium text-vx-muted">{s}</span>
@@ -120,7 +120,7 @@ function DealShowcase({ deal }: { deal: Deal | null }) {
       </div>
 
       <div className="absolute -top-6 -left-10 hidden items-center gap-2 rounded-2xl bg-vx-surface px-3.5 py-2.5 text-[13px] font-semibold text-vx-ink shadow-vx-float ring-1 ring-vx-line sm:flex">
-        <span className="flex size-7 items-center justify-center rounded-full bg-vx-sky-soft text-vx-blue">
+        <span className="flex size-7 items-center justify-center rounded-full bg-vx-accent-soft text-vx-accent">
           <IconShieldCheck size={14} />
         </span>
         Escrow protected
@@ -171,7 +171,7 @@ export default function HomeClient() {
   const marquee = named.slice(0, 20);
 
   return (
-    <div data-theme="light" className="min-h-screen bg-vx-canvas text-vx-ink antialiased">
+    <div className="vx-page min-h-screen bg-vx-canvas text-vx-ink antialiased">
       <SiteNav />
 
       {/* HERO */}
@@ -180,12 +180,12 @@ export default function HomeClient() {
         <div aria-hidden className="pointer-events-none absolute -top-20 right-[-10%] size-[520px] rounded-full bg-vx-glow-2 blur-3xl" />
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(37,94,211,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(37,94,211,0.06)_1px,transparent_1px)] bg-size-[56px_56px] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_0%,black,transparent)]"
+          className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(var(--vx-shadow-rgb),0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(var(--vx-shadow-rgb),0.06)_1px,transparent_1px)] bg-size-[56px_56px] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_0%,black,transparent)]"
         />
 
         <div className="relative mx-auto grid max-w-6xl items-center gap-16 px-5 pt-16 pb-20 sm:px-6 sm:pt-20 lg:grid-cols-[1.1fr_0.9fr] lg:gap-12 lg:pt-24 lg:pb-28">
           <div className="text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 rounded-full bg-vx-surface/80 py-1.5 pr-3.5 pl-1.5 text-[13px] font-semibold text-vx-body shadow-[0_1px_2px_rgba(16,24,40,0.06)] ring-1 ring-vx-blue/10 backdrop-blur">
+            <div className="inline-flex items-center gap-2 rounded-full bg-vx-surface/80 py-1.5 pr-3.5 pl-1.5 text-[13px] font-semibold text-vx-body shadow-[0_1px_2px_rgba(16,24,40,0.06)] ring-1 ring-vx-accent/10 backdrop-blur">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-vx-green-bg px-2 py-0.5 text-[12px] text-vx-green">
                 <span className="size-1.5 animate-pulse rounded-full bg-vx-green motion-reduce:animate-none" />
                 Live
@@ -193,7 +193,7 @@ export default function HomeClient() {
               The #1 YouTube channel marketplace
             </div>
 
-            <h1 className="mt-7 text-[42px] leading-[1.05] font-extrabold tracking-[-0.035em] text-balance text-vx-ink sm:text-[60px]">
+            <h1 className="mt-7 text-[42px] leading-[1.05] font-semibold tracking-[-0.045em] text-balance text-vx-ink sm:text-[60px]">
               Buy &amp; sell YouTube channels <GradientText>with confidence</GradientText>
             </h1>
 
@@ -211,11 +211,11 @@ export default function HomeClient() {
                 rel="noopener noreferrer"
                 className={buttonVariants({ variant: "brandOutline", size: "pill", className: "w-full max-w-xs border-transparent ring-1 ring-vx-line sm:w-auto" })}
               >
-                <TelegramIcon className="size-4 text-vx-blue" /> Browse listings
+                <TelegramIcon className="size-4 text-vx-accent" /> Browse listings
               </a>
             </div>
 
-            <dl className="mt-12 grid grid-cols-2 gap-x-6 gap-y-6 border-t border-vx-blue/10 pt-8 text-left sm:grid-cols-4">
+            <dl className="mt-12 grid grid-cols-2 gap-x-6 gap-y-6 border-t border-vx-accent/10 pt-8 text-left sm:grid-cols-4">
               {[
                 ["Channels sold", <CountUp key="s" value={stats?.sold ?? null} format={plain} />],
                 ["Volume brokered", <CountUp key="v" value={stats?.vol ?? null} format={money} />],
@@ -223,7 +223,7 @@ export default function HomeClient() {
                 ["Avg response", "24h"],
               ].map(([label, value]) => (
                 <div key={label as string}>
-                  <dd className="text-[24px] font-extrabold tracking-[-0.02em] text-vx-ink">{value}</dd>
+                  <dd className="text-[24px] font-semibold tracking-[-0.02em] text-vx-ink">{value}</dd>
                   <dt className="mt-0.5 text-[13px] text-vx-muted">{label}</dt>
                 </div>
               ))}
@@ -242,7 +242,7 @@ export default function HomeClient() {
             <div className="flex w-max animate-vx-marquee gap-8 hover:[animation-play-state:paused] motion-reduce:animate-none">
               {[...marquee, ...marquee].map((d, i) => (
                 <div key={i} aria-hidden={i >= marquee.length} className="flex shrink-0 items-center gap-2 text-[14px] whitespace-nowrap">
-                  <span className="flex size-6 items-center justify-center rounded-full bg-vx-sky-soft text-[11px] font-bold text-vx-blue">
+                  <span className="flex size-6 items-center justify-center rounded-full bg-vx-accent-soft text-[11px] font-bold text-vx-accent">
                     {d.channel_name!.trim().charAt(0).toUpperCase()}
                   </span>
                   <span className="font-semibold text-vx-ink">{d.channel_name}</span>
@@ -265,13 +265,13 @@ export default function HomeClient() {
             sub="From submission to payment — we handle everything so you can focus on what's next."
           />
           <ol className="relative grid gap-12 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
-            <span aria-hidden className="absolute top-6 right-[12%] left-[12%] hidden h-px bg-linear-to-r from-transparent via-vx-blue/35 to-transparent lg:block" />
+            <span aria-hidden className="absolute top-6 right-[12%] left-[12%] hidden h-px bg-linear-to-r from-transparent via-vx-accent/35 to-transparent lg:block" />
             {STEPS.map((s, i) => (
               <li key={s.title} className="relative flex flex-col items-center text-center">
-                <IconTile className="bg-linear-to-b from-vx-surface to-vx-sky-soft">
+                <IconTile className="bg-linear-to-b from-vx-surface to-vx-accent-soft">
                   <s.icon size={20} />
                 </IconTile>
-                <div className="mt-5 font-mono text-[12px] font-semibold text-vx-blue">STEP 0{i + 1}</div>
+                <div className="mt-5 font-mono text-[12px] font-semibold text-vx-accent">STEP 0{i + 1}</div>
                 <h3 className="mt-1.5 text-[17px] font-bold text-vx-ink">{s.title}</h3>
                 <p className="mt-2 max-w-[260px] text-[14px] leading-relaxed text-vx-body">{s.desc}</p>
                 <div className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-vx-surface px-3 py-1 text-[12px] font-semibold text-vx-body ring-1 ring-vx-line">
@@ -303,7 +303,7 @@ export default function HomeClient() {
                 <h3 className="mt-6 text-[18px] font-bold text-vx-ink">{ft.title}</h3>
                 <p className="mt-2.5 flex-1 text-[14px] leading-relaxed text-vx-body">{ft.desc}</p>
                 <div className="mt-7 flex items-baseline gap-2">
-                  <GradientText className="text-[32px] font-extrabold tracking-[-0.02em]">{ft.stat}</GradientText>
+                  <GradientText className="text-[32px] font-semibold tracking-[-0.02em]">{ft.stat}</GradientText>
                   <span className="text-[13px] text-vx-muted">{ft.statLabel}</span>
                 </div>
               </div>
@@ -331,7 +331,7 @@ export default function HomeClient() {
                 className="group rounded-3xl bg-vx-surface p-6 shadow-[0_1px_2px_rgba(16,24,40,0.04)] ring-1 ring-vx-line transition-all hover:-translate-y-0.5 hover:shadow-vx-card"
               >
                 <div className="flex items-center gap-3">
-                  <span className="flex size-10 items-center justify-center rounded-xl bg-linear-to-br from-vx-blue-bright to-vx-sky text-[15px] font-bold text-white">
+                  <span className="flex size-10 items-center justify-center rounded-xl bg-linear-to-br from-vx-accent-bright to-vx-accent-light text-[15px] font-bold text-vx-on-accent">
                     {(d.channel_name || "?").trim().charAt(0).toUpperCase()}
                   </span>
                   <div className="min-w-0">
@@ -342,7 +342,7 @@ export default function HomeClient() {
                 <div className="mt-6 flex items-end justify-between">
                   <div>
                     <div className="text-[12px] text-vx-muted">Sold for</div>
-                    <div className="text-[24px] font-extrabold tracking-[-0.02em] text-vx-ink">{usd(Number(d.closed_price_usd))}</div>
+                    <div className="text-[24px] font-semibold tracking-[-0.02em] text-vx-ink">{usd(Number(d.closed_price_usd))}</div>
                   </div>
                   <div className="text-right">
                     <div className="text-[12px] text-vx-muted">Subscribers</div>
@@ -365,14 +365,14 @@ export default function HomeClient() {
 
       {/* BUYERS LOUNGE */}
       <section className="px-5 pb-24 sm:px-6 sm:pb-28">
-        <div className="relative mx-auto max-w-6xl overflow-hidden rounded-[32px] bg-linear-to-br from-vx-blue-deep via-vx-blue to-vx-blue-bright px-6 py-16 text-center text-white shadow-[0_40px_80px_-40px_rgba(26,71,184,0.8)] sm:px-12 sm:py-20">
-          <div aria-hidden className="absolute -top-24 left-1/2 size-[520px] -translate-x-1/2 rounded-full bg-vx-sky/40 blur-3xl" />
+        <div className="relative mx-auto max-w-6xl overflow-hidden rounded-[32px] bg-linear-to-br from-vx-bold-1 via-vx-bold-2 to-vx-bold-3 px-6 py-16 text-center text-white shadow-[0_40px_80px_-40px_rgba(var(--vx-shadow-rgb),0.8)] sm:px-12 sm:py-20">
+          <div aria-hidden className="absolute -top-24 left-1/2 size-[520px] -translate-x-1/2 rounded-full bg-vx-accent-light/40 blur-3xl" />
           <Rings size={1100} className="top-1/2 hidden -translate-y-1/2 text-white opacity-40 sm:block" />
           <div className="relative mx-auto flex max-w-xl flex-col items-center">
             <div className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3.5 py-1.5 text-[13px] font-semibold ring-1 ring-white/20 backdrop-blur">
               <TelegramIcon className="size-3.5" /> Buyers Lounge · Join free
             </div>
-            <h2 className="mt-6 text-[32px] leading-[1.1] font-extrabold tracking-[-0.03em] text-balance sm:text-[44px]">
+            <h2 className="mt-6 text-[32px] leading-[1.1] font-semibold tracking-[-0.04em] text-balance sm:text-[44px]">
               First access to every new verified listing
             </h2>
             <p className="mt-4 text-[16px] leading-relaxed text-pretty text-white/80">
@@ -396,7 +396,7 @@ export default function HomeClient() {
         <div className="mx-auto grid max-w-6xl items-start gap-12 lg:grid-cols-[1fr_1.1fr] lg:gap-16">
           <div className="lg:sticky lg:top-28">
             <Eyebrow label="Sell your channel" detail="Free listing" />
-            <h2 className="mt-5 text-[32px] leading-[1.1] font-extrabold tracking-[-0.03em] text-vx-ink sm:text-[44px]">
+            <h2 className="mt-5 text-[32px] leading-[1.1] font-semibold tracking-[-0.04em] text-vx-ink sm:text-[44px]">
               Ready to exit? <GradientText>Let&apos;s get you paid.</GradientText>
             </h2>
             <p className="mt-4 text-[16px] leading-relaxed text-vx-body">
@@ -411,7 +411,7 @@ export default function HomeClient() {
                 "Channel details kept private until deal stage",
               ].map((t) => (
                 <li key={t} className="flex items-center gap-3 text-[15px] text-vx-ink">
-                  <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-linear-to-b from-vx-blue-bright to-vx-blue text-white">
+                  <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-linear-to-b from-vx-accent-bright to-vx-accent text-vx-on-accent">
                     <IconCheck size={12} />
                   </span>
                   {t}
@@ -419,7 +419,7 @@ export default function HomeClient() {
               ))}
             </ul>
           </div>
-          <div className="rounded-[28px] bg-vx-surface p-6 shadow-[0_40px_80px_-40px_rgba(26,71,184,0.35)] ring-1 ring-vx-line/80 sm:p-8">
+          <div className="rounded-[28px] bg-vx-surface p-6 shadow-[0_40px_80px_-40px_rgba(var(--vx-shadow-rgb),0.35)] ring-1 ring-vx-line/80 sm:p-8">
             <SellForm />
           </div>
         </div>

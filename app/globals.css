@@ -49,69 +49,118 @@
   --color-brand-red: var(--red);
   --color-brand-blue: var(--blue);
 }
-/* Redesign tokens (the #255ED3 direction). Pages opt in with
-   data-theme="light" or "dark" on their root as they're migrated; the legacy
-   dark-green tokens above retire once every page has. `inline` so each
-   utility resolves the var at the element, i.e. per theme. */
-[data-theme="light"] {
-  --vx-canvas: #fbfcfe;
+/* Redesign tokens (brand green). Light values on :root; dark applies when the OS
+   prefers dark and the visitor hasn't picked light, or when they picked dark
+   (data-theme on <html>, set before paint by the script in app/layout.tsx).
+   Legacy dark-green pages don't use these, so they're unaffected. `inline`
+   so each utility resolves the var at the element. */
+:root {
+  --vx-canvas: #fbfdfb;
   --vx-surface: #ffffff;
-  --vx-subtle: #f5f7fb;
-  --vx-ink: #101828;
-  --vx-body: #475467;
-  --vx-muted: #667085;
-  --vx-faint: #98a2b3;
-  --vx-line: #eaecf0;
-  --vx-tint: #eef3fc;
-  --vx-tint-strong: #dde7f9;
-  --vx-sky-soft: #e6efff;
-  --vx-blue: #255ed3;
-  --vx-blue-hover: #1d4fb8;
-  --vx-blue-deep: #1a47b8;
-  --vx-blue-bright: #3b78ec;
-  --vx-sky: #7fb2ff;
+  --vx-subtle: #f3f8f4;
+  --vx-ink: #0a1a10;
+  --vx-body: #45534a;
+  --vx-muted: #65736a;
+  --vx-faint: #9aa69e;
+  --vx-line: #e4ece6;
+  --vx-tint: #ecfdf3;
+  --vx-tint-strong: #d3f8e0;
+  --vx-accent-soft: #e3f9ea;
+  --vx-accent: #15803d;
+  --vx-accent-hover: #166534;
+  --vx-accent-deep: #0b3b22;
+  --vx-accent-bright: #1fae54;
+  --vx-accent-light: #86efac;
+  --vx-on-accent: #ffffff;
   --vx-green: #15803d;
-  --vx-green-bg: #e7f7ec;
+  --vx-green-bg: #dcfce7;
   --vx-red: #d92d20;
   --vx-red-bg: #fef3f2;
-  --vx-hero-1: #e3edff;
-  --vx-hero-2: #f2f6ff;
-  --vx-band: #eef4ff;
-  --vx-glow-1: rgba(185,210,255,0.5);
-  --vx-glow-2: rgba(207,224,255,0.7);
-  --vx-grad-a: #1a47b8;
-  --vx-grad-b: #255ed3;
-  --vx-grad-c: #5b8def;
+  --vx-hero-1: #dcfce7;
+  --vx-hero-2: #f0fdf4;
+  --vx-band: #effdf4;
+  --vx-glow-1: rgba(134,239,172,0.45);
+  --vx-glow-2: rgba(187,247,208,0.7);
+  --vx-grad-a: #0b3b22;
+  --vx-grad-b: #15803d;
+  --vx-grad-c: #22c55e;
+  --vx-bold-1: #0b3b22;
+  --vx-bold-2: #15803d;
+  --vx-bold-3: #1f9d52;
+  --vx-shadow-rgb: 21, 128, 61;
 }
-[data-theme="dark"] {
-  --vx-canvas: #070b16;
-  --vx-surface: #0d1324;
-  --vx-subtle: #131a2c;
-  --vx-ink: #eef2fb;
-  --vx-body: #a3adc2;
-  --vx-muted: #7c879c;
-  --vx-faint: #566077;
-  --vx-line: #1d2538;
-  --vx-tint: #111e3c;
-  --vx-tint-strong: #172850;
-  --vx-sky-soft: #14254a;
-  --vx-blue: #3b78ec;
-  --vx-blue-hover: #3470e4;
-  --vx-blue-deep: #255ed3;
-  --vx-blue-bright: #5b8def;
-  --vx-sky: #7fb2ff;
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --vx-canvas: #030a05;
+    --vx-surface: #08130b;
+    --vx-subtle: #0e1c12;
+    --vx-ink: #f0fdf4;
+    --vx-body: #a0b3a6;
+    --vx-muted: #768a7c;
+    --vx-faint: #4f6255;
+    --vx-line: #142419;
+    --vx-tint: #0b2213;
+    --vx-tint-strong: #0f2e19;
+    --vx-accent-soft: #0d2817;
+    --vx-accent: #22c55e;
+    --vx-accent-hover: #1fb456;
+    --vx-accent-deep: #15803d;
+    --vx-accent-bright: #4ade80;
+    --vx-accent-light: #86efac;
+    --vx-on-accent: #04150a;
+    --vx-green: #4ade80;
+    --vx-green-bg: #0c2a16;
+    --vx-red: #f97066;
+    --vx-red-bg: #2d1514;
+    --vx-hero-1: #062413;
+    --vx-hero-2: #04120a;
+    --vx-band: #061a0d;
+    --vx-glow-1: rgba(34,197,94,0.28);
+    --vx-glow-2: rgba(34,197,94,0.14);
+    --vx-grad-a: #4ade80;
+    --vx-grad-b: #86efac;
+    --vx-grad-c: #bbf7d0;
+    --vx-bold-1: #06301a;
+    --vx-bold-2: #0f5c2e;
+    --vx-bold-3: #15803d;
+    --vx-shadow-rgb: 0, 0, 0;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --vx-canvas: #030a05;
+  --vx-surface: #08130b;
+  --vx-subtle: #0e1c12;
+  --vx-ink: #f0fdf4;
+  --vx-body: #a0b3a6;
+  --vx-muted: #768a7c;
+  --vx-faint: #4f6255;
+  --vx-line: #142419;
+  --vx-tint: #0b2213;
+  --vx-tint-strong: #0f2e19;
+  --vx-accent-soft: #0d2817;
+  --vx-accent: #22c55e;
+  --vx-accent-hover: #1fb456;
+  --vx-accent-deep: #15803d;
+  --vx-accent-bright: #4ade80;
+  --vx-accent-light: #86efac;
+  --vx-on-accent: #04150a;
   --vx-green: #4ade80;
-  --vx-green-bg: #0e2a1b;
+  --vx-green-bg: #0c2a16;
   --vx-red: #f97066;
   --vx-red-bg: #2d1514;
-  --vx-hero-1: #0c1d45;
-  --vx-hero-2: #09122a;
-  --vx-band: #0b1633;
-  --vx-glow-1: rgba(37,94,211,0.35);
-  --vx-glow-2: rgba(59,120,236,0.22);
-  --vx-grad-a: #5b8def;
-  --vx-grad-b: #7fb2ff;
-  --vx-grad-c: #b3d1ff;
+  --vx-hero-1: #062413;
+  --vx-hero-2: #04120a;
+  --vx-band: #061a0d;
+  --vx-glow-1: rgba(34,197,94,0.28);
+  --vx-glow-2: rgba(34,197,94,0.14);
+  --vx-grad-a: #4ade80;
+  --vx-grad-b: #86efac;
+  --vx-grad-c: #bbf7d0;
+  --vx-bold-1: #06301a;
+  --vx-bold-2: #0f5c2e;
+  --vx-bold-3: #15803d;
+  --vx-shadow-rgb: 0, 0, 0;
   color-scheme: dark;
 }
 @theme inline {
@@ -125,12 +174,13 @@
   --color-vx-line: var(--vx-line);
   --color-vx-tint: var(--vx-tint);
   --color-vx-tint-strong: var(--vx-tint-strong);
-  --color-vx-sky-soft: var(--vx-sky-soft);
-  --color-vx-blue: var(--vx-blue);
-  --color-vx-blue-hover: var(--vx-blue-hover);
-  --color-vx-blue-deep: var(--vx-blue-deep);
-  --color-vx-blue-bright: var(--vx-blue-bright);
-  --color-vx-sky: var(--vx-sky);
+  --color-vx-accent-soft: var(--vx-accent-soft);
+  --color-vx-accent: var(--vx-accent);
+  --color-vx-accent-hover: var(--vx-accent-hover);
+  --color-vx-accent-deep: var(--vx-accent-deep);
+  --color-vx-accent-bright: var(--vx-accent-bright);
+  --color-vx-accent-light: var(--vx-accent-light);
+  --color-vx-on-accent: var(--vx-on-accent);
   --color-vx-green: var(--vx-green);
   --color-vx-green-bg: var(--vx-green-bg);
   --color-vx-red: var(--vx-red);
@@ -143,17 +193,27 @@
   --color-vx-grad-a: var(--vx-grad-a);
   --color-vx-grad-b: var(--vx-grad-b);
   --color-vx-grad-c: var(--vx-grad-c);
+  --color-vx-bold-1: var(--vx-bold-1);
+  --color-vx-bold-2: var(--vx-bold-2);
+  --color-vx-bold-3: var(--vx-bold-3);
 }
 @theme {
   --shadow-vx-card: 0 1px 2px rgba(16, 24, 40, 0.04), 0 24px 48px -24px rgba(16, 24, 40, 0.14);
   --shadow-vx-float: 0 24px 48px -20px rgba(16, 24, 40, 0.2);
-  --shadow-vx-cta: 0 14px 28px -12px rgba(37, 94, 211, 0.55);
   --animate-vx-marquee: marquee 40s linear infinite;
 }
-/* Unlayered on purpose: must beat the unlayered legacy `body` rule below so
-   overscroll on a migrated page doesn't flash the old background. */
-body:has([data-theme="light"]){background:#fbfcfe;color:#101828;}
-body:has([data-theme="dark"]){background:#070b16;color:#eef2fb;}
+/* Redesigned pages opt in with .vx-page on their root. Unlayered on purpose:
+   beats the legacy unlayered `body` rule so overscroll matches the page. */
+body:has(.vx-page) { background: var(--vx-canvas); color: var(--vx-ink); }
+.vx-page { --font-sans: var(--font-outfit), system-ui, -apple-system, "Segoe UI", sans-serif; font-family: var(--font-sans); }
+/* Theme toggle icon: pure CSS so the server HTML never mismatches the client. */
+.vx-theme-sun { display: none; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .vx-theme-sun { display: block; }
+  :root:not([data-theme="light"]) .vx-theme-moon { display: none; }
+}
+:root[data-theme="dark"] .vx-theme-sun { display: block; }
+:root[data-theme="dark"] .vx-theme-moon { display: none; }
 
 html{scroll-behavior:smooth;}
 body{background:var(--bg);color:var(--fg);font-family:var(--font-sans),sans-serif;font-size:16px;line-height:1.6;overflow-x:hidden;}

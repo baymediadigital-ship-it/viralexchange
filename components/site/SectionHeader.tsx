@@ -9,10 +9,10 @@ export function Eyebrow({ label, detail, className }: { label: string; detail: s
         className,
       )}
     >
-      <span className="size-1.5 rounded-full bg-vx-blue" />
+      <span className="size-1.5 rounded-full bg-vx-accent" />
       {label}
       <span className="text-vx-line">/</span>
-      <span className="font-semibold text-vx-blue">{detail}</span>
+      <span className="font-semibold text-vx-accent">{detail}</span>
     </div>
   );
 }
@@ -33,7 +33,7 @@ export function SectionHeader({
   return (
     <div className="mx-auto mb-12 flex max-w-2xl flex-col items-center text-center">
       <Eyebrow label={eyebrow} detail={detail} />
-      <h2 className="mt-5 text-[32px] leading-[1.12] font-extrabold tracking-[-0.025em] text-balance text-vx-ink sm:text-[44px]">
+      <h2 className="mt-5 text-[32px] leading-[1.12] font-semibold tracking-[-0.04em] text-balance text-vx-ink sm:text-[44px]">
         {title} <GradientText>{highlight}</GradientText>
       </h2>
       {sub && <p className="mt-4 max-w-xl text-[16px] leading-relaxed text-pretty text-vx-body">{sub}</p>}

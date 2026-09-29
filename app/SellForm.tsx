@@ -23,7 +23,7 @@ type Channel = {
 };
 
 const fieldClass =
-  "h-11 rounded-xl border-vx-line bg-vx-surface px-3.5 text-[15px] text-vx-ink shadow-[0_1px_2px_rgba(16,24,40,0.04)] placeholder:text-vx-muted focus-visible:border-vx-blue focus-visible:ring-4 focus-visible:ring-vx-blue/15 md:text-[15px]";
+  "h-11 rounded-xl border-vx-line bg-vx-surface px-3.5 text-[15px] text-vx-ink shadow-[0_1px_2px_rgba(16,24,40,0.04)] placeholder:text-vx-muted focus-visible:border-vx-accent focus-visible:ring-4 focus-visible:ring-vx-accent/15 md:text-[15px]";
 const labelClass = "mb-1.5 text-[13px] font-semibold text-vx-body";
 
 function Field({ id, label, className, ...props }: { id: string; label: string } & React.ComponentProps<"input">) {
@@ -150,7 +150,7 @@ export default function SellForm() {
         <div className="mb-6 flex size-16 items-center justify-center rounded-full bg-vx-green-bg text-vx-green ring-8 ring-vx-green-bg/50">
           <IconCheck size={28} />
         </div>
-        <h3 className="text-[24px] font-extrabold tracking-[-0.02em] text-vx-ink">You&apos;re in the pipeline.</h3>
+        <h3 className="text-[24px] font-semibold tracking-[-0.02em] text-vx-ink">You&apos;re in the pipeline.</h3>
         <p className="mt-3 max-w-sm text-[15px] leading-relaxed text-vx-body">
           We&apos;ve received your channel and will be in touch within 24 hours via your preferred contact.
         </p>
@@ -165,7 +165,7 @@ export default function SellForm() {
 
   return (
     <form onSubmit={onSubmit} noValidate>
-      <h3 className="text-[20px] font-extrabold tracking-[-0.02em] text-vx-ink">Submit your channel</h3>
+      <h3 className="text-[20px] font-semibold tracking-[-0.02em] text-vx-ink">Submit your channel</h3>
       <p className="mt-1 mb-6 text-[14px] text-vx-muted">Takes under 2 minutes</p>
 
       <Label htmlFor="url-input" className={labelClass}>YouTube channel URL</Label>
@@ -193,7 +193,7 @@ export default function SellForm() {
       {channel && (
         <div className="mt-6">
           <div className="flex items-center gap-3 border-b border-vx-line pb-4">
-            <div className="flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-vx-tint text-[13px] font-bold text-vx-blue">
+            <div className="flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-vx-tint text-[13px] font-bold text-vx-accent">
               {channel.thumbnail ? <img src={channel.thumbnail} alt="" className="size-full object-cover" /> : initials(channel.name)}
             </div>
             <div className="min-w-0">
@@ -218,12 +218,12 @@ export default function SellForm() {
             ))}
           </dl>
 
-          <div className={cn("mt-3 rounded-xl border p-4", confirmedMonthly ? "border-vx-green/25 bg-vx-green-bg" : "border-vx-blue/15 bg-vx-tint")}>
+          <div className={cn("mt-3 rounded-xl border p-4", confirmedMonthly ? "border-vx-green/25 bg-vx-green-bg" : "border-vx-accent/15 bg-vx-tint")}>
             <div className="flex items-baseline justify-between gap-3">
-              <span className={cn("text-[12px] font-semibold tracking-[0.04em] uppercase", confirmedMonthly ? "text-vx-green" : "text-vx-blue")}>
+              <span className={cn("text-[12px] font-semibold tracking-[0.04em] uppercase", confirmedMonthly ? "text-vx-green" : "text-vx-accent")}>
                 {confirmedMonthly ? "Monthly views · confirmed" : "Monthly views"}
               </span>
-              <span className="text-[20px] font-extrabold text-vx-ink">{monthly ? fmt(monthly) + "/mo" : "—"}</span>
+              <span className="text-[20px] font-semibold text-vx-ink">{monthly ? fmt(monthly) + "/mo" : "—"}</span>
             </div>
             <p className="mt-1 text-[13px] leading-snug text-vx-body">
               {confirmedMonthly
