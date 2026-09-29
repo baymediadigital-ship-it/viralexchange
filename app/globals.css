@@ -4,7 +4,10 @@
 
 @custom-variant dark (&:is(.dark *));
 
-*{box-sizing:border-box;margin:0;padding:0;}
+/* No hand-written `*{margin:0;padding:0}` reset here: Tailwind's Preflight
+   already does it inside @layer base, and an unlayered copy would beat every
+   layered padding/margin utility (unlayered always wins over layers). Keep new
+   global element rules out of the unlayered scope for the same reason. */
 :root{
   --bg:hsl(140,60%,2%);
   --bg2:hsl(140,40%,3%);
@@ -28,8 +31,10 @@
 
 /* Bridge to Tailwind/shadcn -- same tokens, single source of truth so new
    Tailwind-authored components (bg-brand-green, text-brand-fg, etc.) stay in
-   sync with the legacy hand-written CSS above instead of forking the palette. */
-@theme {
+   sync with the legacy hand-written CSS above instead of forking the palette.
+   `inline` so utilities resolve var(--green) etc. at the element, which lets
+   a page scope its own override (e.g. the auth pages' brighter green). */
+@theme inline {
   --color-brand-bg: var(--bg);
   --color-brand-bg2: var(--bg2);
   --color-brand-green: var(--green);

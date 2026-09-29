@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import "../auth.css";
 import { signIn } from "@/lib/actions/auth";
+import { AuthError, AuthField, AuthFooter, AuthShell, AuthSub, AuthSubmit, AuthTitle } from "@/components/AuthShell";
 
 export default function LoginClient() {
   const router = useRouter();
@@ -28,30 +28,18 @@ export default function LoginClient() {
   }
 
   return (
-    <div className="auth-page">
-      <div className="auth-card">
-        <a href="/" className="auth-logo">
-          <div className="auth-logo-img">
-            <img src="/logo.jpg" alt="VX" />
-          </div>
-          <div className="auth-logo-name">VIRALEXCHANGE</div>
-        </a>
-        <div className="auth-title">Welcome back</div>
-        <div className="auth-sub">Log in to see your listings and applications</div>
-        {error && <div className="auth-error">{error}</div>}
-        <form onSubmit={handleSubmit}>
-          <label>Email</label>
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" required />
-          <label>Password</label>
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required />
-          <button className="auth-submit" type="submit" disabled={loading}>
-            {loading ? "Logging in..." : "Log in"}
-          </button>
-        </form>
-        <div className="auth-footer">
-          Don&apos;t have an account? <a href="/signup">Sign up</a>
-        </div>
-      </div>
-    </div>
+    <AuthShell>
+      <AuthTitle>Welcome back</AuthTitle>
+      <AuthSub>Log in to see your listings and applications</AuthSub>
+      {error && <AuthError>{error}</AuthError>}
+      <form onSubmit={handleSubmit}>
+        <AuthField label="Email" id="email" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" required />
+        <AuthField label="Password" id="password" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required />
+        <AuthSubmit loading={loading}>{loading ? "Logging in..." : "Log in"}</AuthSubmit>
+      </form>
+      <AuthFooter>
+        Don&apos;t have an account? <a href="/signup">Sign up</a>
+      </AuthFooter>
+    </AuthShell>
   );
 }
