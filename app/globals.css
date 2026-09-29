@@ -49,6 +49,33 @@
   --color-brand-red: var(--red);
   --color-brand-blue: var(--blue);
 }
+/* Light theme (the #255ED3 redesign). Pages opt in with data-theme="light"
+   as they're migrated; the dark tokens above retire once every page has. */
+@theme {
+  --color-vx-blue: #255ed3;
+  --color-vx-blue-hover: #1d4fb8;
+  --color-vx-tint: #eef3fc;
+  --color-vx-tint-strong: #dde7f9;
+  --color-vx-ink: #101828;
+  --color-vx-body: #475467;
+  --color-vx-muted: #667085;
+  --color-vx-faint: #98a2b3;
+  --color-vx-line: #eaecf0;
+  --color-vx-canvas: #fbfcfe;
+  --color-vx-subtle: #f5f7fb;
+  --color-vx-green: #15803d;
+  --color-vx-green-bg: #e7f7ec;
+  --color-vx-red: #d92d20;
+  --color-vx-red-bg: #fef3f2;
+  --shadow-vx-card: 0 1px 2px rgba(16, 24, 40, 0.04), 0 24px 48px -24px rgba(16, 24, 40, 0.14);
+  --shadow-vx-float: 0 24px 48px -20px rgba(16, 24, 40, 0.2);
+  --shadow-vx-cta: 0 14px 28px -12px rgba(37, 94, 211, 0.55);
+  --animate-vx-marquee: marquee 40s linear infinite;
+}
+/* Unlayered on purpose: must beat the unlayered dark `body` rule below so
+   overscroll on a light page doesn't flash the dark background. */
+body:has([data-theme="light"]){background:var(--color-vx-canvas);color:var(--color-vx-ink);}
+
 html{scroll-behavior:smooth;}
 body{background:var(--bg);color:var(--fg);font-family:var(--font-sans),sans-serif;font-size:16px;line-height:1.6;overflow-x:hidden;}
 

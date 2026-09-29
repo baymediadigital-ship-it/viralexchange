@@ -1,795 +1,403 @@
 "use client";
 
-import { useEffect } from "react";
-import "./home.css";
-import { fmt, initials } from "@/lib/format";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { buttonVariants } from "@/components/ui/button";
+import { SiteNav } from "@/components/site/SiteNav";
+import { SiteFooter } from "@/components/site/SiteFooter";
+import { Eyebrow, SectionHeader } from "@/components/site/SectionHeader";
+import { Rings, TelegramIcon } from "@/components/site/Decor";
+import { TELEGRAM_URL } from "@/components/site/links";
+import {
+  IconArrowRight,
+  IconBanknote,
+  IconBolt,
+  IconCheck,
+  IconCheckCircle,
+  IconClock,
+  IconDocument,
+  IconHandshake,
+  IconLock,
+  IconShieldCheck,
+} from "@/components/Icon";
+import { fmt, usd } from "@/lib/format";
 import { createClient } from "@/lib/supabase/client";
-import { submitListing as submitListingAction } from "@/lib/actions/listings";
-import { IconDocument, IconCheckCircle, IconHandshake, IconBanknote, IconLock, IconBolt, IconShieldCheck, IconCheck, IconClock } from "@/components/Icon";
+import SellForm from "./SellForm";
+
+type Deal = {
+  channel_name: string | null;
+  niche: string | null;
+  subscribers_snapshot: number | null;
+  closed_price_usd: number | null;
+  close_date: string | null;
+};
+
+type Stats = { sold: number; vol: number; listed: number };
+
+function CountUp({ value, format }: { value: number | null; format: (n: number) => string }) {
+  const [shown, setShown] = useState<number | null>(null);
+  useEffect(() => {
+    if (value === null) return;
+    const duration = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 1200;
+    const start = performance.now();
+    let raf = 0;
+    const tick = (now: number) => {
+      const t = duration ? Math.min((now - start) / duration, 1) : 1;
+      setShown(value * (1 - Math.pow(1 - t, 3)));
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [value]);
+  return <>{shown === null ? "—" : format(Math.round(shown))}</>;
+}
+
+const money = (n: number) => "$" + n.toLocaleString();
+const plain = (n: number) => n.toLocaleString();
+
+const STEPS = [
+  { icon: IconDocument, title: "Submit your channel", time: "Under 2 minutes", desc: "Paste your YouTube link and our tool auto-fetches all stats instantly. Fill in your asking price and we take it from there." },
+  { icon: IconCheckCircle, title: "We verify & list", time: "Within 24 hours", desc: "Our team reviews your channel within 24 hours. Once verified, it goes live to our network of active buyers immediately." },
+  { icon: IconHandshake, title: "Negotiate & agree", time: "Within 7 days", desc: "We handle all buyer inquiries and negotiations on your behalf. You only hear from us when there's an offer worth considering." },
+  { icon: IconBanknote, title: "Close via escrow", time: "Within 48 hours", desc: "All deals close through secure escrow. Funds held safely until the channel transfer is complete." },
+];
+
+const FEATURES = [
+  { icon: IconLock, title: "Privacy first", stat: "100%", statLabel: "private until deal stage", desc: "Your channel name and link stay completely private. Buyers see stats only until they are verified serious and sign an NDA." },
+  { icon: IconBolt, title: "Instant valuation", stat: "60s", statLabel: "to get your valuation", desc: "Get a data-driven estimate in 60 seconds based on real market multiples — subscribers, engagement, niche, and revenue." },
+  { icon: IconShieldCheck, title: "Secure escrow", stat: "Zero", statLabel: "failed transactions", desc: "Every deal closes through verified escrow. Funds are held safely by a neutral third party until the channel transfer is complete." },
+];
 
 export default function HomeClient() {
+  const [stats, setStats] = useState<Stats | null>(null);
+  const [deals, setDeals] = useState<Deal[] | null>(null);
+
   useEffect(() => {
-    function setStatus(msg: string, loading = false) {
-      const el = document.getElementById("status-msg");
-      if (!el) return;
-      el.innerHTML = loading
-        ? `<div class="spinner"></div><span>${msg}</span>`
-        : `<span style="color:var(--red)">${msg}</span>`;
-      el.style.display = msg ? "flex" : "none";
-    }
-
-    async function fetchChannel() {
-      const url = (document.getElementById("url-input") as HTMLInputElement).value.trim();
-      if (!url) {
-        setStatus("Please paste your YouTube channel URL.");
-        return;
-      }
-      setStatus("Fetching channel data...", true);
-      (document.getElementById("fetch-btn") as HTMLButtonElement).disabled = true;
-      try {
-        const r = await fetch(`/api/youtube/channel-stats?url=${encodeURIComponent(url)}`);
-        const d = await r.json();
-        if (d.error) throw new Error(d.error);
-        renderChannel(d, url);
-        setStatus("");
-      } catch (e) {
-        setStatus("Error: " + (e as Error).message);
-      }
-      (document.getElementById("fetch-btn") as HTMLButtonElement).disabled = false;
-    }
-
-    function renderChannel(d: any, originalUrl: string) {
-      const subs = d.subscribers || 0;
-      const vids = d.videos || 0;
-      const views = d.views || 0;
-      const avgV = d.avgViewsPerVideo || 0;
-      const eng = subs > 0 ? ((avgV / subs) * 100).toFixed(1) + "%" : "—";
-      const ageMonths = d.ageMonths || null;
-      const estMonthly = d.estimatedMonthlyViews || null;
-      document.getElementById("ch-name")!.textContent = d.name;
-      document.getElementById("ch-handle")!.textContent = d.handle || originalUrl;
-      if (d.thumbnail) {
-        document.getElementById("ch-avatar")!.innerHTML =
-          `<img src="${d.thumbnail}" alt="" style="width:100%;height:100%;object-fit:cover;">`;
-      } else {
-        document.getElementById("ch-init")!.textContent = initials(d.name);
-      }
-      document.getElementById("f-subs")!.textContent = fmt(subs);
-      document.getElementById("f-vids")!.textContent = fmt(vids);
-      document.getElementById("f-views")!.textContent = fmt(views);
-      document.getElementById("f-avg")!.textContent = fmt(avgV);
-      document.getElementById("f-eng")!.textContent = eng;
-      if (ageMonths) document.getElementById("f-age")!.textContent = (ageMonths / 12).toFixed(1) + " yrs";
-      document.getElementById("mv-val")!.textContent = estMonthly ? fmt(estMonthly) + "/mo" : "—";
-      (window as any)._ch = {
-        name: d.name,
-        handle: d.handle || originalUrl,
-        subs,
-        vids,
-        views,
-        avgV,
-        eng,
-        ageMonths,
-        estMonthly,
-        confirmedMonthly: null,
-      };
-      document.getElementById("fetched-panel")!.style.display = "block";
-      setTimeout(
-        () => document.getElementById("fetched-panel")?.scrollIntoView({ behavior: "smooth", block: "nearest" }),
-        200,
-      );
-    }
-
-    function confirmMonthly() {
-      const val = parseInt((document.getElementById("mv-override") as HTMLInputElement).value);
-      if (!val || isNaN(val)) return;
-      (window as any)._ch.confirmedMonthly = val;
-      document.getElementById("mv-val")!.textContent = fmt(val) + "/mo";
-      const box = document.getElementById("mv-box")!;
-      box.className = "mv-box confirmed";
-      box.querySelector(".mvl")!.textContent = "Monthly views — confirmed ✓";
-      box.querySelector(".mvn")!.textContent = "We'll use your confirmed figure in the listing.";
-    }
-
-    const submitBtnIcon =
-      '<svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 2L14 8L8 14M2 8H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Submit my channel';
-
-    async function submitListing() {
-      const d = (window as any)._ch || {};
-      if (!d.name) {
-        alert("Please fetch your channel first.");
-        return;
-      }
-      const btn = document.querySelector(".submit-btn") as HTMLButtonElement;
-      btn.disabled = true;
-      btn.innerHTML =
-        '<div class="spinner" style="border-top-color:#050805;width:14px;height:14px;border-width:2px;"></div> Submitting...';
-
-      const result = await submitListingAction({
-        channelName: d.name,
-        channelUrl: (document.getElementById("url-input") as HTMLInputElement).value.trim(),
-        niche: (document.getElementById("f-niche") as HTMLInputElement).value,
-        subNiche: (document.getElementById("f-subniche") as HTMLInputElement).value,
-        subscribers: d.subs,
-        monthlyViews: d.confirmedMonthly || d.estMonthly || undefined,
-        engagementRate: parseFloat(d.eng) || undefined,
-        monetization: (document.getElementById("f-mono") as HTMLSelectElement).value,
-        accountAgeMonths: d.ageMonths || undefined,
-        language: (document.getElementById("f-lang") as HTMLInputElement).value || "English",
-        askingPriceUsd: (document.getElementById("f-price") as HTMLInputElement).value
-          ? parseInt((document.getElementById("f-price") as HTMLInputElement).value)
-          : undefined,
-        sellerContactName: (document.getElementById("f-name") as HTMLInputElement).value.trim(),
-        sellerContactEmail: (document.getElementById("f-contact") as HTMLInputElement).value.trim(),
-      });
-
-      if (result.error) {
-        alert(result.error);
-        btn.disabled = false;
-        btn.innerHTML = submitBtnIcon;
-        return;
-      }
-
-      document.getElementById("form-main")!.style.display = "none";
-      document.getElementById("success-screen")!.style.display = "block";
-    }
-
-    function resetAll() {
-      (document.getElementById("url-input") as HTMLInputElement).value = "";
-      document.getElementById("fetched-panel")!.style.display = "none";
-      document.getElementById("form-main")!.style.display = "block";
-      document.getElementById("success-screen")!.style.display = "none";
-      document.getElementById("status-msg")!.style.display = "none";
-      (window as any)._ch = null;
-      const btn = document.querySelector(".submit-btn") as HTMLButtonElement;
-      if (btn) {
-        btn.disabled = false;
-        btn.innerHTML = submitBtnIcon;
-      }
-    }
-
-    function animateCount(id: string, target: number, prefix: string) {
-      const el = document.getElementById(id);
-      if (!el) return;
-      const steps = 40,
-        dur = 1200;
-      let step = 0,
-        cur = 0;
-      el.style.opacity = "0";
-      el.style.transform = "translateY(8px)";
-      el.style.transition = "opacity 0.4s ease,transform 0.4s ease";
-      setTimeout(() => {
-        el.style.opacity = "1";
-        el.style.transform = "translateY(0)";
-      }, 100);
-      const t = setInterval(() => {
-        step++;
-        cur = Math.min(cur + target / steps, target);
-        el.textContent = prefix + (prefix === "$" && cur >= 1000 ? Math.round(cur).toLocaleString() : Math.round(cur));
-        if (step >= steps) clearInterval(t);
-      }, dur / steps);
-    }
-
-    async function loadData() {
-      const supabase = createClient();
-      try {
-        const [listingsRes, dealsRes] = await Promise.all([
-          supabase.from("listings").select("id", { count: "exact", head: true }).eq("status", "available"),
-          supabase
-            .from("deals_public_pipeline")
-            .select("channel_name,niche,subscribers_snapshot,closed_price_usd,stage,close_date")
-            .eq("stage", "closed"),
-        ]);
+    const supabase = createClient();
+    Promise.all([
+      supabase.from("listings").select("id", { count: "exact", head: true }).eq("status", "available"),
+      supabase
+        .from("deals_public_pipeline")
+        .select("channel_name,niche,subscribers_snapshot,closed_price_usd,close_date")
+        .eq("stage", "closed")
+        .order("created_at", { ascending: false }),
+    ])
+      .then(([listingsRes, dealsRes]) => {
         if (listingsRes.error) throw listingsRes.error;
         if (dealsRes.error) throw dealsRes.error;
-
-        const listed = listingsRes.count || 0;
-        const closed = dealsRes.data || [];
-        const vol = closed.reduce((s, d) => s + (Number(d.closed_price_usd) || 0), 0);
-
-        animateCount("t-sold", closed.length, "");
-        animateCount("t-vol", vol, "$");
-        animateCount("t-listed", listed, "");
-        animateCount("nc-sold", closed.length, "");
-        animateCount("nc-listed", listed, "");
-        if (vol > 0) {
-          const bigEl = document.getElementById("big-vol");
-          if (bigEl) bigEl.innerHTML = `<em>$${Math.round(vol).toLocaleString()}</em>`;
-        }
-        const grid = document.getElementById("deals-grid");
-        if (!grid) return;
-        if (closed.length === 0) {
-          grid.innerHTML =
-            '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--fg-hint);font-family:var(--font-mono),monospace;font-size:13px;">First closed deal coming soon</div>';
-        } else {
-          grid.innerHTML = closed
-            .map(
-              (d) =>
-                `<div class="deal-card lg"><div class="deal-niche">${d.niche || ""}</div><div class="deal-channel">${d.channel_name || ""}</div><div class="deal-stats"><div class="deal-stat"><div class="dsl">Subscribers</div><div class="dsv">${fmt(d.subscribers_snapshot)}</div></div><div class="deal-stat"><div class="dsl">Closed price</div><div class="dsv price">${d.closed_price_usd ? "$" + Number(d.closed_price_usd).toLocaleString() : "—"}</div></div></div><div class="sold-badge">✓ Sold${d.close_date ? " · " + d.close_date : ""}</div></div>`,
-            )
-            .join("");
-        }
-      } catch (e) {
-        console.log(e);
-      }
-    }
-
-    async function loadMarquee() {
-      const supabase = createClient();
-      try {
-        const { data, error } = await supabase
-          .from("deals_public_pipeline")
-          .select("channel_name,closed_price_usd")
-          .eq("stage", "closed")
-          .order("created_at", { ascending: false })
-          .limit(20);
-        if (error) throw error;
-        const track = document.getElementById("marquee-track");
-        if (!track) return;
-        const fallback: [string, string, string][] = [
-          ["T", "TechPulse Daily", "$18,500"],
-          ["F", "FoodieNaija", "$4,200"],
-          ["S", "StudyWithMe Hub", "$12,000"],
-          ["G", "GreenTech Builds", "$9,000"],
-          ["B", "BodyCam Premium", "$5,000"],
-          ["C", "Celebrix", "$35,000"],
-        ];
-        const items: [string, string, string][] =
-          data && data.length > 0
-            ? data.map((d) => {
-                const name = (d.channel_name || "").trim();
-                const price = d.closed_price_usd ? "$" + Number(d.closed_price_usd).toLocaleString() : "—";
-                return [name.charAt(0).toUpperCase(), name, price];
-              })
-            : fallback;
-        const all = [...items, ...items];
-        track.innerHTML = all
-          .map(([i, n, p]) => `<div class="brand-pill lg"><div class="brand-icon">${i}</div>${n} &nbsp;&middot;&nbsp; Sold ${p}</div>`)
-          .join("");
-      } catch (e) {
-        console.log("Marquee:", e);
-      }
-    }
-
-    (window as any).fetchChannel = fetchChannel;
-    (window as any).confirmMonthly = confirmMonthly;
-    (window as any).submitListing = submitListing;
-    (window as any).resetAll = resetAll;
-
-    loadData();
-    loadMarquee();
+        const closed = (dealsRes.data || []) as Deal[];
+        setDeals(closed);
+        setStats({
+          sold: closed.length,
+          vol: closed.reduce((s, d) => s + (Number(d.closed_price_usd) || 0), 0),
+          listed: listingsRes.count || 0,
+        });
+      })
+      .catch((e) => {
+        console.error(e);
+        setDeals([]);
+      });
   }, []);
 
-  return (
-    <div className="home-page">
-      <div className="dot-grid"></div>
+  const marquee = (deals || []).slice(0, 20).filter((d) => d.channel_name);
 
-      {/* NAV */}
-      <nav>
-        <div className="nav-pill lg">
-          <a href="/" className="logo">
-            <div className="logo-img">
-              <img src="/logo.jpg" alt="VX" />
-            </div>
-            <div className="logo-name">VIRALEXCHANGE</div>
-          </a>
-          <div className="nav-links">
-            <a href="/valuation" className="nav-link hi">
-              Free valuation
-            </a>
-            <a href="#deals" className="nav-link">
-              Closed deals
-            </a>
-            <a href="/deals" className="nav-link">
-              Pipeline
-            </a>
-            <a href="https://t.me/+uM8whHPwYFhjY2Y8" target="_blank" className="nav-link">
-              Buyers Lounge
-            </a>
-            <a href="#submit" className="nav-cta">
-              Sell a channel
-            </a>
-          </div>
-        </div>
-      </nav>
+  return (
+    <div data-theme="light" className="min-h-screen bg-vx-canvas text-vx-ink antialiased">
+      <SiteNav />
 
       {/* HERO */}
-      <div className="hero fade-up" style={{ zIndex: 1 }}>
-        <div className="glow-hero"></div>
-        <div className="hero-badge lg">
-          The #1 YouTube Channel Marketplace
-          <div className="hero-badge-inner">
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-              <circle cx="5" cy="5" r="3" fill="currentColor" style={{ animation: "pulse 2s infinite" }} />
-            </svg>
-            Live
-          </div>
-        </div>
-        <h1>
-          Buy &amp; sell YouTube
-          <br />
-          channels <em>with confidence</em>
-        </h1>
-        <p className="hero-sub">
-          We connect serious channel sellers with verified buyers. Secure escrow, fast closings, zero hassle.
-        </p>
-        <div className="hero-btns">
-          <a href="#submit" className="btn-p">
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-              <path d="M8 2L14 8L8 14M2 8H14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            Sell my channel
-          </a>
-          <a href="https://t.me/+uM8whHPwYFhjY2Y8" target="_blank" className="btn-g lg">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.941z" />
-            </svg>
-            Browse listings
-          </a>
-        </div>
+      <header className="relative overflow-hidden">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 h-[520px] bg-[repeating-conic-gradient(from_200deg_at_50%_340px,transparent_0deg_7deg,rgba(37,94,211,0.07)_7deg_7.25deg)] [mask-image:linear-gradient(to_bottom,black,transparent_85%)]"
+        />
+        <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-[720px] bg-[radial-gradient(ellipse_900px_560px_at_50%_-80px,rgba(37,94,211,0.14),transparent_70%)]" />
+        <Rings size={900} className="-top-[220px] hidden sm:block" />
 
-        {/* MARQUEE */}
-        <div className="marquee-wrap" style={{ width: "100%" }}>
-          <div className="marquee-track" id="marquee-track">
-            <div className="brand-pill lg">
-              <div className="brand-icon">·</div>Loading...
+        <div className="relative mx-auto max-w-6xl px-5 pt-16 pb-14 sm:px-6 sm:pt-24">
+          {/* floating live-stat cards */}
+          <div className="absolute top-28 right-4 hidden w-52 rotate-[2deg] rounded-2xl border border-vx-line bg-white p-4 shadow-vx-float lg:block xl:-right-6">
+            <div className="text-[11px] font-bold tracking-[0.06em] text-vx-muted uppercase">Transaction volume</div>
+            <div className="mt-1 text-[26px] font-extrabold tracking-[-0.02em] text-vx-ink">
+              <CountUp value={stats?.vol ?? null} format={money} />
+            </div>
+            <div className="mt-2 inline-flex items-center gap-1 rounded-full bg-vx-green-bg px-2 py-0.5 text-[12px] font-semibold text-vx-green">
+              <IconShieldCheck size={12} /> Escrow-closed
+            </div>
+          </div>
+          <div className="absolute bottom-20 left-4 hidden w-48 -rotate-[3deg] rounded-2xl border border-vx-line bg-white p-4 shadow-vx-float lg:block xl:-left-6">
+            <div className="text-[11px] font-bold tracking-[0.06em] text-vx-muted uppercase">Active listings</div>
+            <div className="mt-1 text-[26px] font-extrabold tracking-[-0.02em] text-vx-ink">
+              <CountUp value={stats?.listed ?? null} format={plain} />
+            </div>
+            <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-vx-tint px-2 py-0.5 text-[12px] font-semibold text-vx-blue">
+              <span className="size-1.5 animate-pulse rounded-full bg-vx-blue motion-reduce:animate-none" /> Live
+            </div>
+          </div>
+
+          <div className="relative mx-auto flex max-w-3xl flex-col items-center text-center">
+            <div className="inline-flex items-center gap-2 rounded-full border border-vx-blue/20 bg-vx-tint py-1.5 pr-1.5 pl-4 text-[13px] font-semibold text-vx-blue">
+              The #1 YouTube channel marketplace
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-2.5 py-0.5 text-[12px] shadow-[0_1px_2px_rgba(16,24,40,0.06)]">
+                <span className="size-1.5 animate-pulse rounded-full bg-vx-green motion-reduce:animate-none" />
+                <span className="text-vx-green">Live</span>
+              </span>
+            </div>
+
+            <h1 className="mt-7 text-[40px] leading-[1.08] font-extrabold tracking-[-0.03em] text-balance text-vx-ink sm:text-[64px]">
+              Buy &amp; sell YouTube channels{" "}
+              <span className="rounded-2xl bg-vx-blue box-decoration-clone px-3 text-white shadow-vx-cta sm:px-4">with confidence</span>
+            </h1>
+
+            <p className="mt-6 max-w-xl text-[17px] leading-relaxed text-pretty text-vx-body sm:text-[18px]">
+              We connect serious channel sellers with verified buyers. Secure escrow, fast closings, zero hassle.
+            </p>
+
+            <div className="mt-9 flex w-full flex-col items-center justify-center gap-3 sm:w-auto sm:flex-row">
+              <Link href="#submit" className={buttonVariants({ variant: "brand", size: "pill", className: "w-full max-w-xs sm:w-auto" })}>
+                Sell my channel <IconArrowRight size={16} />
+              </Link>
+              <a
+                href={TELEGRAM_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={buttonVariants({ variant: "brandOutline", size: "pill", className: "w-full max-w-xs sm:w-auto" })}
+              >
+                <TelegramIcon className="size-4 text-vx-blue" /> Browse listings
+              </a>
             </div>
           </div>
         </div>
+
+        {/* MARQUEE — recent closed deals */}
+        {marquee.length > 0 && (
+          <div className="relative border-y border-vx-line bg-white/70 py-3.5 [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
+            <div className="flex w-max animate-vx-marquee gap-3 hover:[animation-play-state:paused] motion-reduce:animate-none">
+              {[...marquee, ...marquee].map((d, i) => (
+                <div
+                  key={i}
+                  aria-hidden={i >= marquee.length}
+                  className="flex shrink-0 items-center gap-2.5 rounded-full border border-vx-line bg-white py-1.5 pr-4 pl-1.5 text-[13px] whitespace-nowrap text-vx-body"
+                >
+                  <span className="flex size-6 items-center justify-center rounded-full bg-vx-tint text-[11px] font-bold text-vx-blue">
+                    {d.channel_name!.trim().charAt(0).toUpperCase()}
+                  </span>
+                  <span className="font-semibold text-vx-ink">{d.channel_name}</span>
+                  <span className="text-vx-faint">·</span>
+                  Sold <span className="font-semibold text-vx-green">{usd(Number(d.closed_price_usd))}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* TRUST BAR */}
-        <div className="container" style={{ width: "100%", padding: 0 }}>
-          <div
-            className="trust-bar fade-up-2"
-            id="trust-bar"
-            style={{ opacity: 1, transform: "translateY(0)", transition: "opacity 0.6s ease,transform 0.6s ease" }}
-          >
-            <div className="trust-item">
-              <div className="trust-num" id="t-sold">
-                —
+        <div className="relative mx-auto max-w-6xl px-5 py-12 sm:px-6">
+          <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-vx-line bg-vx-line shadow-vx-card md:grid-cols-4">
+            {[
+              ["Channels sold", <CountUp key="s" value={stats?.sold ?? null} format={plain} />],
+              ["Transaction volume", <CountUp key="v" value={stats?.vol ?? null} format={money} />],
+              ["Active listings", <CountUp key="l" value={stats?.listed ?? null} format={plain} />],
+              ["Avg response time", "24h"],
+            ].map(([label, value]) => (
+              <div key={label as string} className="bg-white px-6 py-6 text-center">
+                <dd className="text-[28px] font-extrabold tracking-[-0.02em] text-vx-ink sm:text-[32px]">{value}</dd>
+                <dt className="mt-1 text-[13px] font-medium text-vx-muted">{label}</dt>
               </div>
-              <div className="trust-label">Channels sold</div>
-            </div>
-            <div className="trust-item">
-              <div className="trust-num" id="t-vol">
-                —
-              </div>
-              <div className="trust-label">Transaction volume</div>
-            </div>
-            <div className="trust-item">
-              <div className="trust-num" id="t-listed">
-                —
-              </div>
-              <div className="trust-label">Active listings</div>
-            </div>
-            <div className="trust-item">
-              <div className="trust-num" id="t-response">
-                24h
-              </div>
-              <div className="trust-label">Avg response time</div>
-            </div>
-          </div>
+            ))}
+          </dl>
         </div>
-      </div>
+      </header>
 
       {/* PROCESS */}
-      <div className="section" id="process">
-        <div className="container">
-          <div className="section-badge lg">
-            How it works{" "}
-            <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
-              <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>{" "}
-            <span className="hi">4 steps</span>
-          </div>
-          <h2>
-            Simple process,
-            <br />
-            <em>serious results</em>
-          </h2>
-          <p className="section-sub">From submission to payment — we handle everything so you can focus on what&apos;s next.</p>
-          <div className="process-grid">
-            <div className="proc-card lg">
-              <div className="proc-num">STEP 01</div>
-              <div className="proc-icon"><IconDocument /></div>
-              <div className="proc-title">Submit your channel</div>
-              <div className="proc-desc">
-                Paste your YouTube link and our tool auto-fetches all stats instantly. Fill in your asking price and we take it
-                from there.
-              </div>
-              <div className="proc-time"><IconClock size={12} />Under 2 minutes</div>
-            </div>
-            <div className="proc-card lg">
-              <div className="proc-num">STEP 02</div>
-              <div className="proc-icon"><IconCheckCircle /></div>
-              <div className="proc-title">We verify &amp; list</div>
-              <div className="proc-desc">
-                Our team reviews your channel within 24 hours. Once verified, it goes live to our network of active buyers
-                immediately.
-              </div>
-              <div className="proc-time"><IconClock size={12} />Within 24 hours</div>
-            </div>
-            <div className="proc-card lg">
-              <div className="proc-num">STEP 03</div>
-              <div className="proc-icon"><IconHandshake /></div>
-              <div className="proc-title">Negotiate &amp; agree</div>
-              <div className="proc-desc">
-                We handle all buyer inquiries and negotiations on your behalf. You only hear from us when there&apos;s an offer
-                worth considering.
-              </div>
-              <div className="proc-time"><IconClock size={12} />Within 7 days</div>
-            </div>
-            <div className="proc-card lg">
-              <div className="proc-num">STEP 04</div>
-              <div className="proc-icon"><IconBanknote /></div>
-              <div className="proc-title">Close via escrow</div>
-              <div className="proc-desc">All deals close through secure escrow. Funds held safely until the channel transfer is complete.</div>
-              <div className="proc-time"><IconClock size={12} />Within 48 hours</div>
-            </div>
-          </div>
+      <section id="process" className="scroll-mt-20 px-5 py-20 sm:px-6 sm:py-24">
+        <div className="mx-auto max-w-6xl">
+          <SectionHeader
+            eyebrow="How it works"
+            detail="4 steps"
+            title="Simple process,"
+            highlight="serious results"
+            sub="From submission to payment — we handle everything so you can focus on what's next."
+          />
+          <ol className="grid gap-px overflow-hidden rounded-2xl border border-vx-line bg-vx-line shadow-vx-card sm:grid-cols-2 lg:grid-cols-4">
+            {STEPS.map((s, i) => (
+              <li key={s.title} className="flex flex-col bg-white p-7">
+                <div className="flex size-11 items-center justify-center rounded-xl bg-vx-tint text-vx-blue">
+                  <s.icon size={20} />
+                </div>
+                <div className="mt-6 text-[16px] font-bold text-vx-ink">
+                  <span className="mr-1.5 font-mono text-[13px] text-vx-blue">0{i + 1}</span>
+                  {s.title}
+                </div>
+                <p className="mt-2.5 flex-1 text-[14px] leading-relaxed text-vx-body">{s.desc}</p>
+                <div className="mt-6 inline-flex items-center gap-1.5 self-start rounded-full bg-vx-subtle px-3 py-1 text-[12px] font-semibold text-vx-body">
+                  <IconClock size={12} />
+                  {s.time}
+                </div>
+              </li>
+            ))}
+          </ol>
         </div>
-      </div>
+      </section>
 
       {/* FEATURES */}
-      <div className="section">
-        <div className="container">
-          <div className="section-badge lg">
-            Why ViralExchange{" "}
-            <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
-              <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>{" "}
-            <span className="hi">Our edge</span>
-          </div>
-          <h2>
-            Built for deals that
-            <br />
-            <em>actually close</em>
-          </h2>
-          <p className="section-sub">Every feature designed to protect your channel, your privacy, and your payout.</p>
-          <div className="feat-grid">
-            <div className="feat-card lg">
-              <div className="feat-icon"><IconLock /></div>
-              <div className="feat-title">Privacy First</div>
-              <div className="feat-desc">
-                Your channel name and link stay completely private. Buyers see stats only until they are verified serious and
-                sign an NDA.
+      <section className="border-y border-vx-line bg-white px-5 py-20 sm:px-6 sm:py-24">
+        <div className="mx-auto max-w-6xl">
+          <SectionHeader
+            eyebrow="Why ViralExchange"
+            detail="Our edge"
+            title="Built for deals that"
+            highlight="actually close"
+            sub="Every feature designed to protect your channel, your privacy, and your payout."
+          />
+          <div className="grid gap-5 md:grid-cols-3">
+            {FEATURES.map((ft) => (
+              <div key={ft.title} className="flex flex-col rounded-2xl border border-vx-line bg-vx-canvas p-7">
+                <div className="flex size-11 items-center justify-center rounded-xl bg-white text-vx-blue ring-1 ring-vx-line">
+                  <ft.icon size={20} />
+                </div>
+                <h3 className="mt-6 text-[18px] font-bold text-vx-ink">{ft.title}</h3>
+                <p className="mt-2.5 flex-1 text-[14px] leading-relaxed text-vx-body">{ft.desc}</p>
+                <div className="mt-6 border-t border-vx-line pt-5">
+                  <div className="text-[30px] font-extrabold tracking-[-0.02em] text-vx-blue">{ft.stat}</div>
+                  <div className="text-[13px] text-vx-muted">{ft.statLabel}</div>
+                </div>
               </div>
-              <div className="feat-divider"></div>
-              <div className="feat-stat">100%</div>
-              <div className="feat-stat-lbl">private until deal stage</div>
-            </div>
-            <div className="feat-card lg">
-              <div className="feat-icon"><IconBolt /></div>
-              <div className="feat-title">Instant Valuation</div>
-              <div className="feat-desc">
-                Get a data-driven estimate in 60 seconds based on real market multiples — subscribers, engagement, niche, and
-                revenue.
-              </div>
-              <div className="feat-divider"></div>
-              <div className="feat-stat">60s</div>
-              <div className="feat-stat-lbl">to get your valuation</div>
-            </div>
-            <div className="feat-card lg">
-              <div className="feat-icon"><IconShieldCheck /></div>
-              <div className="feat-title">Secure Escrow</div>
-              <div className="feat-desc">
-                Every deal closes through verified escrow. Funds are held safely by a neutral third party until the channel
-                transfer is complete.
-              </div>
-              <div className="feat-divider"></div>
-              <div className="feat-stat">Zero</div>
-              <div className="feat-stat-lbl">failed transactions</div>
-            </div>
+            ))}
           </div>
         </div>
-      </div>
+      </section>
 
       {/* NUMBERS */}
-      <div className="numbers">
-        <div className="glow-sm" style={{ top: "20%", left: "50%", transform: "translateX(-50%)" }}></div>
-        <div style={{ position: "relative", zIndex: 1 }}>
-          <div className="big-num" id="big-vol">
-            <em>$—</em>
+      <section className="px-5 py-20 text-center sm:px-6 sm:py-24">
+        <div className="mx-auto max-w-3xl">
+          <div className="text-[52px] leading-none font-extrabold tracking-[-0.04em] text-vx-ink sm:text-[88px]">
+            <CountUp value={stats?.vol ?? null} format={money} />
           </div>
-          <div className="big-label">Total transaction volume brokered</div>
-          <div className="num-cards-wrap lg">
-            <div className="num-card">
-              <div className="num-card-val" id="nc-sold">
-                —
-              </div>
-              <div className="num-card-lbl">Channels successfully sold</div>
+          <p className="mt-4 text-[16px] font-medium text-vx-muted">Total transaction volume brokered</p>
+          <dl className="mx-auto mt-10 grid max-w-xl gap-px overflow-hidden rounded-2xl border border-vx-line bg-vx-line shadow-vx-card sm:grid-cols-2">
+            <div className="bg-white px-6 py-7">
+              <dd className="text-[36px] font-extrabold tracking-[-0.02em] text-vx-blue">
+                <CountUp value={stats?.sold ?? null} format={plain} />
+              </dd>
+              <dt className="mt-1 text-[14px] text-vx-muted">Channels successfully sold</dt>
             </div>
-            <div className="num-card" style={{ borderLeft: "1px solid var(--border)" }}>
-              <div className="num-card-val" id="nc-listed">
-                —
-              </div>
-              <div className="num-card-lbl">Active listings right now</div>
+            <div className="bg-white px-6 py-7">
+              <dd className="text-[36px] font-extrabold tracking-[-0.02em] text-vx-blue">
+                <CountUp value={stats?.listed ?? null} format={plain} />
+              </dd>
+              <dt className="mt-1 text-[14px] text-vx-muted">Active listings right now</dt>
             </div>
-          </div>
+          </dl>
         </div>
-      </div>
+      </section>
 
       {/* CLOSED DEALS */}
-      <div className="section" id="deals">
-        <div className="container">
-          <div className="section-badge lg">
-            Track record{" "}
-            <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
-              <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>{" "}
-            <span className="hi">Recent closes</span>
+      <section id="deals" className="scroll-mt-20 border-t border-vx-line bg-white px-5 py-20 sm:px-6 sm:py-24">
+        <div className="mx-auto max-w-6xl">
+          <SectionHeader
+            eyebrow="Track record"
+            detail="Recent closes"
+            title="Real channels,"
+            highlight="real transactions"
+            sub="Updated live from our deal tracker. Every sale verified and completed through escrow."
+          />
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {deals === null && <p className="col-span-full py-10 text-center text-[14px] text-vx-muted">Loading deals...</p>}
+            {deals?.length === 0 && <p className="col-span-full py-10 text-center text-[14px] text-vx-muted">First closed deal coming soon</p>}
+            {deals?.slice(0, 6).map((d, i) => (
+              <article key={i} className="rounded-2xl border border-vx-line bg-vx-canvas p-6 transition-shadow hover:shadow-vx-card">
+                <div className="text-[12px] font-semibold tracking-[0.04em] text-vx-blue uppercase">{d.niche || "Channel"}</div>
+                <h3 className="mt-1.5 truncate text-[18px] font-bold text-vx-ink">{d.channel_name}</h3>
+                <dl className="mt-5 grid grid-cols-2 gap-3">
+                  <div>
+                    <dt className="text-[12px] text-vx-muted">Subscribers</dt>
+                    <dd className="text-[17px] font-bold text-vx-ink">{fmt(d.subscribers_snapshot)}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-[12px] text-vx-muted">Closed price</dt>
+                    <dd className="text-[17px] font-bold text-vx-green">{usd(Number(d.closed_price_usd))}</dd>
+                  </div>
+                </dl>
+                <div className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-vx-green-bg px-2.5 py-1 text-[12px] font-semibold text-vx-green">
+                  <IconCheck size={12} /> Sold{d.close_date ? ` · ${d.close_date}` : ""}
+                </div>
+              </article>
+            ))}
           </div>
-          <h2>
-            Real channels,
-            <br />
-            <em>real transactions</em>
-          </h2>
-          <p className="section-sub">Updated live from our deal tracker. Every sale verified and completed through escrow.</p>
-          <div className="deals-grid" id="deals-grid">
-            <div style={{ gridColumn: "1/-1", textAlign: "center", padding: 40, color: "var(--fg-hint)", fontFamily: "var(--font-mono),monospace", fontSize: 13 }}>
-              Loading deals...
-            </div>
-          </div>
-          <div style={{ textAlign: "center", marginTop: 28 }}>
-            <a href="/deals" className="btn-g lg" style={{ display: "inline-flex" }}>
-              View full pipeline →
-            </a>
+          <div className="mt-10 text-center">
+            <Link href="/deals" className={buttonVariants({ variant: "brandOutline", size: "pillSm" })}>
+              View full pipeline <IconArrowRight size={14} />
+            </Link>
           </div>
         </div>
-      </div>
-
+      </section>
 
       {/* BUYERS LOUNGE */}
-      <div className="section">
-        <div className="container">
-          <div className="lounge lg">
-            <div className="glow-sm" style={{ top: -60, left: "50%", transform: "translateX(-50%)" }}></div>
-            <div style={{ position: "relative", zIndex: 1 }}>
-              <div className="section-badge lg" style={{ display: "inline-flex", marginBottom: 20 }}>
-                Buyers Lounge{" "}
-                <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
-                  <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                </svg>{" "}
-                <span className="hi">Join free</span>
-              </div>
-              <h3>
-                First access to every
-                <br />
-                <em>new verified listing</em>
-              </h3>
-              <p>New channels posted to our private Telegram the moment they are verified. Be first in line before anyone else sees them.</p>
-              <a
-                href="https://t.me/+uM8whHPwYFhjY2Y8"
-                target="_blank"
-                className="btn-p"
-                style={{ display: "inline-flex", marginBottom: 14 }}
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.941z" />
-                </svg>
-                Join Buyers Lounge on Telegram
-              </a>
-              <div style={{ fontSize: 13, color: "var(--fg-hint)" }}>
-                Already a member?{" "}
-                <a href="/deals" style={{ color: "var(--green)", textDecoration: "none" }}>
-                  View live deal pipeline →
-                </a>
-              </div>
-            </div>
+      <section className="px-5 py-20 sm:px-6 sm:py-24">
+        <div className="relative mx-auto max-w-6xl overflow-hidden rounded-[28px] border border-vx-blue/20 bg-vx-tint px-6 py-16 text-center sm:px-12 sm:py-20">
+          <Rings size={1100} className="top-1/2 hidden -translate-y-1/2 sm:block" />
+          <div className="relative mx-auto flex max-w-xl flex-col items-center">
+            <Eyebrow label="Buyers Lounge" detail="Join free" className="border-vx-blue/15" />
+            <h2 className="mt-5 text-[30px] leading-[1.15] font-extrabold tracking-[-0.025em] text-balance text-vx-ink sm:text-[40px]">
+              First access to every <span className="text-vx-blue">new verified listing</span>
+            </h2>
+            <p className="mt-4 text-[16px] leading-relaxed text-pretty text-vx-body">
+              New channels posted to our private Telegram the moment they are verified. Be first in line before anyone else sees them.
+            </p>
+            <a
+              href={TELEGRAM_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={buttonVariants({ variant: "brand", size: "pill", className: "mt-8" })}
+            >
+              <TelegramIcon className="size-4" /> Join Buyers Lounge on Telegram
+            </a>
+            <p className="mt-4 text-[14px] text-vx-muted">
+              Already a member?{" "}
+              <Link href="/deals" className="font-semibold text-vx-blue hover:underline">
+                View live deal pipeline →
+              </Link>
+            </p>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* SUBMIT FORM */}
-      <div className="form-section" id="submit">
-        <div className="container">
-          <div className="form-wrap">
-            <div className="form-left">
-              <div className="section-badge lg">
-                Sell your channel{" "}
-                <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
-                  <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                </svg>{" "}
-                <span className="hi">Free listing</span>
-              </div>
-              <h2>
-                Ready to exit?
-                <br />
-                <em>Let&apos;s get you paid.</em>
-              </h2>
-              <p style={{ color: "var(--fg-sub)", fontSize: 15, lineHeight: 1.7, marginBottom: 8 }}>
-                Paste your YouTube link and our tool fetches all the stats automatically. No spreadsheets, no back-and-forth.
-              </p>
-              <div className="form-feats">
-                <div className="feat-row">
-                  <div className="feat-dot"></div>Stats auto-fetched from YouTube API
-                </div>
-                <div className="feat-row">
-                  <div className="feat-dot"></div>Listed to verified buyers within 24 hours
-                </div>
-                <div className="feat-row">
-                  <div className="feat-dot"></div>Zero upfront fees — commission on close only
-                </div>
-                <div className="feat-row">
-                  <div className="feat-dot"></div>Secure escrow on every transaction
-                </div>
-                <div className="feat-row">
-                  <div className="feat-dot"></div>Channel details kept private until deal stage
-                </div>
-              </div>
-            </div>
+      {/* SELL FORM */}
+      <section id="submit" className="scroll-mt-20 border-t border-vx-line bg-white px-5 py-20 sm:px-6 sm:py-24">
+        <div className="mx-auto grid max-w-6xl items-start gap-12 lg:grid-cols-[1fr_1.1fr] lg:gap-16">
+          <div className="lg:sticky lg:top-28">
+            <Eyebrow label="Sell your channel" detail="Free listing" />
+            <h2 className="mt-5 text-[32px] leading-[1.12] font-extrabold tracking-[-0.025em] text-vx-ink sm:text-[44px]">
+              Ready to exit? <span className="text-vx-blue">Let&apos;s get you paid.</span>
+            </h2>
+            <p className="mt-4 text-[16px] leading-relaxed text-vx-body">
+              Paste your YouTube link and our tool fetches all the stats automatically. No spreadsheets, no back-and-forth.
+            </p>
+            <ul className="mt-8 flex flex-col gap-3.5">
+              {[
+                "Stats auto-fetched from YouTube API",
+                "Listed to verified buyers within 24 hours",
+                "Zero upfront fees — commission on close only",
+                "Secure escrow on every transaction",
+                "Channel details kept private until deal stage",
+              ].map((t) => (
+                <li key={t} className="flex items-center gap-3 text-[15px] text-vx-ink">
+                  <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-vx-tint text-vx-blue">
+                    <IconCheck size={13} />
+                  </span>
+                  {t}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="rounded-3xl border border-vx-line bg-white p-6 shadow-vx-card sm:p-8">
+            <SellForm />
+          </div>
+        </div>
+      </section>
 
-            <div className="form-card lg">
-              <div id="form-main">
-                <div className="fc-title">Submit your channel</div>
-                <div className="fc-sub">Takes under 2 minutes</div>
-                <label>YouTube channel URL</label>
-                <div className="url-row">
-                  <input type="text" id="url-input" placeholder="https://youtube.com/@yourchannel" />
-                  <button className="fetch-btn" id="fetch-btn" onClick={() => (window as any).fetchChannel()}>
-                    Fetch →
-                  </button>
-                </div>
-                <div id="status-msg"></div>
-                <div id="fetched-panel">
-                  <div className="ch-header">
-                    <div className="ch-avatar" id="ch-avatar">
-                      <span id="ch-init"></span>
-                    </div>
-                    <div>
-                      <div className="ch-name" id="ch-name">
-                        —
-                      </div>
-                      <div className="ch-handle" id="ch-handle">
-                        —
-                      </div>
-                    </div>
-                  </div>
-                  <div className="fetched-grid">
-                    <div className="fstat">
-                      <div className="fl">Subscribers</div>
-                      <div className="fv" id="f-subs">
-                        —
-                      </div>
-                    </div>
-                    <div className="fstat">
-                      <div className="fl">Total videos</div>
-                      <div className="fv w" id="f-vids">
-                        —
-                      </div>
-                    </div>
-                    <div className="fstat">
-                      <div className="fl">Total views</div>
-                      <div className="fv w" id="f-views">
-                        —
-                      </div>
-                    </div>
-                    <div className="fstat">
-                      <div className="fl">Avg views/video</div>
-                      <div className="fv w" id="f-avg">
-                        —
-                      </div>
-                    </div>
-                    <div className="fstat">
-                      <div className="fl">Engagement</div>
-                      <div className="fv" id="f-eng">
-                        —
-                      </div>
-                    </div>
-                    <div className="fstat">
-                      <div className="fl">Channel age</div>
-                      <div className="fv" id="f-age">
-                        —
-                      </div>
-                    </div>
-                  </div>
-                  <div className="mv-box" id="mv-box">
-                    <div className="mvl">Monthly views</div>
-                    <div className="mvv" id="mv-val">
-                      —
-                    </div>
-                    <div className="mvn">Estimated from total views. Override with your actual YouTube Studio figure below.</div>
-                    <div className="mv-row">
-                      <input type="number" id="mv-override" placeholder="Actual monthly views (optional)" />
-                      <button className="btn-sm" onClick={() => (window as any).confirmMonthly()}>
-                        Confirm
-                      </button>
-                    </div>
-                  </div>
-                  <div className="divider"></div>
-                  <div className="sec-label">Channel details</div>
-                  <label>Niche / Category</label>
-                  <input type="text" id="f-niche" placeholder="e.g. Technology, Finance" />
-                  <label>Sub-niche</label>
-                  <input type="text" id="f-subniche" placeholder="e.g. AI & Gadgets" />
-                  <label>Content language</label>
-                  <input type="text" id="f-lang" placeholder="e.g. English" />
-                  <label>Monetization</label>
-                  <select id="f-mono" defaultValue="">
-                    <option value="">Select...</option>
-                    <option>AdSense monetized</option>
-                    <option>Brand deals only</option>
-                    <option>AdSense + Merch</option>
-                    <option>Not monetized</option>
-                    <option>Paid subscriptions</option>
-                  </select>
-                  <label>Asking price (USD)</label>
-                  <input type="number" id="f-price" placeholder="e.g. 18500" />
-                  <label>Monthly revenue (USD)</label>
-                  <input type="number" id="f-rev" placeholder="e.g. 3200" />
-                  <div className="divider"></div>
-                  <div className="sec-label">Your contact</div>
-                  <label>Name / Alias</label>
-                  <input type="text" id="f-name" placeholder="How should we address you?" />
-                  <label>Telegram / Email</label>
-                  <input type="text" id="f-contact" placeholder="@yourhandle or email" />
-                  <label>Anything else to know?</label>
-                  <textarea id="f-notes" placeholder="Channel history, reason for selling..."></textarea>
-                  <button className="submit-btn" onClick={() => (window as any).submitListing()}>
-                    <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
-                      <path d="M8 2L14 8L8 14M2 8H14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                    Submit my channel
-                  </button>
-                </div>
-              </div>
-              <div id="success-screen">
-                <div className="success-ring"><IconCheck size={24} /></div>
-                <h3>You&apos;re in the pipeline.</h3>
-                <p>We&apos;ve received your channel and will be in touch within 24 hours via your preferred contact.</p>
-                <button className="btn-ghost" onClick={() => (window as any).resetAll()}>
-                  Submit another channel
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* FOOTER */}
-      <footer>
-        <div className="footer-grid">
-          <div className="footer-brand">
-            <a href="/" className="logo">
-              <div className="logo-img">
-                <img src="/logo.jpg" alt="VX" />
-              </div>
-              <div className="logo-name">VIRALEXCHANGE</div>
-            </a>
-            <p>The #1 marketplace for buying and selling YouTube channels. Secure, private, and professional.</p>
-          </div>
-          <div className="footer-col">
-            <h4>Platform</h4>
-            <a href="/valuation">Free valuation</a>
-            <a href="/deals">Deal pipeline</a>
-            <a href="#submit">Sell a channel</a>
-            <a href="https://t.me/+uM8whHPwYFhjY2Y8" target="_blank">
-              Buyers Lounge
-            </a>
-          </div>
-          <div className="footer-col">
-            <h4>Process</h4>
-            <a href="#deals">Closed deals</a>
-          </div>
-          <div className="footer-col">
-            <h4>Contact</h4>
-            <a href="mailto:deals@viralexchange.io">deals@viralexchange.io</a>
-            <a href="https://t.me/+uM8whHPwYFhjY2Y8" target="_blank">
-              Telegram
-            </a>
-            <a href="https://x.com/viralexchangeHQ" target="_blank">
-              @viralexchangeHQ
-            </a>
-          </div>
-        </div>
-        <div className="footer-bottom">
-          <div className="footer-copy">&copy; 2026 ViralExchange. All rights reserved.</div>
-          <div className="footer-links">
-            <a href="#">Privacy</a>
-            <a href="#">Terms</a>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }
