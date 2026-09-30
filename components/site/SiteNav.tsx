@@ -2,6 +2,7 @@ import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { TELEGRAM_URL } from "./links";
 import { ThemeToggle } from "./ThemeToggle";
+import { SectionLink } from "./SectionLink";
 
 const linkClass = "rounded-full px-3 py-2 text-[14px] font-medium text-vx-body transition-colors hover:bg-vx-subtle hover:text-vx-ink";
 
@@ -23,16 +24,16 @@ export function SiteNav() {
         <Logo />
         <div className="hidden items-center gap-1 md:flex">
           <Link href="/valuation" className={linkClass}>Free valuation</Link>
-          <Link href="/#deals" className={linkClass}>Closed deals</Link>
+          <SectionLink section="deals" className={linkClass}>Closed deals</SectionLink>
           <Link href="/deals" className={linkClass}>Pipeline</Link>
           <a href={TELEGRAM_URL} target="_blank" rel="noopener noreferrer" className={linkClass}>Buyers Lounge</a>
         </div>
         <div className="flex items-center gap-1.5 sm:gap-2">
           <ThemeToggle />
           <Link href="/valuation" className={`${linkClass} hidden sm:inline-flex md:hidden`}>Valuation</Link>
-          <Link href="/#submit" className={buttonVariants({ variant: "brand", size: "pillSm", className: "px-4 sm:px-5" })}>
+          <SectionLink section="submit" className={buttonVariants({ variant: "brand", size: "pillSm", className: "px-4 sm:px-5" })}>
             Sell a channel
-          </Link>
+          </SectionLink>
         </div>
       </div>
     </nav>

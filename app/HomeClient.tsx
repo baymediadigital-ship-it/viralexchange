@@ -204,9 +204,9 @@ export default function HomeClient() {
             </p>
 
             <div style={delay(240)} className="vx-rise mt-9 flex flex-col items-center gap-3 sm:flex-row sm:justify-center lg:justify-start">
-              <Link href="#submit" className={buttonVariants({ variant: "brand", size: "pill", className: "w-full max-w-xs sm:w-auto" })}>
+              <a href="#submit" className={buttonVariants({ variant: "brand", size: "pill", className: "w-full max-w-xs sm:w-auto" })}>
                 Sell my channel <IconArrowRight size={16} className="transition-transform duration-300 group-hover/button:translate-x-0.5" />
-              </Link>
+              </a>
               <a
                 href={TELEGRAM_URL}
                 target="_blank"
@@ -237,10 +237,13 @@ export default function HomeClient() {
       </header>
 
       {/* RECENTLY SOLD */}
-      {marquee.length > 0 && (
+      {(deals === null || marquee.length > 0) && (
         <div className="flex items-center border-y border-vx-line bg-vx-surface">
           <div className="hidden shrink-0 px-6 text-[12px] font-bold tracking-[0.08em] text-vx-muted uppercase sm:block">Recently sold</div>
           <div className="relative flex-1 overflow-hidden py-3.5 [mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)]">
+            {marquee.length === 0 ? (
+              <div className="h-6" />
+            ) : (
             <div className="flex w-max animate-vx-marquee gap-8 hover:[animation-play-state:paused] motion-reduce:animate-none">
               {[...marquee, ...marquee].map((d, i) => (
                 <div key={i} aria-hidden={i >= marquee.length} className="flex shrink-0 items-center gap-2 text-[14px] whitespace-nowrap">
@@ -252,6 +255,7 @@ export default function HomeClient() {
                 </div>
               ))}
             </div>
+            )}
           </div>
         </div>
       )}
