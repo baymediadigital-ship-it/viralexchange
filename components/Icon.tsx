@@ -1,3 +1,5 @@
+import { Handshake } from "lucide-react";
+
 type IconProps = { size?: number; className?: string };
 
 const base = {
@@ -28,13 +30,7 @@ export function IconCheckCircle({ size = 18, className }: IconProps) {
 }
 
 export function IconHandshake({ size = 18, className }: IconProps) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...base}>
-      <path d="M2 12l4-4 4 3 3-3 2 2-5 5-4-3-2 2" />
-      <path d="M13 9l3-3 4 4-3 3" />
-      <path d="M9 13l2 2M7 15l2 2" />
-    </svg>
-  );
+  return <Handshake size={size} strokeWidth={1.6} className={className} aria-hidden />;
 }
 
 export function IconBanknote({ size = 18, className }: IconProps) {

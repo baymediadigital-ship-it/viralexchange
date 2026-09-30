@@ -173,6 +173,28 @@ body:has(.vx-page) { background: var(--vx-canvas); color: var(--vx-ink); }
 :root[data-theme="dark"] .vx-theme-sun { display: block; }
 :root[data-theme="dark"] .vx-theme-moon { display: none; }
 
+/* Motion: one easing, short distances, everything ends fully visible. */
+@keyframes vx-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes vx-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+/* Page-load entrance; stagger with style={{ "--d": "120ms" }}. */
+.vx-rise { animation: vx-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0ms) both; }
+.vx-float { animation: vx-float 6s ease-in-out var(--d, 0ms) infinite; }
+/* Scroll reveal via native scroll-driven animations (no JS). Browsers without
+   support skip it and simply show the content. */
+@supports (animation-timeline: view()) {
+  .vx-reveal {
+    animation: vx-rise linear both;
+    animation-timeline: view();
+    animation-range: entry 5% entry 45%;
+  }
+}
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 0.35s; }
+@media (prefers-reduced-motion: reduce) {
+  .vx-rise, .vx-float, .vx-reveal { animation: none !important; }
+  html { scroll-behavior: auto; }
+  ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
+}
+
 html{scroll-behavior:smooth;}
 body{background:var(--bg);color:var(--fg);font-family:var(--font-sans),sans-serif;font-size:16px;line-height:1.6;overflow-x:hidden;}
 

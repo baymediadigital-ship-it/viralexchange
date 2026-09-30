@@ -299,7 +299,7 @@ export default function SellForm() {
 
       {channel && (
         <Button type="submit" variant="brand" size="pill" className="mt-6 w-full" disabled={submitting}>
-          {submitting ? <Spinner /> : <IconArrowRight size={16} />}
+          {submitting ? <Spinner /> : <IconArrowRight size={16} className="transition-transform duration-300 group-hover/button:translate-x-0.5" />}
           {submitting ? "Submitting..." : "Submit my channel"}
         </Button>
       )}

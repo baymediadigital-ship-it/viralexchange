@@ -24,6 +24,8 @@ import { fmt, usd } from "@/lib/format";
 import { createClient } from "@/lib/supabase/client";
 import SellForm from "./SellForm";
 
+const delay = (ms: number) => ({ "--d": `${ms}ms` }) as React.CSSProperties;
+
 type Deal = {
   channel_name: string | null;
   niche: string | null;
@@ -72,7 +74,7 @@ const DEAL_STEPS = ["Listed", "Buyer matched", "Escrow funded", "Transferred"];
 
 function DealShowcase({ deal }: { deal: Deal | null }) {
   return (
-    <div className="relative mx-auto w-full max-w-[420px]">
+    <div style={delay(200)} className="vx-rise relative mx-auto w-full max-w-[420px]">
       <div aria-hidden className="absolute -inset-10 rounded-full bg-[radial-gradient(closest-side,rgba(var(--vx-shadow-rgb),0.35),transparent)] blur-2xl" />
 
       <div className="relative overflow-hidden rounded-[28px] bg-vx-surface shadow-[0_40px_80px_-30px_rgba(var(--vx-shadow-rgb),0.45)] ring-1 ring-vx-accent/10">
@@ -119,13 +121,13 @@ function DealShowcase({ deal }: { deal: Deal | null }) {
         </div>
       </div>
 
-      <div className="absolute -top-6 -left-10 hidden items-center gap-2 rounded-2xl bg-vx-surface px-3.5 py-2.5 text-[13px] font-semibold text-vx-ink shadow-vx-float ring-1 ring-vx-line sm:flex">
+      <div className="vx-float absolute -top-6 -left-10 hidden items-center gap-2 rounded-2xl bg-vx-surface px-3.5 py-2.5 text-[13px] font-semibold text-vx-ink shadow-vx-float ring-1 ring-vx-line sm:flex">
         <span className="flex size-7 items-center justify-center rounded-full bg-vx-accent-soft text-vx-accent">
           <IconShieldCheck size={14} />
         </span>
         Escrow protected
       </div>
-      <div className="absolute -right-8 -bottom-8 hidden items-center gap-2 rounded-2xl bg-vx-surface px-3.5 py-2.5 text-[13px] font-semibold text-vx-ink shadow-vx-float ring-1 ring-vx-line sm:flex">
+      <div style={delay(-3000)} className="vx-float absolute -right-8 -bottom-8 hidden items-center gap-2 rounded-2xl bg-vx-surface px-3.5 py-2.5 text-[13px] font-semibold text-vx-ink shadow-vx-float ring-1 ring-vx-line sm:flex">
         <span className="flex size-7 items-center justify-center rounded-full bg-vx-green-bg text-vx-green">
           <IconBanknote size={14} />
         </span>
@@ -185,7 +187,7 @@ export default function HomeClient() {
 
         <div className="relative mx-auto grid max-w-6xl items-center gap-16 px-5 pt-16 pb-20 sm:px-6 sm:pt-20 lg:grid-cols-[1.1fr_0.9fr] lg:gap-12 lg:pt-24 lg:pb-28">
           <div className="text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 rounded-full bg-vx-surface/80 py-1.5 pr-3.5 pl-1.5 text-[13px] font-semibold text-vx-body shadow-[0_1px_2px_rgba(16,24,40,0.06)] ring-1 ring-vx-accent/10 backdrop-blur">
+            <div className="vx-rise inline-flex items-center gap-2 rounded-full bg-vx-surface/80 py-1.5 pr-3.5 pl-1.5 text-[13px] font-semibold text-vx-body shadow-[0_1px_2px_rgba(16,24,40,0.06)] ring-1 ring-vx-accent/10 backdrop-blur">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-vx-green-bg px-2 py-0.5 text-[12px] text-vx-green">
                 <span className="size-1.5 animate-pulse rounded-full bg-vx-green motion-reduce:animate-none" />
                 Live
@@ -193,17 +195,17 @@ export default function HomeClient() {
               The #1 YouTube channel marketplace
             </div>
 
-            <h1 className="mt-7 text-[42px] leading-[1.05] font-semibold tracking-[-0.045em] text-balance text-vx-ink sm:text-[60px]">
+            <h1 style={delay(80)} className="vx-rise mt-7 text-[42px] leading-[1.05] font-semibold tracking-[-0.045em] text-balance text-vx-ink sm:text-[60px]">
               Buy &amp; sell YouTube channels <GradientText>with confidence</GradientText>
             </h1>
 
-            <p className="mx-auto mt-6 max-w-lg text-[17px] leading-relaxed text-pretty text-vx-body sm:text-[18px] lg:mx-0">
+            <p style={delay(160)} className="vx-rise mx-auto mt-6 max-w-lg text-[17px] leading-relaxed text-pretty text-vx-body sm:text-[18px] lg:mx-0">
               We connect serious channel sellers with verified buyers. Secure escrow, fast closings, zero hassle.
             </p>
 
-            <div className="mt-9 flex flex-col items-center gap-3 sm:flex-row sm:justify-center lg:justify-start">
+            <div style={delay(240)} className="vx-rise mt-9 flex flex-col items-center gap-3 sm:flex-row sm:justify-center lg:justify-start">
               <Link href="#submit" className={buttonVariants({ variant: "brand", size: "pill", className: "w-full max-w-xs sm:w-auto" })}>
-                Sell my channel <IconArrowRight size={16} />
+                Sell my channel <IconArrowRight size={16} className="transition-transform duration-300 group-hover/button:translate-x-0.5" />
               </Link>
               <a
                 href={TELEGRAM_URL}
@@ -215,7 +217,7 @@ export default function HomeClient() {
               </a>
             </div>
 
-            <dl className="mt-12 grid grid-cols-2 gap-x-6 gap-y-6 border-t border-vx-accent/10 pt-8 text-left sm:grid-cols-4">
+            <dl style={delay(320)} className="vx-rise mt-12 grid grid-cols-2 gap-x-6 gap-y-6 border-t border-vx-accent/10 pt-8 text-left sm:grid-cols-4">
               {[
                 ["Channels sold", <CountUp key="s" value={stats?.sold ?? null} format={plain} />],
                 ["Volume brokered", <CountUp key="v" value={stats?.vol ?? null} format={money} />],
@@ -267,11 +269,11 @@ export default function HomeClient() {
           <ol className="relative grid gap-12 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
             <span aria-hidden className="absolute top-6 right-[12%] left-[12%] hidden h-px bg-linear-to-r from-transparent via-vx-accent/35 to-transparent lg:block" />
             {STEPS.map((s, i) => (
-              <li key={s.title} className="relative flex flex-col items-center text-center">
+              <li key={s.title} className="vx-reveal relative flex flex-col items-center text-center">
                 <IconTile className="bg-linear-to-b from-vx-surface to-vx-accent-soft">
                   <s.icon size={20} />
                 </IconTile>
-                <div className="mt-5 font-mono text-[12px] font-semibold text-vx-accent">STEP 0{i + 1}</div>
+                <div className="mt-5 text-[12px] font-semibold tracking-[0.14em] text-vx-accent uppercase">Step 0{i + 1}</div>
                 <h3 className="mt-1.5 text-[17px] font-bold text-vx-ink">{s.title}</h3>
                 <p className="mt-2 max-w-[260px] text-[14px] leading-relaxed text-vx-body">{s.desc}</p>
                 <div className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-vx-surface px-3 py-1 text-[12px] font-semibold text-vx-body ring-1 ring-vx-line">
@@ -296,7 +298,7 @@ export default function HomeClient() {
           />
           <div className="grid gap-6 md:grid-cols-3">
             {FEATURES.map((ft) => (
-              <div key={ft.title} className="flex flex-col rounded-3xl bg-vx-surface p-8 shadow-vx-card ring-1 ring-vx-line/70">
+              <div key={ft.title} className="vx-reveal flex flex-col rounded-3xl bg-vx-surface p-8 shadow-vx-card ring-1 ring-vx-line/70">
                 <IconTile>
                   <ft.icon size={20} />
                 </IconTile>
@@ -328,7 +330,7 @@ export default function HomeClient() {
             {deals?.slice(0, 6).map((d, i) => (
               <article
                 key={i}
-                className="group rounded-3xl bg-vx-surface p-6 shadow-[0_1px_2px_rgba(16,24,40,0.04)] ring-1 ring-vx-line transition-all hover:-translate-y-0.5 hover:shadow-vx-card"
+                className="vx-reveal group rounded-3xl bg-vx-surface p-6 shadow-[0_1px_2px_rgba(16,24,40,0.04)] ring-1 ring-vx-line transition-all hover:-translate-y-0.5 hover:shadow-vx-card"
               >
                 <div className="flex items-center gap-3">
                   <span className="flex size-10 items-center justify-center rounded-xl bg-linear-to-br from-vx-accent-bright to-vx-accent-light text-[15px] font-bold text-vx-on-accent">
@@ -357,7 +359,7 @@ export default function HomeClient() {
           </div>
           <div className="mt-12 text-center">
             <Link href="/deals" className={buttonVariants({ variant: "brandOutline", size: "pillSm", className: "border-transparent ring-1 ring-vx-line" })}>
-              View full pipeline <IconArrowRight size={14} />
+              View full pipeline <IconArrowRight size={14} className="transition-transform duration-300 group-hover/button:translate-x-0.5" />
             </Link>
           </div>
         </div>
@@ -365,7 +367,7 @@ export default function HomeClient() {
 
       {/* BUYERS LOUNGE */}
       <section className="px-5 pb-24 sm:px-6 sm:pb-28">
-        <div className="relative mx-auto max-w-6xl overflow-hidden rounded-[32px] bg-linear-to-br from-vx-bold-1 via-vx-bold-2 to-vx-bold-3 px-6 py-16 text-center text-white shadow-[0_40px_80px_-40px_rgba(var(--vx-shadow-rgb),0.8)] sm:px-12 sm:py-20">
+        <div className="vx-reveal relative mx-auto max-w-6xl overflow-hidden rounded-[32px] bg-linear-to-br from-vx-bold-1 via-vx-bold-2 to-vx-bold-3 px-6 py-16 text-center text-white shadow-[0_40px_80px_-40px_rgba(var(--vx-shadow-rgb),0.8)] sm:px-12 sm:py-20">
           <div aria-hidden className="absolute -top-24 left-1/2 size-[520px] -translate-x-1/2 rounded-full bg-vx-accent-light/40 blur-3xl" />
           <Rings size={1100} className="top-1/2 hidden -translate-y-1/2 text-white opacity-40 sm:block" />
           <div className="relative mx-auto flex max-w-xl flex-col items-center">
@@ -419,7 +421,7 @@ export default function HomeClient() {
               ))}
             </ul>
           </div>
-          <div className="rounded-[28px] bg-vx-surface p-6 shadow-[0_40px_80px_-40px_rgba(var(--vx-shadow-rgb),0.35)] ring-1 ring-vx-line/80 sm:p-8">
+          <div className="vx-reveal rounded-[28px] bg-vx-surface p-6 shadow-[0_40px_80px_-40px_rgba(var(--vx-shadow-rgb),0.35)] ring-1 ring-vx-line/80 sm:p-8">
             <SellForm />
           </div>
         </div>

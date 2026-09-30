@@ -35,7 +35,12 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${plusJakartaSans.variable} ${jetBrainsMono.variable} ${outfit.variable}`} suppressHydrationWarning>
+    <html
+      lang="en"
+      className={`${plusJakartaSans.variable} ${jetBrainsMono.variable} ${outfit.variable}`}
+      data-scroll-behavior="smooth"
+      suppressHydrationWarning
+    >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>

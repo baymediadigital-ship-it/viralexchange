@@ -20,7 +20,13 @@ export function ThemeToggle() {
 
   function toggle() {
     const next = currentTheme() === "dark" ? "light" : "dark";
-    document.documentElement.setAttribute("data-theme", next);
+    const apply = () => document.documentElement.setAttribute("data-theme", next);
+    // Crossfade where the View Transitions API exists; instant elsewhere.
+    if (document.startViewTransition && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      document.startViewTransition(apply);
+    } else {
+      apply();
+    }
     try {
       localStorage.setItem(KEY, next);
     } catch {}

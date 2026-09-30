@@ -31,7 +31,7 @@ export function SectionHeader({
   sub?: string;
 }) {
   return (
-    <div className="mx-auto mb-12 flex max-w-2xl flex-col items-center text-center">
+    <div className="vx-reveal mx-auto mb-12 flex max-w-2xl flex-col items-center text-center">
       <Eyebrow label={eyebrow} detail={detail} />
       <h2 className="mt-5 text-[32px] leading-[1.12] font-semibold tracking-[-0.04em] text-balance text-vx-ink sm:text-[44px]">
         {title} <GradientText>{highlight}</GradientText>
