@@ -108,8 +108,8 @@ function DealShowcase({ deal }: { deal: Deal | null }) {
           <ol className="mt-6 grid grid-cols-4">
             {DEAL_STEPS.map((s, i) => (
               <li key={s} className="relative flex flex-col items-center text-center">
-                {i > 0 && <span aria-hidden className="absolute top-3 right-1/2 h-0.5 w-full bg-linear-to-r from-vx-accent-bright to-vx-accent" />}
-                <span className="relative flex size-6 items-center justify-center rounded-full bg-linear-to-b from-vx-accent-bright to-vx-accent text-vx-on-accent ring-4 ring-vx-surface">
+                {i > 0 && <span aria-hidden className="absolute top-[11px] right-1/2 z-0 h-0.5 w-full bg-linear-to-r from-vx-accent-bright to-vx-accent" />}
+                <span className="relative z-10 flex size-6 items-center justify-center rounded-full bg-linear-to-b from-vx-accent-bright to-vx-accent text-vx-on-accent ring-4 ring-vx-surface">
                   <IconCheck size={12} />
                 </span>
                 <span className="mt-2 text-[11px] leading-tight font-medium text-vx-muted">{s}</span>
