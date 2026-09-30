@@ -21,7 +21,7 @@ const outfit = Outfit({
 });
 
 // Applies a saved light/dark choice before first paint (no flash). Without one,
-// the CSS follows the OS setting. See globals.css and components/site/ThemeToggle.tsx.
+// pages render light. See globals.css and components/site/ThemeToggle.tsx.
 const themeScript = `(function(){try{var t=localStorage.getItem("vx-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}})()`;
 
 export const metadata: Metadata = {

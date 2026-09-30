@@ -5,9 +5,7 @@ import { useLayoutEffect } from "react";
 const KEY = "vx-theme";
 
 function currentTheme() {
-  const set = document.documentElement.getAttribute("data-theme");
-  if (set === "light" || set === "dark") return set;
-  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  return document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
 }
 
 export function ThemeToggle() {

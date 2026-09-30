@@ -49,9 +49,9 @@
   --color-brand-red: var(--red);
   --color-brand-blue: var(--blue);
 }
-/* Redesign tokens (brand green). Light values on :root; dark applies when the OS
-   prefers dark and the visitor hasn't picked light, or when they picked dark
-   (data-theme on <html>, set before paint by the script in app/layout.tsx).
+/* Redesign tokens (brand green). Light is the default for everyone; dark applies
+   only when the visitor picks it (data-theme on <html>, set before paint by the
+   script in app/layout.tsx).
    Legacy dark-green pages don't use these, so they're unaffected. `inline`
    so each utility resolves the var at the element. */
 :root {
@@ -89,44 +89,6 @@
   --vx-bold-3: #1f9d52;
   --vx-shadow-rgb: 21, 128, 61;
 }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --vx-canvas: #030a05;
-    --vx-surface: #08130b;
-    --vx-subtle: #0e1c12;
-    --vx-ink: #f0fdf4;
-    --vx-body: #a0b3a6;
-    --vx-muted: #768a7c;
-    --vx-faint: #4f6255;
-    --vx-line: #142419;
-    --vx-tint: #0b2213;
-    --vx-tint-strong: #0f2e19;
-    --vx-accent-soft: #0d2817;
-    --vx-accent: #22c55e;
-    --vx-accent-hover: #1fb456;
-    --vx-accent-deep: #15803d;
-    --vx-accent-bright: #4ade80;
-    --vx-accent-light: #86efac;
-    --vx-on-accent: #04150a;
-    --vx-green: #4ade80;
-    --vx-green-bg: #0c2a16;
-    --vx-red: #f97066;
-    --vx-red-bg: #2d1514;
-    --vx-hero-1: #062413;
-    --vx-hero-2: #04120a;
-    --vx-band: #061a0d;
-    --vx-glow-1: rgba(34,197,94,0.28);
-    --vx-glow-2: rgba(34,197,94,0.14);
-    --vx-grad-a: #4ade80;
-    --vx-grad-b: #86efac;
-    --vx-grad-c: #bbf7d0;
-    --vx-bold-1: #06301a;
-    --vx-bold-2: #0f5c2e;
-    --vx-bold-3: #15803d;
-    --vx-shadow-rgb: 0, 0, 0;
-    color-scheme: dark;
-  }
-}
 :root[data-theme="dark"] {
   --vx-canvas: #030a05;
   --vx-surface: #08130b;
@@ -139,24 +101,24 @@
   --vx-tint: #0b2213;
   --vx-tint-strong: #0f2e19;
   --vx-accent-soft: #0d2817;
-  --vx-accent: #22c55e;
-  --vx-accent-hover: #1fb456;
-  --vx-accent-deep: #15803d;
-  --vx-accent-bright: #4ade80;
-  --vx-accent-light: #86efac;
+  --vx-accent: #40b070;
+  --vx-accent-hover: #389c63;
+  --vx-accent-deep: #2a7a4b;
+  --vx-accent-bright: #5cc48a;
+  --vx-accent-light: #8fd4ab;
   --vx-on-accent: #04150a;
-  --vx-green: #4ade80;
+  --vx-green: #5cc48a;
   --vx-green-bg: #0c2a16;
   --vx-red: #f97066;
   --vx-red-bg: #2d1514;
   --vx-hero-1: #062413;
   --vx-hero-2: #04120a;
   --vx-band: #061a0d;
-  --vx-glow-1: rgba(34,197,94,0.28);
-  --vx-glow-2: rgba(34,197,94,0.14);
-  --vx-grad-a: #4ade80;
-  --vx-grad-b: #86efac;
-  --vx-grad-c: #bbf7d0;
+  --vx-glow-1: rgba(64,176,112,0.24);
+  --vx-glow-2: rgba(64,176,112,0.12);
+  --vx-grad-a: #5cc48a;
+  --vx-grad-b: #8fd4ab;
+  --vx-grad-c: #c2e8d1;
   --vx-bold-1: #06301a;
   --vx-bold-2: #0f5c2e;
   --vx-bold-3: #15803d;
@@ -208,10 +170,6 @@ body:has(.vx-page) { background: var(--vx-canvas); color: var(--vx-ink); }
 .vx-page { --font-sans: var(--font-outfit), system-ui, -apple-system, "Segoe UI", sans-serif; font-family: var(--font-sans); }
 /* Theme toggle icon: pure CSS so the server HTML never mismatches the client. */
 .vx-theme-sun { display: none; }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .vx-theme-sun { display: block; }
-  :root:not([data-theme="light"]) .vx-theme-moon { display: none; }
-}
 :root[data-theme="dark"] .vx-theme-sun { display: block; }
 :root[data-theme="dark"] .vx-theme-moon { display: none; }
 
