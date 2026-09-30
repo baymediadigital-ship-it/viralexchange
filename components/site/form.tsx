@@ -3,7 +3,7 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 
 export const fieldClass =
-  "h-11 rounded-xl border-vx-line bg-vx-surface px-3.5 text-[15px] text-vx-ink shadow-[0_1px_2px_rgba(16,24,40,0.04)] placeholder:text-vx-muted focus-visible:border-vx-accent focus-visible:ring-4 focus-visible:ring-vx-accent/15 md:text-[15px]";
+  "h-11 rounded-xl border-vx-line bg-vx-canvas px-3.5 text-[15px] text-vx-ink shadow-[0_1px_2px_rgba(16,24,40,0.04)] placeholder:text-vx-muted focus-visible:border-vx-accent focus-visible:ring-4 focus-visible:ring-vx-accent/15 md:text-[15px]";
 export const labelClass = "mb-1.5 text-[13px] font-semibold text-vx-body";
 export const selectClass = cn(
   fieldClass,
