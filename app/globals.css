@@ -175,6 +175,7 @@ body:has(.vx-page) { background: var(--vx-canvas); color: var(--vx-ink); }
 
 /* Motion: one easing, short distances, everything ends fully visible. */
 @keyframes vx-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes vx-reveal { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 @keyframes vx-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
 /* Page-load entrance; stagger with style={{ "--d": "120ms" }}. */
 .vx-rise { animation: vx-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0ms) both; }
@@ -183,9 +184,10 @@ body:has(.vx-page) { background: var(--vx-canvas); color: var(--vx-ink); }
    support skip it and simply show the content. */
 @supports (animation-timeline: view()) {
   .vx-reveal {
-    animation: vx-rise linear both;
+    animation: vx-reveal linear both;
     animation-timeline: view();
-    animation-range: entry 5% entry 45%;
+    /* Fixed distance, so tall grids are solid after the first ~160px of travel. */
+    animation-range: entry 0px entry 160px;
   }
 }
 ::view-transition-old(root), ::view-transition-new(root) { animation-duration: 0.35s; }
