@@ -88,6 +88,10 @@
   --vx-bold-2: #15803d;
   --vx-bold-3: #1f9d52;
   --vx-shadow-rgb: 21, 128, 61;
+  --vx-amber: #b54708;
+  --vx-amber-bg: #fef6e7;
+  --vx-info: #175cd3;
+  --vx-info-bg: #eff4ff;
 }
 :root[data-theme="dark"] {
   --vx-canvas: #030a05;
@@ -123,6 +127,10 @@
   --vx-bold-2: #0f5c2e;
   --vx-bold-3: #15803d;
   --vx-shadow-rgb: 0, 0, 0;
+  --vx-amber: #fdb022;
+  --vx-amber-bg: #2e2210;
+  --vx-info: #84adff;
+  --vx-info-bg: #13213d;
   color-scheme: dark;
 }
 @theme inline {
@@ -158,6 +166,10 @@
   --color-vx-bold-1: var(--vx-bold-1);
   --color-vx-bold-2: var(--vx-bold-2);
   --color-vx-bold-3: var(--vx-bold-3);
+  --color-vx-amber: var(--vx-amber);
+  --color-vx-amber-bg: var(--vx-amber-bg);
+  --color-vx-info: var(--vx-info);
+  --color-vx-info-bg: var(--vx-info-bg);
 }
 @theme {
   --shadow-vx-card: 0 1px 2px rgba(16, 24, 40, 0.04), 0 24px 48px -24px rgba(16, 24, 40, 0.14);
