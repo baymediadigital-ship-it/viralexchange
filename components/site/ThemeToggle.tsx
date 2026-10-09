@@ -37,7 +37,7 @@ export function ThemeToggle() {
       type="button"
       onClick={toggle}
       aria-label="Switch between light and dark mode"
-      className="flex size-10 items-center justify-center rounded-full text-vx-body transition-colors hover:bg-vx-subtle hover:text-vx-ink focus-visible:ring-3 focus-visible:ring-vx-accent/30 focus-visible:outline-none"
+      className="flex size-10 items-center justify-center rounded-full text-vx-body transition-[color,background-color,scale] hover:bg-vx-subtle active:scale-[0.92] active:duration-100 hover:text-vx-ink focus-visible:ring-3 focus-visible:ring-vx-accent/30 focus-visible:outline-none"
     >
       <svg className="vx-theme-moon size-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
         <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z" />

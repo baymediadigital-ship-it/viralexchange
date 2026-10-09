@@ -188,10 +188,17 @@ body:has(.vx-page) { background: var(--vx-canvas); color: var(--vx-ink); }
 /* Motion: one easing, short distances, everything ends fully visible. */
 @keyframes vx-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 @keyframes vx-reveal { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
-@keyframes vx-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
 /* Page-load entrance; stagger with style={{ "--d": "120ms" }}. */
 .vx-rise { animation: vx-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0ms) both; }
-.vx-float { animation: vx-float 6s ease-in-out var(--d, 0ms) infinite; }
+/* Sticky nav edge (Apple "scroll edge effect"): no divider while the page sits
+   at the top; the line and a soft shadow fade in once content scrolls under. */
+@keyframes vx-nav-edge {
+  from { border-bottom-color: transparent; box-shadow: 0 0 0 transparent; }
+  to { border-bottom-color: var(--vx-line); box-shadow: 0 10px 30px -22px rgba(var(--vx-shadow-rgb), 0.35); }
+}
+@supports (animation-timeline: scroll()) {
+  .vx-nav { animation: vx-nav-edge linear both; animation-timeline: scroll(root); animation-range: 0 48px; }
+}
 /* Scroll reveal via native scroll-driven animations (no JS). Browsers without
    support skip it and simply show the content. */
 @supports (animation-timeline: view()) {
@@ -204,9 +211,20 @@ body:has(.vx-page) { background: var(--vx-canvas); color: var(--vx-ink); }
 }
 ::view-transition-old(root), ::view-transition-new(root) { animation-duration: 0.35s; }
 @media (prefers-reduced-motion: reduce) {
-  .vx-rise, .vx-float, .vx-reveal { animation: none !important; }
+  .vx-rise, .vx-reveal { animation: none !important; }
+  /* Presses still give feedback, just without the shrink. */
+  .vx-page :active { scale: none !important; }
   html { scroll-behavior: auto; }
   ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
+}
+/* Reduced transparency: translucent chrome becomes solid. */
+@media (prefers-reduced-transparency: reduce) {
+  .vx-nav { background-color: var(--vx-surface) !important; }
+}
+/* Increased contrast: firmer lines and darker secondary text. */
+@media (prefers-contrast: more) {
+  :root { --vx-line: #b9c7bd; --vx-muted: #46534b; --vx-faint: #5f6d64; --vx-body: #2c3a31; }
+  :root[data-theme="dark"] { --vx-line: #3a5243; --vx-muted: #b3c4b8; --vx-faint: #8ea295; --vx-body: #d0ddd4; }
 }
 
 html{scroll-behavior:smooth;}

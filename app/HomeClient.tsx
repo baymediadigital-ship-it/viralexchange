@@ -121,13 +121,13 @@ function DealShowcase({ deal }: { deal: Deal | null }) {
         </div>
       </div>
 
-      <div className="vx-float absolute -top-6 -left-10 hidden items-center gap-2 rounded-2xl bg-vx-surface px-3.5 py-2.5 text-[13px] font-semibold text-vx-ink shadow-vx-float ring-1 ring-vx-line sm:flex">
+      <div style={delay(550)} className="vx-rise absolute -top-6 -left-10 hidden items-center gap-2 rounded-2xl bg-vx-surface px-3.5 py-2.5 text-[13px] font-semibold text-vx-ink shadow-vx-float ring-1 ring-vx-line sm:flex">
         <span className="flex size-7 items-center justify-center rounded-full bg-vx-accent-soft text-vx-accent">
           <IconShieldCheck size={14} />
         </span>
         Escrow protected
       </div>
-      <div style={delay(-3000)} className="vx-float absolute -right-3 -bottom-8 hidden items-center xl:-right-8 gap-2 rounded-2xl bg-vx-surface px-3.5 py-2.5 text-[13px] font-semibold text-vx-ink shadow-vx-float ring-1 ring-vx-line sm:flex">
+      <div style={delay(700)} className="vx-rise absolute -right-3 -bottom-8 hidden items-center xl:-right-8 gap-2 rounded-2xl bg-vx-surface px-3.5 py-2.5 text-[13px] font-semibold text-vx-ink shadow-vx-float ring-1 ring-vx-line sm:flex">
         <span className="flex size-7 items-center justify-center rounded-full bg-vx-green-bg text-vx-green">
           <IconBanknote size={14} />
         </span>
