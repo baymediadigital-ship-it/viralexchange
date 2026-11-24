@@ -43,15 +43,15 @@ const submitted = (iso: string) => new Date(iso).toLocaleDateString("en-US", { m
 
 function Pill({ status, map }: { status: string; map: Record<string, { label: string; pill: string }> }) {
   const s = map[status] ?? { label: status, pill: PILL.neutral };
-  return <span className={cn("shrink-0 rounded-full px-2.5 py-1 text-[12px] font-semibold whitespace-nowrap", s.pill)}>{s.label}</span>;
+  return <span className={cn("shrink-0 rounded-full px-2.5 py-1 text-[12px] font-medium whitespace-nowrap", s.pill)}>{s.label}</span>;
 }
 
 function Section({ title, count, children }: { title: string; count: number; children: React.ReactNode }) {
   return (
     <section className="vx-reveal mt-10">
-      <h2 className="flex items-center gap-2.5 text-[18px] font-semibold tracking-[-0.02em] text-vx-ink">
+      <h2 className="flex items-center gap-2.5 text-[18px] font-medium tracking-[-0.02em] text-vx-ink">
         {title}
-        <span className="rounded-full bg-vx-subtle px-2 py-0.5 text-[12px] font-semibold text-vx-muted tabular-nums">{count}</span>
+        <span className="rounded-full bg-vx-subtle px-2 py-0.5 text-[12px] font-medium text-vx-muted tabular-nums">{count}</span>
       </h2>
       <div className="mt-4">{children}</div>
     </section>
@@ -60,7 +60,7 @@ function Section({ title, count, children }: { title: string; count: number; chi
 
 function Empty({ text, href, cta }: { text: string; href: string; cta: string }) {
   return (
-    <div className="flex flex-col items-center gap-4 rounded-3xl border border-dashed border-vx-line bg-vx-surface/60 px-6 py-10 text-center">
+    <div className="flex flex-col items-center gap-4 rounded-xl border border-dashed border-vx-line bg-vx-surface/60 px-6 py-10 text-center">
       <p className="text-[15px] text-vx-body">{text}</p>
       <Link href={href} className={buttonVariants({ variant: "brand", size: "pillSm" })}>
         {cta} <IconArrowRight size={14} className="transition-transform duration-300 group-hover/button:translate-x-0.5" />
@@ -70,14 +70,14 @@ function Empty({ text, href, cta }: { text: string; href: string; cta: string })
 }
 
 function Rows({ children }: { children: React.ReactNode }) {
-  return <ul className="divide-y divide-vx-line overflow-hidden rounded-3xl bg-vx-surface shadow-vx-card ring-1 ring-vx-line/80">{children}</ul>;
+  return <ul className="divide-y divide-vx-line overflow-hidden rounded-xl bg-vx-surface ring-1 ring-vx-line">{children}</ul>;
 }
 
 export function AccountView({ email, listings, applications }: { email: string; listings: AccountListing[]; applications: AccountApplication[] }) {
   return (
     <main className="mx-auto max-w-3xl px-5 pt-12 pb-24 sm:px-6 sm:pt-16">
       <div className="vx-rise">
-        <h1 className="text-[34px] leading-tight font-semibold tracking-[-0.04em] text-vx-ink sm:text-[42px]">
+        <h1 className="text-[34px] leading-tight font-normal tracking-[-0.035em] text-vx-ink sm:text-[42px]">
           My <GradientText>account</GradientText>
         </h1>
         <p className="mt-2 text-[15px] text-vx-muted">{email}</p>
@@ -91,7 +91,7 @@ export function AccountView({ email, listings, applications }: { email: string; 
             {listings.map((l) => (
               <li key={l.id} className="flex items-center justify-between gap-4 px-5 py-4 sm:px-6">
                 <div className="min-w-0">
-                  <div className="truncate text-[15px] font-semibold text-vx-ink">{l.channel_name}</div>
+                  <div className="truncate text-[15px] font-medium text-vx-ink">{l.channel_name}</div>
                   <div className="mt-0.5 text-[13px] text-vx-muted sm:truncate">
                     {[l.niche, usd(l.asking_price_usd), `Submitted ${submitted(l.created_at)}`].filter(Boolean).join(" · ")}
                   </div>
@@ -111,7 +111,7 @@ export function AccountView({ email, listings, applications }: { email: string; 
             {applications.map((a) => (
               <li key={a.id} className="flex items-center justify-between gap-4 px-5 py-4 sm:px-6">
                 <div className="min-w-0">
-                  <div className="truncate text-[15px] font-semibold text-vx-ink">{a.niche || "Any niche"}</div>
+                  <div className="truncate text-[15px] font-medium text-vx-ink">{a.niche || "Any niche"}</div>
                   <div className="mt-0.5 text-[13px] text-vx-muted sm:truncate">
                     Budget {a.budget_range ? BUDGET[a.budget_range] ?? a.budget_range : "—"} · Submitted {submitted(a.created_at)}
                   </div>

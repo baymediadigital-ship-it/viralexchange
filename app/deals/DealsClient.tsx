@@ -6,11 +6,11 @@ import { buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SiteNav } from "@/components/site/SiteNav";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { GradientText, Rings, TelegramIcon } from "@/components/site/Decor";
+import { GradientText, TelegramIcon } from "@/components/site/Decor";
 import { TELEGRAM_URL } from "@/components/site/links";
 import { IconArrowRight, IconCheck, IconLock, IconSearch } from "@/components/Icon";
 import { createClient } from "@/lib/supabase/client";
-import { fmt, usd } from "@/lib/format";
+import { fmt, usd, tidyNiche } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 type Listing = { id: string; niche: string | null; subscribers: number | null; monthly_views: number | null; asking_price_usd: number | null };
@@ -36,11 +36,7 @@ const stageOf = (key: string) => STAGES.find((s) => s.key === key) ?? STAGES[0];
 
 // Niches are typed by hand ("MOVIES", "anime"); tidy all-caps/all-lowercase ones,
 // leave deliberately mixed-case ones ("Tourism and RV") alone.
-function tidy(n: string) {
-  const t = n.trim();
-  if (t !== t.toUpperCase() && t !== t.toLowerCase()) return t;
-  return t.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
-}
+const tidy = tidyNiche;
 const nicheLabel = (n: string | null) => (n ? tidy(n) : "—");
 const nicheShort = (n: string | null) => (n ? tidy(n.split(/[/,]/)[0]) : "Channel");
 
@@ -48,7 +44,7 @@ function Cell({ label, children, className }: { label: string; children: React.R
   return (
     <div className={className}>
       <div className="text-[12px] text-vx-muted md:hidden">{label}</div>
-      <div className="text-[15px] font-semibold text-vx-ink tabular-nums">{children}</div>
+      <div className="text-[15px] font-medium text-vx-ink tabular-nums">{children}</div>
     </div>
   );
 }
@@ -69,8 +65,8 @@ function Empty({ children }: { children: React.ReactNode }) {
   return <p className="px-6 py-12 text-center text-[14px] text-vx-muted">{children}</p>;
 }
 
-const tableShell = "overflow-hidden rounded-3xl bg-vx-surface shadow-vx-card ring-1 ring-vx-line/80";
-const headRow = "hidden border-b border-vx-line px-6 py-3 text-[12px] font-semibold tracking-[0.06em] text-vx-muted uppercase md:grid";
+const tableShell = "overflow-hidden rounded-xl bg-vx-surface ring-1 ring-vx-line";
+const headRow = "hidden border-b border-vx-line px-6 py-3 bg-vx-canvas font-mono text-[11px] text-vx-muted md:grid";
 const LISTING_COLS = "md:grid-cols-[2fr_1fr_1fr_1fr_0.9fr_auto]";
 const DEAL_COLS = "md:grid-cols-[2fr_1fr_1fr_1fr_1fr]";
 
@@ -151,23 +147,15 @@ export default function DealsClient() {
       <SiteNav />
 
       {/* HERO */}
-      <header className="relative overflow-hidden bg-linear-to-b from-vx-hero-1 via-vx-hero-2 to-vx-canvas">
-        <div aria-hidden className="pointer-events-none absolute -top-56 left-1/2 size-[900px] -translate-x-1/2 bg-[radial-gradient(closest-side,var(--vx-glow-1),transparent)]" />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(var(--vx-shadow-rgb),0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(var(--vx-shadow-rgb),0.06)_1px,transparent_1px)] bg-size-[56px_56px] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_0%,black,transparent)]"
-        />
+      <header className="relative overflow-hidden">
         <div className="relative mx-auto max-w-6xl px-5 pt-16 pb-14 text-center sm:px-6 sm:pt-20">
-          <div className="vx-rise inline-flex items-center gap-2 rounded-full bg-vx-surface/90 py-1.5 pr-3.5 pl-1.5 text-[13px] font-semibold text-vx-body shadow-[0_1px_2px_rgba(16,24,40,0.06)] ring-1 ring-vx-accent/10">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-vx-green-bg px-2 py-0.5 text-[12px] text-vx-green">
-              <span className="size-1.5 animate-pulse rounded-full bg-vx-green motion-reduce:animate-none" />
-              Live
-            </span>
-            Straight from our deal tracker
+          <div className="vx-rise inline-flex items-center gap-2.5 font-mono text-[11px] tracking-[0.06em] text-vx-muted uppercase sm:text-[12px]">
+            <span className="size-1.5 animate-pulse rounded-full bg-vx-accent motion-reduce:animate-none" />
+            Live · Straight from our deal tracker
           </div>
           <h1
             style={{ "--d": "80ms" } as React.CSSProperties}
-            className="vx-rise mt-6 text-[42px] leading-[1.05] font-semibold tracking-[-0.045em] text-vx-ink sm:text-[60px]"
+            className="vx-rise mt-6 text-[42px] leading-[1.05] font-normal tracking-[-0.04em] text-vx-ink sm:text-[60px]"
           >
             Deal <GradientText>pipeline</GradientText>
           </h1>
@@ -182,8 +170,8 @@ export default function DealsClient() {
               ["Closed deals", stats ? String(stats.closed) : "—"],
               ["Volume closed", stats ? usd(stats.vol) : "—"],
             ].map(([label, value]) => (
-              <div key={label} className="rounded-2xl bg-vx-surface px-5 py-4 text-left shadow-[0_1px_2px_rgba(16,24,40,0.04)] ring-1 ring-vx-line/80">
-                <dd className="text-[26px] font-semibold tracking-[-0.02em] text-vx-ink tabular-nums">{value}</dd>
+              <div key={label} className="rounded-2xl bg-vx-surface px-5 py-4 text-left ring-1 ring-vx-line">
+                <dd className="text-[26px] font-normal tracking-[-0.02em] text-vx-ink tabular-nums">{value}</dd>
                 <dt className="mt-0.5 text-[13px] text-vx-muted">{label}</dt>
               </div>
             ))}
@@ -195,7 +183,7 @@ export default function DealsClient() {
         {/* AVAILABLE LISTINGS */}
         <section id="listings" className="scroll-mt-24 pt-10">
           <div className="vx-reveal flex flex-col gap-1.5">
-            <h2 className="text-[28px] leading-tight font-semibold tracking-[-0.04em] text-vx-ink sm:text-[34px]">
+            <h2 className="text-[28px] leading-tight font-normal tracking-[-0.035em] text-vx-ink sm:text-[34px]">
               Available <GradientText>listings</GradientText>
             </h2>
             <p className="text-[15px] text-vx-body">Verified channels open for acquisition. Names stay private until you&apos;re in a deal.</p>
@@ -261,7 +249,7 @@ export default function DealsClient() {
                         <IconLock size={16} />
                       </span>
                       <div className="min-w-0">
-                        <div className="truncate text-[15px] font-semibold text-vx-ink">Verified {nicheShort(r.niche)} channel</div>
+                        <div className="truncate text-[15px] font-medium text-vx-ink">Verified {nicheShort(r.niche)} channel</div>
                         <div className="truncate text-[13px] text-vx-muted">{nicheLabel(r.niche)}</div>
                       </div>
                     </div>
@@ -269,7 +257,7 @@ export default function DealsClient() {
                     <Cell label="Monthly views">{fmt(r.monthly_views)}</Cell>
                     <Cell label="Asking price">{usd(r.asking_price_usd)}</Cell>
                     <div className="col-span-1">
-                      <span className="inline-flex items-center gap-1.5 rounded-full bg-vx-green-bg px-2.5 py-1 text-[12px] font-semibold text-vx-green">
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-vx-green-bg px-2.5 py-1 text-[12px] font-medium text-vx-green">
                         <span className="size-1.5 rounded-full bg-vx-green" />
                         Available
                       </span>
@@ -295,14 +283,14 @@ export default function DealsClient() {
         {/* DEAL TRACKER */}
         <section id="tracker" className="scroll-mt-24 pt-20">
           <div className="vx-reveal flex flex-col gap-1.5">
-            <h2 className="text-[28px] leading-tight font-semibold tracking-[-0.04em] text-vx-ink sm:text-[34px]">
+            <h2 className="text-[28px] leading-tight font-normal tracking-[-0.035em] text-vx-ink sm:text-[34px]">
               Deal <GradientText>tracker</GradientText>
             </h2>
             <p className="text-[15px] text-vx-body">Where every deal sits right now. Channel names are revealed once a sale closes.</p>
           </div>
 
           {/* stage summary */}
-          <div className="vx-reveal mt-6 rounded-3xl bg-vx-surface p-5 ring-1 ring-vx-line/80 sm:p-6">
+          <div className="vx-reveal mt-6 rounded-xl bg-vx-surface p-5 ring-1 ring-vx-line sm:p-6">
             <div className="flex h-2 overflow-hidden rounded-full bg-vx-subtle" role="img" aria-label={byStage.map((s) => `${s.label}: ${s.count}`).join(", ")}>
               {totalDeals > 0 &&
                 byStage.map((s) => s.count > 0 && <div key={s.key} className={cn("h-full first:rounded-l-full last:rounded-r-full", s.bar)} style={{ width: `${(s.count / totalDeals) * 100}%` }} />)}
@@ -312,7 +300,7 @@ export default function DealsClient() {
                 <div key={s.key} className="flex items-center gap-2.5">
                   <span className={cn("size-2.5 shrink-0 rounded-full", s.bar)} />
                   <dt className="text-[14px] text-vx-body">{s.label}</dt>
-                  <dd className="ml-auto text-[15px] font-semibold text-vx-ink tabular-nums sm:ml-1">{deals ? s.count : "—"}</dd>
+                  <dd className="ml-auto text-[15px] font-medium text-vx-ink tabular-nums sm:ml-1">{deals ? s.count : "—"}</dd>
                 </div>
               ))}
             </dl>
@@ -345,7 +333,7 @@ export default function DealsClient() {
                     <li key={d.id} className={cn("grid grid-cols-3 items-center gap-x-4 gap-y-4 px-5 py-5 md:gap-4 md:px-6 md:py-4", DEAL_COLS)}>
                       <div className="col-span-3 flex min-w-0 items-center gap-3 md:col-span-1">
                         {closed ? (
-                          <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-vx-accent-bright to-vx-accent-light text-[15px] font-bold text-vx-on-accent">
+                          <span className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-vx-line bg-vx-canvas text-[13px] text-vx-body">
                             {(d.channel_name || "?").trim().charAt(0).toUpperCase()}
                           </span>
                         ) : (
@@ -354,14 +342,14 @@ export default function DealsClient() {
                           </span>
                         )}
                         <div className="min-w-0">
-                          <div className="truncate text-[15px] font-semibold text-vx-ink">{closed ? d.channel_name : `Verified ${nicheShort(d.niche)} channel`}</div>
+                          <div className="truncate text-[15px] font-medium text-vx-ink">{closed ? d.channel_name : `Verified ${nicheShort(d.niche)} channel`}</div>
                           <div className="truncate text-[13px] text-vx-muted">{nicheLabel(d.niche)}</div>
                         </div>
                       </div>
                       <Cell label="Subscribers">{fmt(d.subscribers_snapshot)}</Cell>
                       <Cell label="Asking price">{usd(d.asking_price_usd)}</Cell>
                       <div>
-                        <span className={cn("inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[12px] font-semibold whitespace-nowrap", st.pill)}>
+                        <span className={cn("inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[12px] font-medium whitespace-nowrap", st.pill)}>
                           {closed && <IconCheck size={12} />}
                           {st.label}
                         </span>
@@ -379,11 +367,9 @@ export default function DealsClient() {
 
         {/* CTA */}
         <section className="pt-20">
-          <div className="vx-reveal relative overflow-hidden rounded-[32px] bg-linear-to-br from-vx-bold-1 via-vx-bold-2 to-vx-bold-3 px-6 py-16 text-center text-white shadow-[0_40px_80px_-40px_rgba(var(--vx-shadow-rgb),0.8)] sm:px-12">
-            <div aria-hidden className="absolute -top-44 left-1/2 size-[760px] -translate-x-1/2 bg-[radial-gradient(closest-side,color-mix(in_oklab,var(--vx-accent-light)_40%,transparent),transparent)]" />
-            <Rings size={1000} className="top-1/2 hidden -translate-y-1/2 text-white opacity-40 sm:block" />
+          <div className="vx-reveal relative overflow-hidden rounded-xl bg-vx-bold-1 px-6 py-16 text-center text-white sm:px-12">
             <div className="relative mx-auto flex max-w-xl flex-col items-center">
-              <h2 className="text-[30px] leading-[1.1] font-semibold tracking-[-0.04em] text-balance sm:text-[40px]">Want your channel in this pipeline?</h2>
+              <h2 className="text-[30px] leading-[1.1] font-normal tracking-[-0.035em] text-balance sm:text-[40px]">Want your channel in this pipeline?</h2>
               <p className="mt-4 text-[16px] leading-relaxed text-pretty text-white/80">
                 Submit it today. We verify and list it to our buyer network within 24 hours.
               </p>

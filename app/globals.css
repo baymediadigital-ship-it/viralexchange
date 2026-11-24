@@ -26,7 +26,7 @@
      background trick) with a green-tinted value -- shadcn's init overwrote
      it once already and every page's borders went light gray until this was
      caught and fixed. */
-  --background:oklch(1 0 0);--foreground:oklch(0.145 0 0);--card:oklch(1 0 0);--card-foreground:oklch(0.145 0 0);--popover:oklch(1 0 0);--popover-foreground:oklch(0.145 0 0);--primary:oklch(0.205 0 0);--primary-foreground:oklch(0.985 0 0);--secondary:oklch(0.97 0 0);--secondary-foreground:oklch(0.205 0 0);--muted:oklch(0.97 0 0);--muted-foreground:oklch(0.556 0 0);--accent:oklch(0.97 0 0);--accent-foreground:oklch(0.205 0 0);--destructive:oklch(0.577 0.245 27.325);--shadcn-border:oklch(0.922 0 0);--input:oklch(0.922 0 0);--ring:oklch(0.708 0 0);--chart-1:oklch(0.87 0 0);--chart-2:oklch(0.556 0 0);--chart-3:oklch(0.439 0 0);--chart-4:oklch(0.371 0 0);--chart-5:oklch(0.269 0 0);--radius:0.625rem;--sidebar:oklch(0.985 0 0);--sidebar-foreground:oklch(0.145 0 0);--sidebar-primary:oklch(0.205 0 0);--sidebar-primary-foreground:oklch(0.985 0 0);--sidebar-accent:oklch(0.97 0 0);--sidebar-accent-foreground:oklch(0.205 0 0);--sidebar-border:oklch(0.922 0 0);--sidebar-ring:oklch(0.708 0 0);
+  --background:oklch(1 0 0);--foreground:oklch(0.145 0 0);--card:oklch(1 0 0);--card-foreground:oklch(0.145 0 0);--popover:oklch(1 0 0);--popover-foreground:oklch(0.145 0 0);--primary:oklch(0.205 0 0);--primary-foreground:oklch(0.985 0 0);--secondary:oklch(0.97 0 0);--secondary-foreground:oklch(0.205 0 0);--muted:oklch(0.97 0 0);--muted-foreground:oklch(0.556 0 0);--accent:oklch(0.97 0 0);--accent-foreground:oklch(0.205 0 0);--destructive:oklch(0.577 0.245 27.325);--shadcn-border:oklch(0.922 0 0);--input:oklch(0.922 0 0);--ring:oklch(0.708 0 0);--chart-1:oklch(0.87 0 0);--chart-2:oklch(0.556 0 0);--chart-3:oklch(0.439 0 0);--chart-4:oklch(0.371 0 0);--chart-5:oklch(0.269 0 0);--radius:0.4rem;--sidebar:oklch(0.985 0 0);--sidebar-foreground:oklch(0.145 0 0);--sidebar-primary:oklch(0.205 0 0);--sidebar-primary-foreground:oklch(0.985 0 0);--sidebar-accent:oklch(0.97 0 0);--sidebar-accent-foreground:oklch(0.205 0 0);--sidebar-border:oklch(0.922 0 0);--sidebar-ring:oklch(0.708 0 0);
 }
 
 /* Bridge to Tailwind/shadcn -- same tokens, single source of truth so new
@@ -49,88 +49,83 @@
   --color-brand-red: var(--red);
   --color-brand-blue: var(--blue);
 }
-/* Redesign tokens (brand green). Light is the default for everyone; dark applies
-   only when the visitor picks it (data-theme on <html>, set before paint by the
-   script in app/layout.tsx).
-   Legacy dark-green pages don't use these, so they're unaffected. `inline`
-   so each utility resolves the var at the element. */
+/* Redesign tokens. Restrained, near-neutral palette: color is reserved for
+   meaning (green = money/closed/live, amber = in progress), never decoration.
+   Light is the default; dark applies when the visitor picks it (data-theme on
+   <html>, set before paint by the script in app/layout.tsx). The old
+   gradient/glow tokens are kept as names but flattened, so any surface still
+   using them renders flat. */
 :root {
-  --vx-canvas: #fbfdfb;
+  --vx-canvas: #f7f7f8;
   --vx-surface: #ffffff;
-  --vx-subtle: #f3f8f4;
-  --vx-ink: #0a1a10;
-  --vx-body: #45534a;
-  --vx-muted: #65736a;
-  --vx-faint: #9aa69e;
-  --vx-line: #e4ece6;
-  --vx-tint: #ecfdf3;
-  --vx-tint-strong: #d3f8e0;
-  --vx-accent-soft: #e3f9ea;
+  --vx-subtle: #f0f1f3;
+  --vx-ink: #1b1d21;
+  --vx-body: #4a4f57;
+  --vx-muted: #6b717a;
+  --vx-faint: #a3a8af;
+  --vx-line: #e3e5e8;
+  --vx-line-strong: #cfd3d8;
+  --vx-tint: #eef6f1;
+  --vx-tint-strong: #ddefe4;
+  --vx-accent-soft: #e9f4ed;
   --vx-accent: #15803d;
-  --vx-accent-hover: #166534;
+  --vx-accent-hover: #116932;
   --vx-accent-deep: #0b3b22;
-  --vx-accent-bright: #1fae54;
-  --vx-accent-light: #86efac;
+  --vx-accent-bright: #15803d;
+  --vx-accent-light: #7fcf9c;
   --vx-on-accent: #ffffff;
   --vx-green: #15803d;
-  --vx-green-bg: #dcfce7;
-  --vx-red: #d92d20;
-  --vx-red-bg: #fef3f2;
-  --vx-hero-1: #dcfce7;
-  --vx-hero-2: #f0fdf4;
-  --vx-band: #effdf4;
-  --vx-glow-1: rgba(134,239,172,0.45);
-  --vx-glow-2: rgba(187,247,208,0.7);
-  --vx-grad-a: #0b3b22;
-  --vx-grad-b: #15803d;
-  --vx-grad-c: #22c55e;
-  --vx-bold-1: #0b3b22;
-  --vx-bold-2: #15803d;
-  --vx-bold-3: #1f9d52;
-  --vx-shadow-rgb: 21, 128, 61;
-  --vx-amber: #b54708;
-  --vx-amber-bg: #fef6e7;
-  --vx-info: #175cd3;
-  --vx-info-bg: #eff4ff;
+  --vx-green-bg: #e7f4ec;
+  --vx-red: #c4320a;
+  --vx-red-bg: #fdf1ee;
+  --vx-hero-1: var(--vx-canvas);
+  --vx-hero-2: var(--vx-canvas);
+  --vx-band: var(--vx-canvas);
+  --vx-glow-1: transparent;
+  --vx-glow-2: transparent;
+  --vx-grad-a: var(--vx-ink);
+  --vx-grad-b: var(--vx-ink);
+  --vx-grad-c: var(--vx-ink);
+  --vx-bold-1: #17191c;
+  --vx-bold-2: #17191c;
+  --vx-bold-3: #17191c;
+  --vx-shadow-rgb: 15, 17, 20;
+  --vx-amber: #a15c07;
+  --vx-amber-bg: #fbf3e4;
+  --vx-info: #2f5bb7;
+  --vx-info-bg: #eef2fb;
 }
 :root[data-theme="dark"] {
-  --vx-canvas: #030a05;
-  --vx-surface: #08130b;
-  --vx-subtle: #0e1c12;
-  --vx-ink: #f0fdf4;
-  --vx-body: #a0b3a6;
-  --vx-muted: #768a7c;
-  --vx-faint: #4f6255;
-  --vx-line: #142419;
-  --vx-tint: #0b2213;
-  --vx-tint-strong: #0f2e19;
-  --vx-accent-soft: #0d2817;
-  --vx-accent: #40b070;
-  --vx-accent-hover: #389c63;
-  --vx-accent-deep: #2a7a4b;
-  --vx-accent-bright: #5cc48a;
-  --vx-accent-light: #8fd4ab;
-  --vx-on-accent: #04150a;
-  --vx-green: #5cc48a;
-  --vx-green-bg: #0c2a16;
-  --vx-red: #f97066;
-  --vx-red-bg: #2d1514;
-  --vx-hero-1: #062413;
-  --vx-hero-2: #04120a;
-  --vx-band: #061a0d;
-  --vx-glow-1: rgba(64,176,112,0.24);
-  --vx-glow-2: rgba(64,176,112,0.12);
-  --vx-grad-a: #5cc48a;
-  --vx-grad-b: #8fd4ab;
-  --vx-grad-c: #c2e8d1;
-  --vx-bold-1: #06301a;
-  --vx-bold-2: #0f5c2e;
-  --vx-bold-3: #15803d;
+  --vx-canvas: #101113;
+  --vx-surface: #16181b;
+  --vx-subtle: #1d2023;
+  --vx-ink: #eceef0;
+  --vx-body: #a9adb5;
+  --vx-muted: #8a9099;
+  --vx-faint: #5b616a;
+  --vx-line: #26292e;
+  --vx-line-strong: #3a3e45;
+  --vx-tint: #13221a;
+  --vx-tint-strong: #183024;
+  --vx-accent-soft: #15241c;
+  --vx-accent: #5fc58c;
+  --vx-accent-hover: #74d19d;
+  --vx-accent-deep: #2f7a51;
+  --vx-accent-bright: #5fc58c;
+  --vx-accent-light: #8ed9ad;
+  --vx-on-accent: #0b1a11;
+  --vx-green: #6fd09a;
+  --vx-green-bg: #14261b;
+  --vx-red: #f28b74;
+  --vx-red-bg: #2a1713;
+  --vx-bold-1: #1d2023;
+  --vx-bold-2: #1d2023;
+  --vx-bold-3: #1d2023;
   --vx-shadow-rgb: 0, 0, 0;
-  --vx-amber: #fdb022;
-  --vx-amber-bg: #2e2210;
-  --vx-info: #84adff;
-  --vx-info-bg: #13213d;
+  --vx-amber: #e8b45a;
+  --vx-amber-bg: #2a2214;
+  --vx-info: #8fb0f0;
+  --vx-info-bg: #18213a;
   color-scheme: dark;
 }
 @theme inline {
@@ -138,6 +133,7 @@
   --color-vx-surface: var(--vx-surface);
   --color-vx-subtle: var(--vx-subtle);
   --color-vx-ink: var(--vx-ink);
+  --color-vx-line-strong: var(--vx-line-strong);
   --color-vx-body: var(--vx-body);
   --color-vx-muted: var(--vx-muted);
   --color-vx-faint: var(--vx-faint);
@@ -172,14 +168,20 @@
   --color-vx-info-bg: var(--vx-info-bg);
 }
 @theme {
-  --shadow-vx-card: 0 1px 2px rgba(16, 24, 40, 0.04), 0 24px 48px -24px rgba(16, 24, 40, 0.14);
-  --shadow-vx-float: 0 24px 48px -20px rgba(16, 24, 40, 0.2);
+  --shadow-vx-card: 0 0 #0000;
+  --shadow-vx-float: 0 12px 32px -18px rgba(15, 17, 20, 0.28);
   --animate-vx-marquee: marquee 40s linear infinite;
 }
 /* Redesigned pages opt in with .vx-page on their root. Unlayered on purpose:
    beats the legacy unlayered `body` rule so overscroll matches the page. */
 body:has(.vx-page) { background: var(--vx-canvas); color: var(--vx-ink); }
-.vx-page { --font-sans: var(--font-outfit), system-ui, -apple-system, "Segoe UI", sans-serif; font-family: var(--font-sans); }
+.vx-page {
+  --font-sans: var(--font-inter), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  font-family: var(--font-sans);
+  font-optical-sizing: auto;
+  font-feature-settings: "cv11", "ss01";
+}
 /* Theme toggle icon: pure CSS so the server HTML never mismatches the client. */
 .vx-theme-sun { display: none; }
 :root[data-theme="dark"] .vx-theme-sun { display: block; }
@@ -193,8 +195,8 @@ body:has(.vx-page) { background: var(--vx-canvas); color: var(--vx-ink); }
 /* Sticky nav edge (Apple "scroll edge effect"): no divider while the page sits
    at the top; the line and a soft shadow fade in once content scrolls under. */
 @keyframes vx-nav-edge {
-  from { border-bottom-color: transparent; box-shadow: 0 0 0 transparent; }
-  to { border-bottom-color: var(--vx-line); box-shadow: 0 10px 30px -22px rgba(var(--vx-shadow-rgb), 0.35); }
+  from { border-bottom-color: transparent; }
+  to { border-bottom-color: var(--vx-line); }
 }
 @supports (animation-timeline: scroll()) {
   .vx-nav { animation: vx-nav-edge linear both; animation-timeline: scroll(root); animation-range: 0 48px; }

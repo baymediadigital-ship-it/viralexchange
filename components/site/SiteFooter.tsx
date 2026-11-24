@@ -3,11 +3,11 @@ import { Logo } from "./SiteNav";
 import { SectionLink } from "./SectionLink";
 import { CONTACT_EMAIL, TELEGRAM_URL, X_URL } from "./links";
 
-const colLink = "text-[14px] text-vx-body transition-colors hover:text-vx-accent";
+const colLink = "text-[14px] text-vx-muted transition-colors duration-150 hover:text-vx-ink";
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-vx-line bg-vx-surface">
+    <footer className="border-t border-vx-line bg-vx-canvas">
       <div className="mx-auto grid max-w-6xl gap-10 px-5 pt-14 pb-10 sm:grid-cols-2 sm:px-6 lg:grid-cols-[1.6fr_1fr_1fr_1fr]">
         <div className="max-w-xs">
           <Logo />
@@ -16,19 +16,19 @@ export function SiteFooter() {
           </p>
         </div>
         <div className="flex flex-col gap-3">
-          <h4 className="text-[12px] font-bold tracking-[0.08em] text-vx-ink uppercase">Platform</h4>
+          <h4 className="font-mono text-[12px] text-vx-faint">Platform</h4>
           <Link href="/valuation" className={colLink}>Free valuation</Link>
           <Link href="/deals" className={colLink}>Deal pipeline</Link>
           <SectionLink section="submit" className={colLink}>Sell a channel</SectionLink>
           <a href={TELEGRAM_URL} target="_blank" rel="noopener noreferrer" className={colLink}>Buyers Lounge</a>
         </div>
         <div className="flex flex-col gap-3">
-          <h4 className="text-[12px] font-bold tracking-[0.08em] text-vx-ink uppercase">Process</h4>
+          <h4 className="font-mono text-[12px] text-vx-faint">Process</h4>
           <SectionLink section="process" className={colLink}>How it works</SectionLink>
           <SectionLink section="deals" className={colLink}>Closed deals</SectionLink>
         </div>
         <div className="flex flex-col gap-3">
-          <h4 className="text-[12px] font-bold tracking-[0.08em] text-vx-ink uppercase">Contact</h4>
+          <h4 className="font-mono text-[12px] text-vx-faint">Contact</h4>
           <a href={`mailto:${CONTACT_EMAIL}`} className={colLink}>{CONTACT_EMAIL}</a>
           <a href={TELEGRAM_URL} target="_blank" rel="noopener noreferrer" className={colLink}>Telegram</a>
           <a href={X_URL} target="_blank" rel="noopener noreferrer" className={colLink}>@viralexchangeHQ</a>

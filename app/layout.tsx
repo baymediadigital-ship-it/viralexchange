@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, JetBrains_Mono, Outfit } from "next/font/google";
+import { Plus_Jakarta_Sans, JetBrains_Mono, Inter, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -14,10 +14,17 @@ const jetBrainsMono = JetBrains_Mono({
   weight: ["400", "600"],
 });
 
-const outfit = Outfit({
-  variable: "--font-outfit",
+// Redesign type: Inter (with optical sizing, so display sizes get tighter
+// letterforms) and Geist Mono for small labels.
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
-  weight: "variable",
+  axes: ["opsz"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
 });
 
 // Applies a saved light/dark choice before first paint (no flash). Without one,
@@ -37,7 +44,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${plusJakartaSans.variable} ${jetBrainsMono.variable} ${outfit.variable}`}
+      className={`${plusJakartaSans.variable} ${jetBrainsMono.variable} ${inter.variable} ${geistMono.variable}`}
       data-scroll-behavior="smooth"
       suppressHydrationWarning
     >

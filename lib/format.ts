@@ -36,3 +36,11 @@ export function parseYouTubeURL(raw: string): ParsedYouTubeRef {
   if (raw.startsWith("@")) return { type: "handle", value: raw.slice(1) };
   return { type: "handle", value: raw.replace(/^@/, "") };
 }
+
+/** Normalizes hand-typed niche names: "MOVIES" / "anime" -> "Movies" / "Anime"; mixed case is kept. */
+export function tidyNiche(n: string | null | undefined): string {
+  if (!n) return "";
+  const t = n.trim();
+  if (t !== t.toUpperCase() && t !== t.toLowerCase()) return t;
+  return t.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
+}

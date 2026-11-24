@@ -1,42 +1,36 @@
 import { cn } from "@/lib/utils";
-import { GradientText } from "./Decor";
 
-export function Eyebrow({ label, detail, className }: { label: string; detail: string; className?: string }) {
+/** Small monospace label above a heading, e.g. "01  How it works". */
+export function Eyebrow({ index, label, className }: { index?: string; label: string; className?: string }) {
   return (
-    <div
-      className={cn(
-        "inline-flex items-center gap-2 rounded-full border border-vx-line bg-vx-surface py-1.5 pr-3.5 pl-3 text-[13px] font-medium text-vx-muted shadow-[0_1px_2px_rgba(16,24,40,0.04)]",
-        className,
-      )}
-    >
-      <span className="size-1.5 rounded-full bg-vx-accent" />
+    <div className={cn("flex items-center gap-3 font-mono text-[12px] tracking-[0.01em] text-vx-muted", className)}>
+      {index && <span className="text-vx-faint">{index}</span>}
       {label}
-      <span className="text-vx-line">/</span>
-      <span className="font-semibold text-vx-accent">{detail}</span>
     </div>
   );
 }
 
+/** Section opener: heading on the left, a short supporting paragraph on the right. */
 export function SectionHeader({
-  eyebrow,
-  detail,
+  index,
+  label,
   title,
-  highlight,
   sub,
+  className,
 }: {
-  eyebrow: string;
-  detail: string;
-  title: string;
-  highlight: string;
-  sub?: string;
+  index?: string;
+  label: string;
+  title: React.ReactNode;
+  sub?: React.ReactNode;
+  className?: string;
 }) {
   return (
-    <div className="vx-reveal mx-auto mb-12 flex max-w-2xl flex-col items-center text-center">
-      <Eyebrow label={eyebrow} detail={detail} />
-      <h2 className="mt-5 text-[32px] leading-[1.12] font-semibold tracking-[-0.04em] text-balance text-vx-ink sm:text-[44px]">
-        {title} <GradientText>{highlight}</GradientText>
-      </h2>
-      {sub && <p className="mt-4 max-w-xl text-[16px] leading-relaxed text-pretty text-vx-body">{sub}</p>}
+    <div className={cn("vx-reveal mb-12 grid gap-6 lg:mb-14 lg:grid-cols-[1.25fr_1fr] lg:items-end lg:gap-16", className)}>
+      <div>
+        <Eyebrow index={index} label={label} />
+        <h2 className="mt-4 text-[34px] leading-[1.08] font-normal tracking-[-0.035em] text-balance text-vx-ink sm:text-[46px]">{title}</h2>
+      </div>
+      {sub && <p className="max-w-md text-[15px] leading-relaxed text-pretty text-vx-body lg:justify-self-end lg:text-right">{sub}</p>}
     </div>
   );
 }

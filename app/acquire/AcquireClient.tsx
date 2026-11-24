@@ -49,11 +49,11 @@ const MATH = [
 const MATH_MAX = 48000;
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
-  return <div className="text-[12px] font-semibold tracking-[0.14em] text-vx-accent uppercase">{children}</div>;
+  return <div className="font-mono text-[12px] text-vx-muted">{children}</div>;
 }
 
 function H2({ children }: { children: React.ReactNode }) {
-  return <h2 className="mt-3 text-[32px] leading-[1.1] font-semibold tracking-[-0.04em] text-balance text-vx-ink sm:text-[42px]">{children}</h2>;
+  return <h2 className="mt-3 text-[32px] leading-[1.1] font-normal tracking-[-0.035em] text-balance text-vx-ink sm:text-[42px]">{children}</h2>;
 }
 
 export default function AcquireClient() {
@@ -106,19 +106,14 @@ export default function AcquireClient() {
       <SiteNav />
 
       {/* HERO */}
-      <header className="relative overflow-hidden bg-linear-to-b from-vx-hero-1 via-vx-hero-2 to-vx-canvas">
-        <div aria-hidden className="pointer-events-none absolute -top-56 left-1/2 size-[900px] -translate-x-1/2 bg-[radial-gradient(closest-side,var(--vx-glow-1),transparent)]" />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(var(--vx-shadow-rgb),0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(var(--vx-shadow-rgb),0.06)_1px,transparent_1px)] bg-size-[56px_56px] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_0%,black,transparent)]"
-        />
+      <header className="relative overflow-hidden">
         <div className="relative mx-auto max-w-3xl px-5 pt-16 pb-20 text-center sm:px-6 sm:pt-24">
-          <div className="vx-rise inline-flex items-center gap-2 rounded-full bg-vx-surface/90 px-3.5 py-1.5 text-[13px] font-semibold text-vx-accent shadow-[0_1px_2px_rgba(16,24,40,0.06)] ring-1 ring-vx-accent/15">
+          <div className="vx-rise inline-flex items-center gap-2.5 font-mono text-[11px] tracking-[0.06em] text-vx-muted uppercase sm:text-[12px]">
             <span className="size-1.5 rounded-full bg-vx-accent" />
             Done-for-you acquisition
           </div>
-          <h1 style={delay(80)} className="vx-rise mt-7 text-[40px] leading-[1.06] font-semibold tracking-[-0.045em] text-balance text-vx-ink sm:text-[60px]">
-            You didn&apos;t fail at faceless YouTube. <GradientText>The approach did.</GradientText>
+          <h1 style={delay(80)} className="vx-rise mt-7 text-[40px] leading-[1.06] font-normal tracking-[-0.04em] text-balance text-vx-ink sm:text-[60px]">
+            You didn&apos;t fail at faceless YouTube. <GradientText className="text-vx-muted">The approach did.</GradientText>
           </h1>
           <p style={delay(160)} className="vx-rise mx-auto mt-6 max-w-xl text-[17px] leading-relaxed text-pretty text-vx-body sm:text-[18px]">
             Stop starting from scratch. We find you a monetized channel that&apos;s already earning, handle the acquisition, and connect you with a
@@ -152,7 +147,7 @@ export default function AcquireClient() {
                 The frustrating part isn&apos;t that faceless YouTube doesn&apos;t work. It does. Channels on this model are making real money right now. The
                 frustrating part is that you spent months and thousands of dollars on the hardest part of the process when you didn&apos;t have to.
               </p>
-              <p className="border-l-2 border-vx-accent pl-5 font-semibold text-vx-ink">
+              <p className="border-l-2 border-vx-accent pl-5 font-medium text-vx-ink">
                 Building from scratch is the slowest, riskiest, most uncertain way to get into this. There&apos;s a faster way.
               </p>
             </div>
@@ -161,7 +156,7 @@ export default function AcquireClient() {
 
         {/* PROOF */}
         <section className="px-5 sm:px-6">
-          <dl className="vx-reveal mx-auto grid max-w-5xl grid-cols-2 gap-px overflow-hidden rounded-3xl bg-vx-line shadow-vx-card ring-1 ring-vx-line md:grid-cols-4">
+          <dl className="vx-reveal mx-auto grid max-w-5xl grid-cols-2 gap-px overflow-hidden rounded-xl bg-vx-line ring-1 ring-vx-line md:grid-cols-4">
             {[
               [stats ? String(stats.sold) : "—", "Channels sold"],
               [stats ? usd(stats.vol) : "—", "Volume closed"],
@@ -169,7 +164,7 @@ export default function AcquireClient() {
               ["100%", "Escrow protected"],
             ].map(([v, l]) => (
               <div key={l} className="bg-vx-surface px-6 py-6 text-center">
-                <dd className="text-[28px] font-semibold tracking-[-0.02em] text-vx-ink tabular-nums">{v}</dd>
+                <dd className="text-[28px] font-normal tracking-[-0.02em] text-vx-ink tabular-nums">{v}</dd>
                 <dt className="mt-1 text-[13px] text-vx-muted">{l}</dt>
               </div>
             ))}
@@ -190,14 +185,14 @@ export default function AcquireClient() {
             </div>
             <ol className="vx-reveal mt-12 grid gap-5 md:grid-cols-3">
               {OFFER.map((o, i) => (
-                <li key={o.title} className="flex flex-col rounded-3xl bg-vx-surface p-7 shadow-vx-card ring-1 ring-vx-line/70">
+                <li key={o.title} className="flex flex-col rounded-xl bg-vx-surface p-7 ring-1 ring-vx-line">
                   <div className="flex items-center justify-between">
                     <IconTile>
                       <o.icon size={20} />
                     </IconTile>
-                    <span className="text-[12px] font-semibold tracking-[0.14em] text-vx-faint">0{i + 1}</span>
+                    <span className="font-mono text-[12px] text-vx-faint">0{i + 1}</span>
                   </div>
-                  <h3 className="mt-6 text-[18px] font-semibold text-vx-ink">{o.title}</h3>
+                  <h3 className="mt-6 text-[18px] font-medium text-vx-ink">{o.title}</h3>
                   <p className="mt-2.5 text-[14px] leading-relaxed text-vx-body">{o.desc}</p>
                 </li>
               ))}
@@ -206,7 +201,7 @@ export default function AcquireClient() {
         </section>
 
         {/* THE MATH */}
-        <section className="border-y border-vx-line bg-linear-to-b from-vx-canvas via-vx-band to-vx-canvas px-5 py-20 sm:px-6 sm:py-24">
+        <section className="border-y border-vx-line px-5 py-20 sm:px-6 sm:py-24">
           <div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-2 lg:gap-16">
             <div className="vx-reveal">
               <SectionLabel>The math</SectionLabel>
@@ -221,23 +216,23 @@ export default function AcquireClient() {
                   You put capital in at the bottom. You scale with a production team. You sell at the top, or hold and collect the income. Either way you own
                   something with real value, not a certificate and a Slack group.
                 </p>
-                <p className="font-semibold text-vx-ink">The people who understand this aren&apos;t buying courses. They&apos;re buying assets.</p>
+                <p className="font-medium text-vx-ink">The people who understand this aren&apos;t buying courses. They&apos;re buying assets.</p>
               </div>
             </div>
-            <figure className="vx-reveal rounded-3xl bg-vx-surface p-6 shadow-vx-card ring-1 ring-vx-line/80 sm:p-8">
-              <figcaption className="text-[13px] font-semibold text-vx-muted">Sale value at 12–24× monthly revenue</figcaption>
+            <figure className="vx-reveal rounded-xl bg-vx-surface p-6 ring-1 ring-vx-line sm:p-8">
+              <figcaption className="text-[13px] font-medium text-vx-muted">Sale value at 12–24× monthly revenue</figcaption>
               <div className="mt-6 flex flex-col gap-7">
                 {MATH.map((m) => (
                   <div key={m.earns}>
                     <div className="flex items-baseline justify-between gap-3">
-                      <span className="text-[15px] font-semibold text-vx-ink">Earning {usd(m.earns)}/mo</span>
-                      <span className="text-[15px] font-semibold text-vx-accent tabular-nums">
+                      <span className="text-[15px] font-medium text-vx-ink">Earning {usd(m.earns)}/mo</span>
+                      <span className="text-[15px] font-medium text-vx-accent tabular-nums">
                         {usd(m.low)}–{usd(m.high)}
                       </span>
                     </div>
                     <div className="relative mt-3 h-3 rounded-full bg-vx-subtle">
                       <div
-                        className="absolute inset-y-0 rounded-full bg-linear-to-r from-vx-accent-bright to-vx-accent"
+                        className="absolute inset-y-0 rounded-full bg-vx-accent"
                         style={{ left: `${(m.low / MATH_MAX) * 100}%`, width: `${((m.high - m.low) / MATH_MAX) * 100}%` }}
                       />
                     </div>
@@ -263,8 +258,8 @@ export default function AcquireClient() {
               </H2>
             </div>
             <div className="vx-reveal mt-12 grid gap-5 md:grid-cols-2">
-              <div className="rounded-3xl bg-vx-surface p-7 shadow-vx-card ring-1 ring-vx-accent/25">
-                <h3 className="flex items-center gap-2 text-[16px] font-semibold text-vx-accent">
+              <div className="rounded-xl bg-vx-surface p-7 ring-1 ring-vx-accent/25">
+                <h3 className="flex items-center gap-2 text-[16px] font-medium text-vx-accent">
                   <span className="flex size-6 items-center justify-center rounded-full bg-vx-accent-soft">
                     <IconCheck size={13} />
                   </span>
@@ -284,8 +279,8 @@ export default function AcquireClient() {
                   ))}
                 </ul>
               </div>
-              <div className="rounded-3xl bg-vx-subtle p-7 ring-1 ring-vx-line">
-                <h3 className="flex items-center gap-2 text-[16px] font-semibold text-vx-muted">
+              <div className="rounded-xl bg-vx-subtle p-7 ring-1 ring-vx-line">
+                <h3 className="flex items-center gap-2 text-[16px] font-medium text-vx-muted">
                   <span className="flex size-6 items-center justify-center rounded-full bg-vx-surface text-[13px] ring-1 ring-vx-line">✕</span>
                   This is not for you if
                 </h3>
@@ -321,11 +316,11 @@ export default function AcquireClient() {
                   key={p.title}
                   className="relative flex gap-5 after:absolute after:top-9 after:-bottom-8 after:left-[17px] after:w-px after:bg-vx-line last:after:hidden"
                 >
-                  <span className="relative z-10 flex size-9 shrink-0 items-center justify-center rounded-full bg-vx-surface text-[14px] font-semibold text-vx-accent ring-1 ring-vx-accent/30">
+                  <span className="relative z-10 flex size-9 shrink-0 items-center justify-center rounded-full bg-vx-surface text-[14px] font-medium text-vx-accent ring-1 ring-vx-accent/30">
                     {i + 1}
                   </span>
                   <div className="pt-1">
-                    <h3 className="text-[17px] font-semibold text-vx-ink">{p.title}</h3>
+                    <h3 className="text-[17px] font-medium text-vx-ink">{p.title}</h3>
                     <p className="mt-1.5 text-[15px] leading-relaxed text-vx-body">{p.desc}</p>
                   </div>
                 </li>
@@ -335,14 +330,14 @@ export default function AcquireClient() {
         </section>
 
         {/* APPLICATION */}
-        <section id="apply" className="scroll-mt-24 border-t border-vx-line bg-linear-to-b from-vx-surface to-vx-band px-5 py-20 sm:px-6 sm:py-24">
-          <div className="vx-reveal mx-auto max-w-2xl rounded-[28px] bg-vx-surface p-6 shadow-[0_40px_80px_-40px_rgba(var(--vx-shadow-rgb),0.35)] ring-1 ring-vx-line/80 sm:p-9">
+        <section id="apply" className="scroll-mt-24 border-t border-vx-line px-5 py-20 sm:px-6 sm:py-24">
+          <div className="vx-reveal mx-auto max-w-2xl rounded-xl bg-vx-surface p-6 ring-1 ring-vx-line sm:p-9">
             {done ? (
               <div className="py-4 text-center">
                 <div className="mx-auto flex size-14 items-center justify-center rounded-full bg-vx-green-bg text-vx-green">
                   <IconCheck size={26} />
                 </div>
-                <h2 className="mt-5 text-[26px] font-semibold tracking-[-0.03em] text-vx-ink">Application received.</h2>
+                <h2 className="mt-5 text-[26px] font-normal tracking-[-0.025em] text-vx-ink">Application received.</h2>
                 <p className="mx-auto mt-3 max-w-md text-[15px] leading-relaxed text-vx-body">
                   We&apos;ll review it within 24 hours and reach out on your preferred contact. While you wait, join our private Buyers Lounge on Telegram. New
                   verified listings go live there first.
@@ -353,7 +348,7 @@ export default function AcquireClient() {
               </div>
             ) : (
               <form onSubmit={submit} noValidate>
-                <h2 className="text-[26px] font-semibold tracking-[-0.03em] text-vx-ink">Apply to acquire a channel</h2>
+                <h2 className="text-[26px] font-normal tracking-[-0.025em] text-vx-ink">Apply to acquire a channel</h2>
                 <p className="mt-1.5 text-[15px] text-vx-body">Takes 3 minutes. We review every application within 24 hours.</p>
                 <div className="mt-7 grid gap-4 sm:grid-cols-2">
                   <Field id="f-fname" label="First name" autoComplete="given-name" placeholder="Your first name" value={f.fname} onChange={set("fname")} />
@@ -411,7 +406,7 @@ export default function AcquireClient() {
           </div>
           <p className="mt-8 text-center text-[14px] text-vx-muted">
             Selling instead?{" "}
-            <Link href="/valuation" className="font-semibold text-vx-accent hover:underline">
+            <Link href="/valuation" className="font-medium text-vx-accent hover:underline">
               Get a free valuation →
             </Link>
           </p>

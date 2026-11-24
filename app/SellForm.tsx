@@ -122,10 +122,10 @@ export default function SellForm() {
   if (done) {
     return (
       <div className="flex flex-col items-center py-10 text-center">
-        <div className="mb-6 flex size-16 items-center justify-center rounded-full bg-vx-green-bg text-vx-green ring-8 ring-vx-green-bg/50">
+        <div className="mb-6 flex size-16 items-center justify-center rounded-full bg-vx-green-bg text-vx-green">
           <IconCheck size={28} />
         </div>
-        <h3 className="text-[24px] font-semibold tracking-[-0.02em] text-vx-ink">You&apos;re in the pipeline.</h3>
+        <h3 className="text-[24px] font-normal tracking-[-0.02em] text-vx-ink">You&apos;re in the pipeline.</h3>
         <p className="mt-3 max-w-sm text-[15px] leading-relaxed text-vx-body">
           We&apos;ve received your channel and will be in touch within 24 hours via your preferred contact.
         </p>
@@ -140,7 +140,7 @@ export default function SellForm() {
 
   return (
     <form onSubmit={onSubmit} noValidate>
-      <h3 className="text-[20px] font-semibold tracking-[-0.02em] text-vx-ink">Submit your channel</h3>
+      <h3 className="text-[20px] font-normal tracking-[-0.02em] text-vx-ink">Submit your channel</h3>
       <p className="mt-1 mb-6 text-[14px] text-vx-muted">Takes under 2 minutes</p>
 
       <Label htmlFor="url-input" className={labelClass}>YouTube channel URL</Label>
@@ -158,7 +158,7 @@ export default function SellForm() {
             }
           }}
         />
-        <Button type="button" variant="brand" className="h-11 rounded-xl px-5 text-[14px] font-semibold shadow-none" onClick={fetchChannel} disabled={fetching}>
+        <Button type="button" variant="brand" className="h-10 px-4 text-[14px]" onClick={fetchChannel} disabled={fetching}>
           {fetching ? <Spinner /> : null}
           {fetching ? "Fetching" : "Fetch stats"}
         </Button>
@@ -168,11 +168,11 @@ export default function SellForm() {
       {channel && (
         <div className="mt-6">
           <div className="flex items-center gap-3 border-b border-vx-line pb-4">
-            <div className="flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-vx-tint text-[13px] font-bold text-vx-accent">
+            <div className="flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-vx-tint text-[13px] font-medium text-vx-accent">
               {channel.thumbnail ? <img src={channel.thumbnail} alt="" className="size-full object-cover" /> : initials(channel.name)}
             </div>
             <div className="min-w-0">
-              <div className="truncate text-[15px] font-bold text-vx-ink">{channel.name}</div>
+              <div className="truncate text-[15px] font-medium text-vx-ink">{channel.name}</div>
               <div className="truncate text-[13px] text-vx-muted">{channel.handle}</div>
             </div>
           </div>
@@ -187,18 +187,18 @@ export default function SellForm() {
               ["Channel age", channel.ageMonths ? (channel.ageMonths / 12).toFixed(1) + " yrs" : "—"],
             ].map(([k, v]) => (
               <div key={k} className="rounded-xl bg-vx-subtle px-3 py-2.5">
-                <dt className="text-[11px] font-semibold tracking-[0.04em] text-vx-muted uppercase">{k}</dt>
-                <dd className="mt-0.5 text-[16px] font-bold text-vx-ink">{v}</dd>
+                <dt className="text-[12px] text-vx-muted">{k}</dt>
+                <dd className="mt-0.5 text-[16px] font-medium text-vx-ink">{v}</dd>
               </div>
             ))}
           </dl>
 
           <div className={cn("mt-3 rounded-xl border p-4", confirmedMonthly ? "border-vx-green/25 bg-vx-green-bg" : "border-vx-accent/15 bg-vx-tint")}>
             <div className="flex items-baseline justify-between gap-3">
-              <span className={cn("text-[12px] font-semibold tracking-[0.04em] uppercase", confirmedMonthly ? "text-vx-green" : "text-vx-accent")}>
+              <span className={cn("font-mono text-[12px]", confirmedMonthly ? "text-vx-green" : "text-vx-accent")}>
                 {confirmedMonthly ? "Monthly views · confirmed" : "Monthly views"}
               </span>
-              <span className="text-[20px] font-semibold text-vx-ink">{monthly ? fmt(monthly) + "/mo" : "—"}</span>
+              <span className="text-[20px] font-normal text-vx-ink">{monthly ? fmt(monthly) + "/mo" : "—"}</span>
             </div>
             <p className="mt-1 text-[13px] leading-snug text-vx-body">
               {confirmedMonthly
@@ -215,7 +215,7 @@ export default function SellForm() {
                   value={override}
                   onChange={(e) => setOverride(e.target.value)}
                 />
-                <Button type="button" variant="brandOutline" className="h-10 rounded-xl px-4 text-[14px] font-semibold" onClick={confirmMonthly}>
+                <Button type="button" variant="brandOutline" className="h-10 px-4 text-[14px]" onClick={confirmMonthly}>
                   Confirm
                 </Button>
               </div>

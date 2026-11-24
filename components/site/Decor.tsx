@@ -1,39 +1,22 @@
 import { cn } from "@/lib/utils";
 
-export function Rings({ size = 900, className }: { size?: number; className?: string }) {
-  const c = size / 2;
-  const step = size / 8.5;
-  return (
-    <svg
-      aria-hidden
-      width={size}
-      height={size}
-      viewBox={`0 0 ${size} ${size}`}
-      className={cn("pointer-events-none absolute left-1/2 -translate-x-1/2 text-vx-accent", className)}
-    >
-      {[0.45, 0.3, 0.18, 0.09].map((opacity, i) => (
-        <circle key={i} cx={c} cy={c} r={step * (i + 1)} fill="none" stroke="currentColor" strokeWidth="1" opacity={opacity} />
-      ))}
-    </svg>
-  );
+// The redesign is deliberately undecorated: these keep their names so existing
+// pages compile, but render flat.
+
+/** Decorative rings were retired; renders nothing. */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function Rings(_props: { size?: number; className?: string }) {
+  return null;
 }
 
+/** Formerly a gradient fill; now plain text in the surrounding color. */
 export function GradientText({ children, className }: { children: React.ReactNode; className?: string }) {
-  return (
-    <span className={cn("bg-linear-to-r from-vx-grad-a via-vx-grad-b to-vx-grad-c box-decoration-clone bg-clip-text text-transparent", className)}>
-      {children}
-    </span>
-  );
+  return <span className={className}>{children}</span>;
 }
 
 export function IconTile({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <div
-      className={cn(
-        "flex size-12 items-center justify-center rounded-2xl bg-linear-to-b from-vx-surface to-vx-accent-soft text-vx-accent shadow-[0_8px_18px_-10px_rgba(var(--vx-shadow-rgb),0.55)] ring-1 ring-vx-accent/15",
-        className,
-      )}
-    >
+    <div className={cn("flex size-10 items-center justify-center rounded-lg border border-vx-line bg-vx-surface text-vx-ink", className)}>
       {children}
     </div>
   );

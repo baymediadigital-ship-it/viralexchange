@@ -92,7 +92,7 @@ function Progress({ step }: { step: Step }) {
         <li key={s.label} className="flex flex-1 items-center gap-2" aria-current={i === current ? "step" : undefined}>
           <span
             className={cn(
-              "flex size-6 shrink-0 items-center justify-center rounded-full text-[12px] font-semibold",
+              "flex size-6 shrink-0 items-center justify-center rounded-full text-[12px] font-medium",
               i < current && "bg-vx-accent text-vx-on-accent",
               i === current && "bg-vx-accent-soft text-vx-accent ring-1 ring-vx-accent/40",
               i > current && "bg-vx-subtle text-vx-muted",
@@ -150,8 +150,9 @@ export default function ValuationClient() {
     document.getElementById("tool")?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
-  async function fetchChannel() {
-    const u = url.trim();
+  async function fetchChannel(input: string = url) {
+    const u = input.trim();
+    if (input !== url) setUrl(input);
     if (!u) return setError("Paste your YouTube channel URL to start.");
     setError("");
     setFetching(true);
@@ -175,6 +176,22 @@ export default function ValuationClient() {
       setFetching(false);
     }
   }
+
+  // The homepage hero links here as /valuation?channel=<url>: pre-fill and look it up.
+  useEffect(() => {
+    // Started asynchronously like any other fetch; the flag stops Strict Mode's
+    // dev double-mount from looking the channel up twice.
+    const prefill = new URLSearchParams(window.location.search).get("channel");
+    if (!prefill) return;
+    let cancelled = false;
+    Promise.resolve().then(() => {
+      if (!cancelled) fetchChannel(prefill);
+    });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function continueToEmail() {
     if (!ch) return;
@@ -248,17 +265,13 @@ export default function ValuationClient() {
     <div className="vx-page min-h-screen bg-vx-canvas text-vx-ink antialiased">
       <SiteNav />
 
-      <header className="relative overflow-hidden bg-linear-to-b from-vx-hero-1 via-vx-hero-2 to-vx-canvas">
-        <div aria-hidden className="pointer-events-none absolute -top-56 left-1/2 size-[900px] -translate-x-1/2 bg-[radial-gradient(closest-side,var(--vx-glow-1),transparent)]" />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(var(--vx-shadow-rgb),0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(var(--vx-shadow-rgb),0.06)_1px,transparent_1px)] bg-size-[56px_56px] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_0%,black,transparent)]"
-        />
+      <header className="relative overflow-hidden">
         <div className="relative mx-auto max-w-3xl px-5 pt-16 pb-12 text-center sm:px-6 sm:pt-20">
-          <div className="vx-rise inline-flex items-center gap-2 rounded-full bg-vx-surface/90 px-3.5 py-1.5 text-[13px] font-semibold text-vx-body shadow-[0_1px_2px_rgba(16,24,40,0.06)] ring-1 ring-vx-accent/10">
-            Free valuation <span className="text-vx-line">/</span> <span className="text-vx-accent">No signup needed</span>
+          <div className="vx-rise inline-flex items-center gap-2.5 font-mono text-[11px] tracking-[0.06em] text-vx-muted uppercase sm:text-[12px]">
+            <span className="size-1.5 rounded-full bg-vx-accent" />
+            Free valuation · No signup needed
           </div>
-          <h1 style={{ "--d": "80ms" } as React.CSSProperties} className="vx-rise mt-6 text-[40px] leading-[1.05] font-semibold tracking-[-0.045em] text-balance text-vx-ink sm:text-[58px]">
+          <h1 style={{ "--d": "80ms" } as React.CSSProperties} className="vx-rise mt-6 text-[40px] leading-[1.05] font-normal tracking-[-0.04em] text-balance text-vx-ink sm:text-[58px]">
             What is your channel <GradientText>worth?</GradientText>
           </h1>
           <p style={{ "--d": "160ms" } as React.CSSProperties} className="vx-rise mx-auto mt-5 max-w-lg text-[17px] leading-relaxed text-pretty text-vx-body">
@@ -276,7 +289,7 @@ export default function ValuationClient() {
       </header>
 
       <main className="px-5 pb-24 sm:px-6">
-        <div id="tool" className="vx-rise mx-auto max-w-2xl scroll-mt-24 rounded-[28px] bg-vx-surface p-6 shadow-[0_40px_80px_-40px_rgba(var(--vx-shadow-rgb),0.35)] ring-1 ring-vx-line/80 sm:p-9" style={{ "--d": "300ms" } as React.CSSProperties}>
+        <div id="tool" className="vx-rise mx-auto max-w-2xl scroll-mt-24 rounded-xl bg-vx-surface p-6 ring-1 ring-vx-line sm:p-9" style={{ "--d": "300ms" } as React.CSSProperties}>
           <Progress step={step} />
 
           {step === "channel" && (
@@ -296,7 +309,7 @@ export default function ValuationClient() {
                     }
                   }}
                 />
-                <Button type="button" variant="brand" className="h-11 rounded-xl px-5 text-[14px] font-semibold shadow-none" onClick={fetchChannel} disabled={fetching}>
+                <Button type="button" variant="brand" className="h-10 px-4 text-[14px]" onClick={() => fetchChannel()} disabled={fetching}>
                   {fetching && <Spinner />}
                   {fetching ? "Fetching" : "Fetch stats"}
                 </Button>
@@ -305,11 +318,11 @@ export default function ValuationClient() {
               {ch && (
                 <div className="mt-6">
                   <div className="flex items-center gap-3 border-b border-vx-line pb-4">
-                    <div className="flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-vx-accent-soft text-[13px] font-bold text-vx-accent">
+                    <div className="flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-vx-accent-soft text-[13px] font-medium text-vx-accent">
                       {ch.thumbnail ? <img src={ch.thumbnail} alt="" className="size-full object-cover" /> : initials(ch.name)}
                     </div>
                     <div className="min-w-0">
-                      <div className="truncate text-[15px] font-semibold text-vx-ink">{ch.name}</div>
+                      <div className="truncate text-[15px] font-medium text-vx-ink">{ch.name}</div>
                       <div className="truncate text-[13px] text-vx-muted">{ch.handle}</div>
                     </div>
                   </div>
@@ -321,8 +334,8 @@ export default function ValuationClient() {
                       ["Age", ch.ageMonths >= 12 ? (ch.ageMonths / 12).toFixed(1) + " yrs" : ch.ageMonths + " mo"],
                     ].map(([k, v]) => (
                       <div key={k} className="rounded-xl bg-vx-subtle px-3 py-2.5">
-                        <dt className="text-[11px] font-semibold tracking-[0.04em] text-vx-muted uppercase">{k}</dt>
-                        <dd className="mt-0.5 text-[16px] font-semibold text-vx-ink tabular-nums">{v}</dd>
+                        <dt className="text-[12px] text-vx-muted">{k}</dt>
+                        <dd className="mt-0.5 text-[16px] font-medium text-vx-ink tabular-nums">{v}</dd>
                       </div>
                     ))}
                   </dl>
@@ -364,14 +377,14 @@ export default function ValuationClient() {
             <form onSubmit={unlock} noValidate className="text-center">
               <div className="relative overflow-hidden rounded-2xl bg-vx-subtle px-6 py-9">
                 {/* Placeholder figure only; the real number isn't rendered until the email step completes. */}
-                <div aria-hidden className="text-[36px] font-semibold tracking-[-0.03em] text-vx-ink blur-md select-none sm:text-[44px]">$48,000 — $96,000</div>
+                <div aria-hidden className="text-[36px] font-normal tracking-[-0.025em] text-vx-ink blur-md select-none sm:text-[44px]">$48,000 — $96,000</div>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="inline-flex items-center gap-2 rounded-full bg-vx-surface px-4 py-2 text-[13px] font-semibold text-vx-ink shadow-vx-float ring-1 ring-vx-line">
+                  <span className="inline-flex items-center gap-2 rounded-full bg-vx-surface px-4 py-2 text-[13px] font-medium text-vx-ink shadow-vx-float ring-1 ring-vx-line">
                     <IconLock size={14} className="text-vx-accent" /> Enter your email to unlock
                   </span>
                 </div>
               </div>
-              <h2 className="mt-7 text-[24px] font-semibold tracking-[-0.03em] text-vx-ink">Your valuation is ready</h2>
+              <h2 className="mt-7 text-[24px] font-normal tracking-[-0.025em] text-vx-ink">Your valuation is ready</h2>
               <p className="mx-auto mt-2 max-w-sm text-[15px] text-vx-body">Add your email to see the full breakdown. We&apos;ll send you a copy too.</p>
               <div className="mx-auto mt-6 flex max-w-md flex-col gap-2 sm:flex-row">
                 <Input
@@ -383,7 +396,7 @@ export default function ValuationClient() {
                   onChange={(e) => setEmail(e.target.value)}
                   className={cn(fieldClass, "flex-1")}
                 />
-                <Button type="submit" variant="brand" className="h-11 rounded-xl px-5 text-[14px] font-semibold shadow-none" disabled={busy}>
+                <Button type="submit" variant="brand" className="h-10 px-4 text-[14px]" disabled={busy}>
                   {busy && <Spinner />}
                   Unlock
                 </Button>
@@ -398,12 +411,12 @@ export default function ValuationClient() {
               <div className="mx-auto flex size-14 items-center justify-center rounded-full bg-vx-amber-bg text-vx-amber">
                 <IconClock size={24} />
               </div>
-              <h2 className="mt-5 text-[24px] font-semibold tracking-[-0.03em] text-vx-ink">Not quite ready yet</h2>
+              <h2 className="mt-5 text-[24px] font-normal tracking-[-0.025em] text-vx-ink">Not quite ready yet</h2>
               <p className="mx-auto mt-2 max-w-md text-[15px] leading-relaxed text-vx-body">
                 We only work with monetized channels, so buyers get assets that already earn.
               </p>
               <div className="mx-auto mt-5 max-w-md rounded-2xl bg-vx-subtle p-4 text-left text-[14px] leading-relaxed text-vx-body">
-                <strong className="font-semibold text-vx-ink">Come back once you&apos;re monetized.</strong> When your channel is in the YouTube Partner Program and
+                <strong className="font-medium text-vx-ink">Come back once you&apos;re monetized.</strong> When your channel is in the YouTube Partner Program and
                 earning, we can value it and list it within 24 hours.
               </div>
               <Button type="button" variant="brandOutline" size="pillSm" className="mt-7" onClick={reset}>
@@ -415,15 +428,15 @@ export default function ValuationClient() {
           {step === "result" && result && (
             <div>
               <div className="text-center">
-                <div className="text-[13px] font-semibold tracking-[0.12em] text-vx-muted uppercase">Estimated channel value</div>
-                <div className="mt-2 text-[36px] leading-tight font-semibold tracking-[-0.035em] tabular-nums sm:text-[48px]">
+                <div className="text-[13px] font-mono text-vx-muted">Estimated channel value</div>
+                <div className="mt-2 text-[36px] leading-tight font-normal tracking-[-0.03em] tabular-nums sm:text-[48px]">
                   <GradientText>
                     {usd(result.low)} — {usd(result.high)}
                   </GradientText>
                 </div>
                 <div className="mt-3 flex flex-wrap justify-center gap-2">
-                  <span className="rounded-full bg-vx-green-bg px-3 py-1 text-[12px] font-semibold text-vx-green">{result.conf} confidence</span>
-                  <span className="rounded-full bg-vx-subtle px-3 py-1 text-[12px] font-semibold text-vx-body">{result.tierLabel}</span>
+                  <span className="rounded-full bg-vx-green-bg px-3 py-1 text-[12px] font-medium text-vx-green">{result.conf} confidence</span>
+                  <span className="rounded-full bg-vx-subtle px-3 py-1 text-[12px] font-medium text-vx-body">{result.tierLabel}</span>
                 </div>
               </div>
 
@@ -433,7 +446,7 @@ export default function ValuationClient() {
                   <li key={f.name} className="grid grid-cols-[110px_1fr_36px] items-center gap-x-4 gap-y-1 sm:grid-cols-[130px_1fr_40px]">
                     <span className="text-[14px] font-medium text-vx-ink">{f.name}</span>
                     <Bar score={f.score} />
-                    <span className={cn("text-right text-[14px] font-semibold tabular-nums", f.score >= 70 ? "text-vx-accent" : "text-vx-amber")}>{f.score}</span>
+                    <span className={cn("text-right text-[14px] font-medium tabular-nums", f.score >= 70 ? "text-vx-accent" : "text-vx-amber")}>{f.score}</span>
                     <span className="col-start-2 col-end-4 text-[12px] text-vx-muted">{f.note}</span>
                   </li>
                 ))}
@@ -442,7 +455,7 @@ export default function ValuationClient() {
 
               <div className="mt-7 flex flex-col items-start justify-between gap-4 rounded-2xl bg-vx-accent-soft p-5 sm:flex-row sm:items-center">
                 <div>
-                  <h3 className="text-[17px] font-semibold text-vx-ink">Ready to list?</h3>
+                  <h3 className="text-[17px] font-medium text-vx-ink">Ready to list?</h3>
                   <p className="mt-1 text-[14px] text-vx-body">Listed to verified buyers in 24 hours. Zero upfront fees, secure escrow.</p>
                 </div>
                 <Button type="button" variant="brand" size="pillSm" onClick={toListing} className="shrink-0">
@@ -454,7 +467,7 @@ export default function ValuationClient() {
 
           {step === "list" && ch && (
             <form onSubmit={submit} noValidate>
-              <h2 className="text-[24px] font-semibold tracking-[-0.03em] text-vx-ink">List {ch.name}</h2>
+              <h2 className="text-[24px] font-normal tracking-[-0.025em] text-vx-ink">List {ch.name}</h2>
               <p className="mt-1.5 text-[15px] text-vx-body">Your channel qualifies. Add a few details and we&apos;ll list it to our verified buyers within 24 hours.</p>
               <div className="mt-6 grid gap-4 sm:grid-cols-2">
                 <Field id="s4-price" label="Asking price (USD)" type="number" min={1} placeholder="e.g. 25000" value={list.price} onChange={(e) => setList({ ...list, price: e.target.value })} />
@@ -485,7 +498,7 @@ export default function ValuationClient() {
               <div className="mx-auto flex size-14 items-center justify-center rounded-full bg-vx-green-bg text-vx-green">
                 <IconCheck size={26} />
               </div>
-              <h2 className="mt-5 text-[24px] font-semibold tracking-[-0.03em] text-vx-ink">You&apos;re in the pipeline.</h2>
+              <h2 className="mt-5 text-[24px] font-normal tracking-[-0.025em] text-vx-ink">You&apos;re in the pipeline.</h2>
               <p className="mx-auto mt-2 max-w-sm text-[15px] text-vx-body">We&apos;ll verify your channel within 24 hours and reach out on the contact you gave us.</p>
               <dl className="mx-auto mt-6 max-w-sm divide-y divide-vx-line rounded-2xl bg-vx-subtle px-5 text-left text-[14px]">
                 {[
@@ -496,12 +509,12 @@ export default function ValuationClient() {
                 ].map(([k, v]) => (
                   <div key={k} className="flex justify-between gap-4 py-3">
                     <dt className="text-vx-muted">{k}</dt>
-                    <dd className="truncate font-semibold text-vx-ink">{v}</dd>
+                    <dd className="truncate font-medium text-vx-ink">{v}</dd>
                   </div>
                 ))}
               </dl>
               <p className="mt-6 text-[13px] text-vx-muted">
-                Questions? <span className="font-semibold text-vx-ink select-all">{CONTACT_EMAIL}</span>
+                Questions? <span className="font-medium text-vx-ink select-all">{CONTACT_EMAIL}</span>
               </p>
             </div>
           )}
