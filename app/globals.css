@@ -90,6 +90,8 @@
   --vx-bold-2: #17191c;
   --vx-bold-3: #17191c;
   --vx-shadow-rgb: 15, 17, 20;
+  --vx-stage: rgba(34, 160, 84, 0.26);
+  --vx-stage-edge: rgba(21, 128, 61, 0.45);
   --vx-amber: #a15c07;
   --vx-amber-bg: #fbf3e4;
   --vx-info: #2f5bb7;
@@ -122,6 +124,8 @@
   --vx-bold-2: #1d2023;
   --vx-bold-3: #1d2023;
   --vx-shadow-rgb: 0, 0, 0;
+  --vx-stage: rgba(95, 197, 140, 0.24);
+  --vx-stage-edge: rgba(95, 197, 140, 0.35);
   --vx-amber: #e8b45a;
   --vx-amber-bg: #2a2214;
   --vx-info: #8fb0f0;
@@ -221,7 +225,7 @@ body:has(.vx-page) { background: var(--vx-canvas); color: var(--vx-ink); }
 }
 /* Reduced transparency: translucent chrome becomes solid. */
 @media (prefers-reduced-transparency: reduce) {
-  .vx-nav { background-color: var(--vx-surface) !important; }
+  .vx-nav, .vx-pillnav { background-color: var(--vx-surface) !important; }
 }
 /* Increased contrast: firmer lines and darker secondary text. */
 @media (prefers-contrast: more) {

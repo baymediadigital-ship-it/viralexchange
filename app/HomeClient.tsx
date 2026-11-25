@@ -27,7 +27,16 @@ type Deal = {
   close_date: string | null;
 };
 
-type Listing = { id: string; niche: string | null; subscribers: number | null; asking_price_usd: number | null };
+type Listing = { id: string; niche: string | null; subscribers: number | null; monthly_views: number | null; asking_price_usd: number | null };
+
+type PipelineDeal = { niche: string | null; asking_price_usd: number | null; stage: string };
+
+const STAGES = [
+  { key: "inquiry", label: "Inquiry" },
+  { key: "negotiating", label: "Negotiating" },
+  { key: "due_diligence", label: "Due diligence" },
+  { key: "closed", label: "Closed" },
+];
 
 type Stats = { sold: number; vol: number; listed: number };
 
@@ -273,6 +282,181 @@ function ClosedDealsTable({ deals }: { deals: Deal[] | null }) {
   );
 }
 
+/** The one bright moment on the page: a soft green stage behind the hero product view. */
+function Stage({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="relative">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -inset-x-8 top-1/4 -bottom-28 bg-[radial-gradient(closest-side,var(--vx-stage),transparent)] sm:-inset-x-24"
+      />
+      <div className="relative rounded-2xl border border-vx-line bg-[linear-gradient(to_bottom,transparent_30%,var(--vx-stage))] p-1.5 sm:p-2.5">
+        <div aria-hidden className="absolute inset-x-12 -top-px h-px bg-[linear-gradient(90deg,transparent,var(--vx-stage-edge),transparent)]" />
+        {children}
+      </div>
+    </div>
+  );
+}
+
+/** Real closed deals, scrolling. Grows on its own as deals are added. */
+function SoldStrip({ deals, sold }: { deals: Deal[] | null; sold: number | null }) {
+  const named = (deals || []).filter((d) => d.channel_name);
+  if (deals && named.length === 0) return null;
+  return (
+    <div className="mt-14 sm:mt-16">
+      <p className="text-center text-[15px] text-vx-muted">
+        {sold ? (
+          <>
+            <span className="text-vx-ink">{sold} channels</span> sold through ViralExchange, and counting
+          </>
+        ) : (
+          <span className="invisible">Loading</span>
+        )}
+      </p>
+      <div className="relative mt-6 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
+        {named.length === 0 ? (
+          <div className="h-9" />
+        ) : (
+          <div className="flex w-max animate-vx-marquee gap-3 hover:[animation-play-state:paused] motion-reduce:animate-none">
+            {[...named, ...named].map((d, i) => (
+              <div
+                key={i}
+                aria-hidden={i >= named.length}
+                className="flex h-9 shrink-0 items-center gap-2.5 rounded-full border border-vx-line bg-vx-surface pr-4 pl-1.5 text-[13px] whitespace-nowrap"
+              >
+                <span className="flex size-6 items-center justify-center rounded-full bg-vx-subtle text-[11px] text-vx-body">
+                  {d.channel_name!.trim().charAt(0).toUpperCase()}
+                </span>
+                <span className="text-vx-ink">{d.channel_name}</span>
+                <span className="font-mono text-[12px] text-vx-muted">{fmt(d.subscribers_snapshot)}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function FeatureRow({
+  title,
+  desc,
+  points,
+  visual,
+  flip,
+}: {
+  title: string;
+  desc: string;
+  points: [string, string][];
+  visual: React.ReactNode;
+  flip?: boolean;
+}) {
+  return (
+    <div className="vx-reveal grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+      <div className={cn(flip && "lg:order-2")}>
+        <h3 className="max-w-md text-[26px] leading-[1.12] font-normal tracking-[-0.03em] text-vx-ink sm:text-[32px]">{title}</h3>
+        <p className="mt-4 max-w-md text-[15px] leading-relaxed text-vx-body">{desc}</p>
+        <ul className="mt-7 flex max-w-md flex-col gap-4">
+          {points.map(([t, d]) => (
+            <li key={t} className="flex gap-3">
+              <Check className="mt-0.5 size-4 shrink-0 text-vx-accent" strokeWidth={2.25} aria-hidden />
+              <div>
+                <div className="text-[14px] text-vx-ink">{t}</div>
+                <div className="mt-0.5 text-[13px] leading-relaxed text-vx-muted">{d}</div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div className={cn(flip && "lg:order-1")}>{visual}</div>
+    </div>
+  );
+}
+
+/** A live listing as it moves through review. The checklist is the standard process, not this listing's history. */
+function ListingReview({ listing }: { listing: Listing | null }) {
+  const steps: [string, "green" | "amber", string][] = [
+    ["Stats pulled from YouTube", "green", "Done"],
+    ["Reviewed by our team", "green", "Done"],
+    ["Shown to verified buyers", "green", "Live"],
+    ["Name shared after NDA", "amber", "On request"],
+  ];
+  return (
+    <Frame label="Listing review · Illustrative view of a live listing">
+      <div className="p-5 sm:p-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="text-[16px] text-vx-ink">Verified {tidyNiche(listing?.niche) || "YouTube"} channel</div>
+          <StatusPill tone="neutral">Name private</StatusPill>
+        </div>
+        <dl className="mt-5 grid grid-cols-3 gap-px overflow-hidden rounded-lg border border-vx-line bg-vx-line">
+          {[
+            ["Subscribers", listing?.subscribers ? fmt(listing.subscribers) : "—"],
+            ["Monthly views", listing?.monthly_views ? fmt(listing.monthly_views) : "—"],
+            ["Asking", listing?.asking_price_usd ? usd(Number(listing.asking_price_usd)) : "—"],
+          ].map(([k, v]) => (
+            <div key={k} className="bg-vx-surface px-3.5 py-3">
+              <dt className="text-[11px] text-vx-muted">{k}</dt>
+              <dd className="mt-1 truncate font-mono text-[15px] text-vx-ink tabular-nums">{v}</dd>
+            </div>
+          ))}
+        </dl>
+        <ul className="mt-5 divide-y divide-vx-line rounded-lg border border-vx-line">
+          {steps.map(([t, tone, state]) => (
+            <li key={t} className="flex items-center justify-between gap-3 px-3.5 py-2.5 text-[13px]">
+              <span className="text-vx-body">{t}</span>
+              <StatusPill tone={tone}>{state}</StatusPill>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </Frame>
+  );
+}
+
+/** Real pipeline counts and in-progress deals (names stay masked until close). */
+function PipelineView({ pipeline }: { pipeline: PipelineDeal[] | null }) {
+  const count = (k: string) => (pipeline ? pipeline.filter((d) => d.stage === k).length : null);
+  const active = (pipeline || []).filter((d) => d.stage !== "closed").slice(0, 4);
+  const stageLabel = (k: string) => STAGES.find((s) => s.key === k)?.label ?? k;
+  return (
+    <Frame label="Deal pipeline · Live data">
+      <div className="p-5 sm:p-6">
+        <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-vx-line bg-vx-line sm:grid-cols-4">
+          {STAGES.map((s) => (
+            <div key={s.key} className="bg-vx-surface px-3.5 py-3">
+              <dt className="text-[11px] text-vx-muted">{s.label}</dt>
+              <dd className="mt-1 font-mono text-[18px] text-vx-ink tabular-nums">{count(s.key) ?? "—"}</dd>
+            </div>
+          ))}
+        </dl>
+        <ul className="mt-5 divide-y divide-vx-line rounded-lg border border-vx-line">
+          {pipeline === null &&
+            Array.from({ length: 3 }).map((_, i) => (
+              <li key={i} className="px-3.5 py-3">
+                <span className="block h-4 animate-pulse rounded bg-vx-subtle" />
+              </li>
+            ))}
+          {pipeline?.length === 0 || (pipeline && active.length === 0) ? (
+            <li className="px-3.5 py-3 text-[13px] text-vx-muted">No deals in progress right now</li>
+          ) : (
+            active.map((d, i) => (
+              <li key={i} className="flex items-center justify-between gap-3 px-3.5 py-2.5 text-[13px]">
+                <span className="min-w-0 truncate text-vx-ink">Verified {tidyNiche(d.niche) || "YouTube"} channel</span>
+                <span className="flex shrink-0 items-center gap-3">
+                  <span className="hidden font-mono text-[12px] text-vx-muted tabular-nums sm:inline">
+                    {d.asking_price_usd ? usd(Number(d.asking_price_usd)) : ""}
+                  </span>
+                  <StatusPill tone="amber">{stageLabel(d.stage)}</StatusPill>
+                </span>
+              </li>
+            ))
+          )}
+        </ul>
+      </div>
+    </Frame>
+  );
+}
+
 function HeroValuation() {
   const router = useRouter();
   const [url, setUrl] = useState("");
@@ -291,7 +475,7 @@ function HeroValuation() {
         value={url}
         onChange={(e) => setUrl(e.target.value)}
         placeholder="Paste your YouTube channel URL"
-        className={cn(fieldClass, "flex-1")}
+        className={cn(fieldClass, "sm:flex-1")}
       />
       <button type="submit" className={buttonVariants({ variant: "brand", size: "pill" })}>
         Get a free valuation <ArrowUpRight aria-hidden />
@@ -304,27 +488,30 @@ export default function HomeClient() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [deals, setDeals] = useState<Deal[] | null>(null);
   const [listings, setListings] = useState<Listing[]>([]);
+  const [pipeline, setPipeline] = useState<PipelineDeal[] | null>(null);
 
   useEffect(() => {
     const supabase = createClient();
     Promise.all([
       supabase
         .from("listings")
-        .select("id,niche,subscribers,asking_price_usd", { count: "exact" })
+        .select("id,niche,subscribers,monthly_views,asking_price_usd", { count: "exact" })
         .eq("status", "available")
         .order("created_at", { ascending: false })
         .limit(3),
       supabase
         .from("deals_public_pipeline")
-        .select("channel_name,niche,subscribers_snapshot,closed_price_usd,close_date")
-        .eq("stage", "closed")
+        .select("channel_name,niche,subscribers_snapshot,asking_price_usd,closed_price_usd,close_date,stage")
+        .neq("stage", "lost")
         .order("created_at", { ascending: false }),
     ])
       .then(([listingsRes, dealsRes]) => {
         if (listingsRes.error) throw listingsRes.error;
         if (dealsRes.error) throw dealsRes.error;
-        const closed = (dealsRes.data || []) as Deal[];
+        const all = (dealsRes.data || []) as (Deal & PipelineDeal)[];
+        const closed = all.filter((d) => d.stage === "closed");
         setDeals(closed);
+        setPipeline(all);
         setListings((listingsRes.data || []) as Listing[]);
         setStats({
           sold: closed.length,
@@ -335,6 +522,7 @@ export default function HomeClient() {
       .catch((e) => {
         console.error(e);
         setDeals([]);
+        setPipeline([]);
       });
   }, []);
 
@@ -346,8 +534,8 @@ export default function HomeClient() {
       <SiteNav />
 
       {/* HERO */}
-      <header className="px-5 sm:px-6">
-        <div className="mx-auto max-w-6xl pt-20 pb-20 sm:pt-28 sm:pb-24">
+      <header className="overflow-x-clip px-5 sm:px-6">
+        <div className="mx-auto max-w-6xl pt-16 pb-20 sm:pt-24 sm:pb-24">
           <div className="vx-rise flex items-center gap-2.5 font-mono text-[11px] tracking-[0.06em] text-vx-muted uppercase sm:text-[12px]">
             <span className="size-1.5 rounded-full bg-vx-accent" />
             The YouTube channel marketplace
@@ -382,8 +570,12 @@ export default function HomeClient() {
           </div>
 
           <div style={delay(320)} className="vx-rise mt-16 sm:mt-20">
-            <DealRoom deal={topDeal} stats={stats} />
+            <Stage>
+              <DealRoom deal={topDeal} stats={stats} />
+            </Stage>
           </div>
+
+          <SoldStrip deals={deals} sold={stats?.sold ?? null} />
         </div>
       </header>
 
@@ -398,10 +590,49 @@ export default function HomeClient() {
         <EscrowDiagram />
       </Section>
 
-      {/* 02 PROCESS */}
-      <Section id="process">
+      {/* 02 WHY */}
+      <Section>
         <SectionHeader
           index="02"
+          label="Why ViralExchange"
+          title={
+            <>
+              Built so both sides
+              <br />
+              can trust the deal.
+            </>
+          }
+          sub="Verified listings, a public pipeline, and escrow on every sale."
+        />
+        <div className="flex flex-col gap-20 sm:gap-24">
+          <FeatureRow
+            title="Every channel checked before a buyer sees it."
+            desc="Stats come straight from YouTube, not from a seller's screenshot. Then our team reviews the channel before it's listed."
+            points={[
+              ["Stats pulled from YouTube", "Subscribers and views are fetched automatically, so nobody can type in a better number."],
+              ["Reviewed within 24 hours", "A real person checks the channel before it goes to buyers."],
+              ["Name private until an NDA", "Buyers see the numbers first. The channel name comes after they're verified."],
+            ]}
+            visual={<ListingReview listing={listings[0] ?? null} />}
+          />
+          <FeatureRow
+            flip
+            title="Every deal tracked, in the open."
+            desc="Our pipeline is public. Anyone can see what's for sale, what's being negotiated, and what every closed channel actually sold for."
+            points={[
+              ["A live pipeline", "Deals move from inquiry to close in one place, updated from our tracker."],
+              ["Closed prices published", "Every sale shows its real price. No vague \"sold for six figures\"."],
+              ["Escrow on every transaction", "A neutral third party holds the money until the transfer is complete."],
+            ]}
+            visual={<PipelineView pipeline={pipeline} />}
+          />
+        </div>
+      </Section>
+
+      {/* 03 PROCESS */}
+      <Section id="process">
+        <SectionHeader
+          index="03"
           label="How it works"
           title={
             <>
@@ -424,10 +655,10 @@ export default function HomeClient() {
         </ol>
       </Section>
 
-      {/* 03 CLOSED DEALS */}
+      {/* 04 CLOSED DEALS */}
       <Section id="deals">
         <SectionHeader
-          index="03"
+          index="04"
           label="Track record"
           title={
             <>
@@ -456,11 +687,11 @@ export default function HomeClient() {
         </div>
       </Section>
 
-      {/* 04 BUYERS */}
+      {/* 05 BUYERS */}
       <Section>
         <div className="grid gap-12 lg:grid-cols-[1fr_1.1fr] lg:items-center lg:gap-16">
           <div className="vx-reveal">
-            <Eyebrow index="04" label="For buyers" />
+            <Eyebrow index="05" label="For buyers" />
             <h2 className="mt-4 text-[34px] leading-[1.08] font-normal tracking-[-0.035em] text-vx-ink sm:text-[46px]">Buyers see new channels first.</h2>
             <p className="mt-5 max-w-md text-[15px] leading-relaxed text-vx-body">
               New listings go to our private Telegram the moment they&apos;re verified. Join free and be first in line.
@@ -500,11 +731,11 @@ export default function HomeClient() {
         </div>
       </Section>
 
-      {/* 05 FAQ */}
+      {/* 06 FAQ */}
       <Section>
         <div className="grid gap-10 lg:grid-cols-[1fr_1.4fr] lg:gap-16">
           <div className="vx-reveal">
-            <Eyebrow index="05" label="FAQ" />
+            <Eyebrow index="06" label="FAQ" />
             <h2 className="mt-4 text-[34px] leading-[1.08] font-normal tracking-[-0.035em] text-vx-ink sm:text-[46px]">Good questions.</h2>
           </div>
           <div className="vx-reveal border-t border-vx-line">
@@ -525,7 +756,7 @@ export default function HomeClient() {
       <Section id="submit">
         <div className="grid items-start gap-12 lg:grid-cols-[1fr_1.15fr] lg:gap-16">
           <div className="lg:sticky lg:top-28">
-            <Eyebrow index="06" label="Sell your channel" />
+            <Eyebrow index="07" label="Sell your channel" />
             <h2 className="mt-4 text-[34px] leading-[1.08] font-normal tracking-[-0.035em] text-vx-ink sm:text-[46px]">
               Ready to sell?
               <br />
