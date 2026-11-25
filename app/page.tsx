@@ -12,14 +12,14 @@ export const metadata: Metadata = {
     title: "ViralExchange — Buy & Sell YouTube Channels",
     description:
       "Buy and sell monetized YouTube channels on ViralExchange. Verified buyers and sellers, secure escrow, fast closings.",
-    images: ["/logo.jpg"],
+    images: ["/brand/viralexchange-icon.png"],
   },
   twitter: {
     card: "summary",
     title: "ViralExchange — Buy & Sell YouTube Channels",
     description:
       "Buy and sell monetized YouTube channels on ViralExchange. Verified buyers and sellers, secure escrow, fast closings.",
-    images: ["/logo.jpg"],
+    images: ["/brand/viralexchange-icon.png"],
   },
 };
 

@@ -10,13 +10,13 @@ export const metadata: Metadata = {
     url: "https://viralexchange.io/valuation",
     title: "Free Channel Valuation — ViralExchange",
     description: "Get a free, instant valuation for your YouTube channel based on real market sale data. No signup needed.",
-    images: ["/logo.jpg"],
+    images: ["/brand/viralexchange-icon.png"],
   },
   twitter: {
     card: "summary",
     title: "Free Channel Valuation — ViralExchange",
     description: "Get a free, instant valuation for your YouTube channel based on real market sale data. No signup needed.",
-    images: ["/logo.jpg"],
+    images: ["/brand/viralexchange-icon.png"],
   },
 };
 
