@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,7 @@ import { SiteNav } from "@/components/site/SiteNav";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { GradientText, TelegramIcon } from "@/components/site/Decor";
 import { TELEGRAM_URL } from "@/components/site/links";
+import { fieldClass } from "@/components/site/form";
 import { IconArrowRight, IconCheck, IconLock, IconSearch } from "@/components/Icon";
 import { createClient } from "@/lib/supabase/client";
 import { fmt, usd, tidyNiche } from "@/lib/format";
@@ -39,6 +40,37 @@ const stageOf = (key: string) => STAGES.find((s) => s.key === key) ?? STAGES[0];
 const tidy = tidyNiche;
 const nicheLabel = (n: string | null) => (n ? tidy(n) : "—");
 const nicheShort = (n: string | null) => (n ? tidy(n.split(/[/,]/)[0]) : "Channel");
+
+/** Horizontal scroller that fades whichever edge still has more content, and hides its scrollbar. */
+function FadeScroller({ children, className }: { children: React.ReactNode; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [edges, setEdges] = useState({ start: false, end: false });
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const update = () =>
+      setEdges({ start: el.scrollLeft > 2, end: el.scrollLeft + el.clientWidth < el.scrollWidth - 2 });
+    update();
+    el.addEventListener("scroll", update, { passive: true });
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    if (el.firstElementChild) ro.observe(el.firstElementChild);
+    return () => {
+      el.removeEventListener("scroll", update);
+      ro.disconnect();
+    };
+  }, []);
+  const mask = `linear-gradient(to right, ${edges.start ? "transparent, black 40px" : "black, black"}, ${edges.end ? "black calc(100% - 40px), transparent" : "black, black"})`;
+  return (
+    <div
+      ref={ref}
+      className={cn("overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden", className)}
+      style={{ maskImage: mask, WebkitMaskImage: mask }}
+    >
+      {children}
+    </div>
+  );
+}
 
 function Cell({ label, children, className }: { label: string; children: React.ReactNode; className?: string }) {
   return (
@@ -189,34 +221,38 @@ export default function DealsClient() {
             <p className="text-[15px] text-vx-body">Verified channels open for acquisition. Names stay private until you&apos;re in a deal.</p>
           </div>
 
-          <div className="mt-6 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-            <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1 sm:mx-0 sm:flex-wrap sm:px-0" role="group" aria-label="Filter by niche">
-              {chips.map((n) => (
-                <button
-                  key={n.key}
-                  type="button"
-                  aria-pressed={niche === n.key}
-                  onClick={() => setNiche(n.key)}
-                  className={cn(
-                    "shrink-0 rounded-full px-4 py-2 text-[14px] font-medium ring-1 transition-colors",
-                    niche === n.key
-                      ? "bg-vx-ink text-vx-canvas ring-vx-ink"
-                      : "bg-vx-surface text-vx-body ring-vx-line hover:text-vx-ink hover:ring-vx-faint/60",
-                  )}
-                >
-                  {n.label}
-                  <span className={cn("ml-1.5 tabular-nums", niche === n.key ? "opacity-70" : "text-vx-muted")}>{listings ? n.count : ""}</span>
-                </button>
-              ))}
-            </div>
-            <div className="relative w-full lg:w-64">
-              <IconSearch size={16} className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-vx-muted" />
+          <div className="mt-6 flex flex-col gap-3 lg:flex-row lg:items-center">
+            <FadeScroller className="min-w-0 flex-1">
+              <div className="flex w-max gap-0.5 rounded-lg border border-vx-line bg-vx-subtle p-1" role="group" aria-label="Filter by niche">
+                {chips.map((n) => (
+                  <button
+                    key={n.key}
+                    type="button"
+                    aria-pressed={niche === n.key}
+                    onClick={() => setNiche(n.key)}
+                    className={cn(
+                      "flex h-8 shrink-0 items-center gap-2 rounded-md px-3 text-[13px] whitespace-nowrap transition-[color,background-color,box-shadow,scale] duration-150 active:scale-[0.97]",
+                      niche === n.key
+                        ? "bg-vx-surface text-vx-ink shadow-[0_1px_2px_rgba(var(--vx-shadow-rgb),0.08)] ring-1 ring-vx-line"
+                        : "text-vx-muted hover:text-vx-ink",
+                    )}
+                  >
+                    {n.label}
+                    <span className={cn("font-mono text-[11px] tabular-nums", niche === n.key ? "text-vx-muted" : "text-vx-faint")}>
+                      {listings ? n.count : ""}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </FadeScroller>
+            <div className="relative w-full shrink-0 lg:w-60">
+              <IconSearch size={15} className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-vx-faint" />
               <Input
                 aria-label="Search listings by niche"
-                placeholder="Search by niche..."
+                placeholder="Search by niche"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                className="h-10 rounded-full border-vx-line bg-vx-surface pl-10 text-[14px] text-vx-ink placeholder:text-vx-muted focus-visible:border-vx-accent focus-visible:ring-4 focus-visible:ring-vx-accent/15 md:text-[14px]"
+                className={cn(fieldClass, "h-[42px] pl-9")}
               />
             </div>
           </div>
