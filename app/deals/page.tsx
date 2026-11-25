@@ -12,14 +12,14 @@ export const metadata: Metadata = {
     title: "Deal Pipeline — ViralExchange",
     description:
       "Live deal pipeline for ViralExchange — active listings, deals in progress, and recently closed YouTube channel sales.",
-    images: ["/brand/viralexchange-icon.png"],
+    images: ["/logo.jpg"],
   },
   twitter: {
     card: "summary",
     title: "Deal Pipeline — ViralExchange",
     description:
       "Live deal pipeline for ViralExchange — active listings, deals in progress, and recently closed YouTube channel sales.",
-    images: ["/brand/viralexchange-icon.png"],
+    images: ["/logo.jpg"],
   },
 };
 

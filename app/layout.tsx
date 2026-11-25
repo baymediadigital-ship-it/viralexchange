@@ -37,6 +37,7 @@ export const metadata: Metadata = {
     default: "ViralExchange — Buy & Sell YouTube Channels",
     template: "%s — ViralExchange",
   },
+  icons: { icon: "/logo.jpg" },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

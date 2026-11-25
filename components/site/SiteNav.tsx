@@ -5,15 +5,16 @@ import { TELEGRAM_URL } from "./links";
 import { ThemeToggle } from "./ThemeToggle";
 import { SectionLink } from "./SectionLink";
 import { NavLink } from "./NavLink";
-import { LogoMark } from "./LogoMark";
 
 const linkClass = "rounded-full px-3 py-1.5 text-[14px] text-vx-muted transition-[color,background-color,scale] duration-150 hover:bg-vx-subtle hover:text-vx-ink active:scale-[0.97] active:duration-100 aria-[current=page]:text-vx-ink";
 
 export function Logo() {
   return (
-    <Link href="/" aria-label="ViralExchange home" className="flex items-center gap-2 text-vx-ink">
-      <LogoMark className="h-[19px]" />
-      <span className="text-[16px] font-medium tracking-[-0.015em]">ViralExchange</span>
+    <Link href="/" className="flex items-center gap-2.5">
+      <span className="size-7 overflow-hidden rounded-[7px] ring-1 ring-vx-ink/10">
+        <img src="/logo.jpg" alt="" className="size-full object-cover" />
+      </span>
+      <span className="text-[16px] font-medium tracking-[-0.015em] text-vx-ink">ViralExchange</span>
     </Link>
   );
 }
