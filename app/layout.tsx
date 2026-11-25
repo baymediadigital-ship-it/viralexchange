@@ -50,7 +50,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body>{children}</body>
+      {/* Extensions like ColorZilla add attributes to <body> before React loads;
+          ignore attribute mismatches on this one element only. */}
+      <body suppressHydrationWarning>{children}</body>
     </html>
   );
 }
