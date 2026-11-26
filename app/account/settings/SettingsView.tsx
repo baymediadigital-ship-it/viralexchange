@@ -7,7 +7,8 @@ import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Field, Spinner } from "@/components/site/form";
 import { CONTACT_EMAIL } from "@/components/site/links";
-import { signOut, updateName, updatePassword } from "@/lib/actions/auth";
+import { updateName, updatePassword } from "@/lib/actions/auth";
+import { useSignOut } from "@/lib/useSignOut";
 
 function Card({ title, sub, children }: { title: string; sub?: string; children: React.ReactNode }) {
   return (
@@ -27,6 +28,7 @@ function Status({ error, ok }: { error: string; ok: string }) {
 
 export function SettingsView({ email, name: initialName, resetting }: { email: string; name: string; resetting: boolean }) {
   const router = useRouter();
+  const signOut = useSignOut();
   const [name, setName] = useState(initialName);
   const [nameMsg, setNameMsg] = useState({ error: "", ok: "" });
   const [savingName, startName] = useTransition();

@@ -13,9 +13,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { signOut } from "@/lib/actions/auth";
 import { createClient } from "@/lib/supabase/client";
 import { useAuthUser } from "@/lib/useAuthUser";
+import { useSignOut } from "@/lib/useSignOut";
 import { cn } from "@/lib/utils";
 
 const itemClass = "cursor-pointer gap-2.5 rounded-md px-2.5 py-2 text-[14px] text-vx-body focus:bg-vx-subtle focus:text-vx-ink [&_svg]:size-4 [&_svg]:text-vx-muted";
@@ -27,6 +27,7 @@ const itemClass = "cursor-pointer gap-2.5 rounded-md px-2.5 py-2 text-[14px] tex
  */
 export function AccountMenu() {
   const user = useAuthUser();
+  const signOut = useSignOut();
   const pathname = usePathname();
   const [isAdmin, setIsAdmin] = useState(false);
 

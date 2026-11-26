@@ -1,7 +1,6 @@
 "use server";
 
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { safeNext } from "@/lib/safeNext";
 
@@ -32,11 +31,6 @@ export async function signIn(input: { email: string; password: string }) {
   return { success: true };
 }
 
-export async function signOut() {
-  const supabase = await createClient();
-  await supabase.auth.signOut();
-  redirect("/");
-}
 
 /** Sends a reset link; always reports success so it can't be used to probe which emails have accounts. */
 export async function requestPasswordReset(email: string) {
