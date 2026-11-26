@@ -86,3 +86,23 @@ export async function notifyNewListing(l: ListingForReview) {
     console.error("notifyNewListing failed:", e);
   }
 }
+
+/** Tells the admin a seller changed the asking price. Never throws. */
+export async function notifyPriceChange(l: { channel_name: string; status: string }, from: number | null, to: number) {
+  if (!telegramConfigured()) return;
+  try {
+    await tg("sendMessage", {
+      chat_id: process.env.TELEGRAM_ADMIN_CHAT_ID,
+      text: [
+        "<b>Asking price changed</b>",
+        "",
+        `<b>${escapeHtml(l.channel_name)}</b> (${escapeHtml(l.status === "draft" ? "under review" : l.status === "available" ? "live" : "in negotiation")})`,
+        `${from ? usd(from) : "not set"} → ${usd(to)}`,
+      ].join("\n"),
+      parse_mode: "HTML",
+      reply_markup: { inline_keyboard: [[{ text: "Open admin", url: `${SITE_URL}/admin` }]] },
+    });
+  } catch (e) {
+    console.error("notifyPriceChange failed:", e);
+  }
+}

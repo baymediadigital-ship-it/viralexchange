@@ -4,6 +4,7 @@ import { GradientText } from "@/components/site/Decor";
 import { IconArrowRight } from "@/components/Icon";
 import { usd } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { EditPrice } from "./EditPrice";
 
 export type AccountListing = { id: string; channel_name: string; niche: string | null; asking_price_usd: number | null; status: string; created_at: string };
 export type AccountApplication = { id: string; niche: string | null; budget_range: string | null; status: string; created_at: string };
@@ -90,12 +91,15 @@ export function AccountView({ email, listings, applications }: { email: string; 
         ) : (
           <Rows>
             {listings.map((l) => (
-              <li key={l.id} className="flex items-center justify-between gap-4 px-5 py-4 sm:px-6">
+              <li key={l.id} className="flex items-start justify-between gap-4 px-5 py-4 sm:px-6">
                 <div className="min-w-0">
                   <div className="truncate text-[15px] font-medium text-vx-ink">{l.channel_name}</div>
                   <div className="mt-0.5 text-[13px] text-vx-muted sm:truncate">
                     {[l.niche, usd(l.asking_price_usd), `Submitted ${submitted(l.created_at)}`].filter(Boolean).join(" · ")}
                   </div>
+                  {["draft", "available", "pending_sale"].includes(l.status) && (
+                    <EditPrice id={l.id} price={l.asking_price_usd === null ? null : Number(l.asking_price_usd)} />
+                  )}
                 </div>
                 <Pill status={l.status} map={LISTING_STATUS} />
               </li>

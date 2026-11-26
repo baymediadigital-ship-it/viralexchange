@@ -1,7 +1,8 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { notifyNewListing } from "@/lib/telegram";
+import { revalidatePath } from "next/cache";
+import { notifyNewListing, notifyPriceChange } from "@/lib/telegram";
 
 export type SubmitListingInput = {
   channelName: string;
@@ -59,5 +60,38 @@ export async function submitListing(input: SubmitListingInput) {
     return { error: "Something went wrong submitting your channel. Please try again." };
   }
   await notifyNewListing(listing);
+  return { success: true };
+}
+
+const EDITABLE = ["draft", "available", "pending_sale"];
+
+/** Lets a seller change the asking price on their own listing (also enforced by RLS + trigger). */
+export async function updateMyAskingPrice(id: string, price: number) {
+  if (!Number.isInteger(price) || price < 1 || price > 100_000_000) return { error: "Enter a whole dollar amount." };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Please log in again." };
+
+  const { data: current } = await supabase
+    .from("listings")
+    .select("channel_name,status,asking_price_usd")
+    .eq("id", id)
+    .eq("seller_id", user.id)
+    .maybeSingle();
+  if (!current) return { error: "Listing not found." };
+  if (!EDITABLE.includes(current.status)) return { error: "This listing can't be changed any more." };
+
+  const { error } = await supabase.from("listings").update({ asking_price_usd: price }).eq("id", id).eq("seller_id", user.id);
+  if (error) {
+    console.error("updateMyAskingPrice failed:", error);
+    return { error: "Couldn't update the price. Please try again." };
+  }
+
+  const before = current.asking_price_usd === null ? null : Number(current.asking_price_usd);
+  if (before !== price) await notifyPriceChange(current, before, price);
+  revalidatePath("/account");
   return { success: true };
 }
