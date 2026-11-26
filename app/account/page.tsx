@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { PageTransition } from "@/components/site/PageTransition";
 import { AccountView, type AccountApplication, type AccountListing } from "./AccountView";
 
 export const metadata: Metadata = { title: "My account" };
@@ -27,10 +28,12 @@ export default async function AccountPage() {
   ]);
 
   return (
-    <AccountView
-      email={user.email ?? ""}
-      listings={(listingsRes.data || []) as AccountListing[]}
-      applications={(applicationsRes.data || []) as AccountApplication[]}
-    />
+    <PageTransition>
+      <AccountView
+        email={user.email ?? ""}
+        listings={(listingsRes.data || []) as AccountListing[]}
+        applications={(applicationsRes.data || []) as AccountApplication[]}
+      />
+    </PageTransition>
   );
 }

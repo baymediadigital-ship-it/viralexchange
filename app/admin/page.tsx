@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { PageTransition } from "@/components/site/PageTransition";
 import { AdminListings, type AdminListing } from "./AdminListings";
 
 export default async function AdminPage() {
@@ -21,5 +22,9 @@ export default async function AdminPage() {
 
   if (error) console.error("admin listings load failed:", error);
 
-  return <AdminListings listings={(data || []) as unknown as AdminListing[]} loadFailed={Boolean(error)} />;
+  return (
+    <PageTransition>
+      <AdminListings listings={(data || []) as unknown as AdminListing[]} loadFailed={Boolean(error)} />
+    </PageTransition>
+  );
 }
