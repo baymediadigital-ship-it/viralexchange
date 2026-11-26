@@ -24,14 +24,6 @@ export async function signUp(input: { email: string; password: string; fullName?
   return { success: true };
 }
 
-export async function signIn(input: { email: string; password: string }) {
-  const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({ email: input.email, password: input.password });
-  if (error) return { error: error.message };
-  return { success: true };
-}
-
-
 /** Sends a reset link; always reports success so it can't be used to probe which emails have accounts. */
 export async function requestPasswordReset(email: string) {
   if (!email?.includes("@")) return { error: "Please enter a valid email." };

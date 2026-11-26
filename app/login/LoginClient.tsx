@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { signIn } from "@/lib/actions/auth";
+import { createClient } from "@/lib/supabase/client";
 import { safeNext } from "@/lib/safeNext";
 import { AuthError, AuthField, AuthFooter, AuthShell, AuthSub, AuthSubmit, AuthTitle } from "@/components/AuthShell";
 
@@ -16,18 +16,22 @@ export default function LoginClient() {
   const next = safeNext(searchParams.get("next"));
   const signupHref = next === "/account" ? "/signup" : `/signup?next=${encodeURIComponent(next)}`;
 
+  // Signs in from the browser so the nav's account menu hears about it right
+  // away, then makes a single navigation. (Pushing and refreshing together
+  // raced each other and sometimes needed a second click.) The button stays in
+  // its loading state until the next page takes over.
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (loading) return;
     setError("");
     setLoading(true);
-    const result = await signIn({ email, password });
-    setLoading(false);
-    if (result.error) {
-      setError(result.error);
+    const { error: authError } = await createClient().auth.signInWithPassword({ email: email.trim(), password });
+    if (authError) {
+      setLoading(false);
+      setError(authError.message === "Invalid login credentials" ? "That email and password don't match." : authError.message);
       return;
     }
-    router.push(next);
-    router.refresh();
+    router.replace(next);
   }
 
   return (
