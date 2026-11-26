@@ -559,9 +559,9 @@ export default function HomeClient() {
               <a href="#submit" className={buttonVariants({ variant: "brandOutline", size: "pillSm" })}>
                 Sell a channel
               </a>
-              <a href={TELEGRAM_URL} target="_blank" rel="noopener noreferrer" className={buttonVariants({ variant: "ghost", size: "pillSm", className: "text-vx-body hover:bg-vx-subtle hover:text-vx-ink" })}>
+              <Link href="/listings" className={buttonVariants({ variant: "ghost", size: "pillSm", className: "text-vx-body hover:bg-vx-subtle hover:text-vx-ink" })}>
                 Browse listings <ArrowUpRight aria-hidden />
-              </a>
+              </Link>
             </div>
             <p className="mt-2 flex items-center gap-2 text-[13px] text-vx-muted">
               <ShieldCheck className="size-3.5 shrink-0" aria-hidden />
@@ -700,7 +700,10 @@ export default function HomeClient() {
               <a href={TELEGRAM_URL} target="_blank" rel="noopener noreferrer" className={buttonVariants({ variant: "brand", size: "pill" })}>
                 <TelegramIcon className="size-3.5" /> Join the Buyers Lounge
               </a>
-              <Link href="/acquire" className={buttonVariants({ variant: "brandOutline", size: "pill" })}>
+              <Link href="/listings" className={buttonVariants({ variant: "brandOutline", size: "pill" })}>
+                Browse listings
+              </Link>
+              <Link href="/acquire" className={buttonVariants({ variant: "ghost", size: "pill", className: "text-vx-body hover:bg-vx-subtle hover:text-vx-ink" })}>
                 Apply to acquire
               </Link>
             </div>

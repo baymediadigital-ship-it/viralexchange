@@ -44,3 +44,9 @@ export function tidyNiche(n: string | null | undefined): string {
   if (t !== t.toUpperCase() && t !== t.toLowerCase()) return t;
   return t.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
 }
+
+/** Niche for display, "—" when missing. */
+export const nicheLabel = (n: string | null | undefined) => (n ? tidyNiche(n) : "—");
+
+/** First niche from a "Movies / Recap" style entry, for "Verified X channel" labels. */
+export const nicheShort = (n: string | null | undefined) => (n ? tidyNiche(n.split(/[/,]/)[0]) : "Channel");

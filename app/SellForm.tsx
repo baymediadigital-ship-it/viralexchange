@@ -1,14 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Field, GroupLabel, Spinner, fieldClass, labelClass, selectClass } from "@/components/site/form";
+import { SignInGate } from "@/components/site/SignInGate";
 import { IconArrowRight, IconCheck } from "@/components/Icon";
 import { fmt, initials } from "@/lib/format";
 import { submitListing } from "@/lib/actions/listings";
 import { cn } from "@/lib/utils";
+import { useAuthUser } from "@/lib/useAuthUser";
 
 type Channel = {
   name: string;
@@ -24,6 +27,7 @@ type Channel = {
 };
 
 export default function SellForm() {
+  const user = useAuthUser();
   const [url, setUrl] = useState("");
   const [fetching, setFetching] = useState(false);
   const [fetchError, setFetchError] = useState("");
@@ -97,8 +101,8 @@ export default function SellForm() {
       accountAgeMonths: channel.ageMonths || undefined,
       language: f.lang || "English",
       askingPriceUsd: f.price ? parseInt(f.price) : undefined,
-      sellerContactName: f.name.trim(),
-      sellerContactEmail: f.contact.trim(),
+      sellerContactName: f.name.trim() || user?.user_metadata?.full_name || undefined,
+      sellerContactEmail: f.contact.trim() || user?.email || undefined,
     });
     setSubmitting(false);
     if (result.error) {
@@ -127,7 +131,8 @@ export default function SellForm() {
         </div>
         <h3 className="text-[24px] font-normal tracking-[-0.02em] text-vx-ink">You&apos;re in the pipeline.</h3>
         <p className="mt-3 max-w-sm text-[15px] leading-relaxed text-vx-body">
-          We&apos;ve received your channel and will be in touch within 24 hours via your preferred contact.
+          We&apos;ll review it within 24 hours. You can follow its status from{" "}
+          <Link href="/account" className="text-vx-ink underline underline-offset-4">your account</Link>.
         </p>
         <Button variant="brandOutline" size="pillSm" className="mt-8" onClick={reset}>
           Submit another channel
@@ -137,6 +142,17 @@ export default function SellForm() {
   }
 
   const monthly = confirmedMonthly ?? channel?.estMonthly ?? null;
+
+  if (user === undefined) return <div className="min-h-[260px]" aria-busy="true" />;
+  if (user === null) {
+    return (
+      <SignInGate
+        next="/#submit"
+        title="Create a free account to list your channel"
+        sub="So you can track your listing from review to sale. It takes 30 seconds, and you'll come straight back here."
+      />
+    );
+  }
 
   return (
     <form onSubmit={onSubmit} noValidate>
@@ -249,8 +265,8 @@ export default function SellForm() {
 
           <GroupLabel>Your contact</GroupLabel>
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field id="f-name" label="Name / Alias" placeholder="How should we address you?" value={f.name} onChange={set("name")} />
-            <Field id="f-contact" label="Telegram / Email" placeholder="@yourhandle or email" value={f.contact} onChange={set("contact")} />
+            <Field id="f-name" label="Name / Alias" placeholder={user.user_metadata?.full_name || "How should we address you?"} value={f.name} onChange={set("name")} />
+            <Field id="f-contact" label="Telegram / Email" placeholder={user.email ? `${user.email} (or your @telegram)` : "@yourhandle or email"} value={f.contact} onChange={set("contact")} />
             <div className="sm:col-span-2">
               <Label htmlFor="f-notes" className={labelClass}>Anything else to know?</Label>
               <textarea

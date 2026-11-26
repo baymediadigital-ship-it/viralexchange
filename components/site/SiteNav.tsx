@@ -43,8 +43,8 @@ export function SiteNav() {
     <PillNav>
       <Logo />
       <div className="hidden items-center md:flex">
+        <NavLink href="/listings" className={linkClass}>Browse channels</NavLink>
         <NavLink href="/valuation" className={linkClass}>Free valuation</NavLink>
-        <SectionLink section="deals" className={linkClass}>Closed deals</SectionLink>
         <NavLink href="/deals" className={linkClass}>Pipeline</NavLink>
         <a href={TELEGRAM_URL} target="_blank" rel="noopener noreferrer" className={linkClass}>Buyers Lounge</a>
       </div>

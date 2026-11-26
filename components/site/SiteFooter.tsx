@@ -17,6 +17,7 @@ export function SiteFooter() {
         </div>
         <div className="flex flex-col gap-3">
           <h4 className="font-mono text-[12px] text-vx-faint">Platform</h4>
+          <Link href="/listings" className={colLink}>Browse channels</Link>
           <Link href="/valuation" className={colLink}>Free valuation</Link>
           <Link href="/deals" className={colLink}>Deal pipeline</Link>
           <SectionLink section="submit" className={colLink}>Sell a channel</SectionLink>

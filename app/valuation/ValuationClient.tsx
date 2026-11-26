@@ -8,12 +8,14 @@ import { SiteNav } from "@/components/site/SiteNav";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { GradientText } from "@/components/site/Decor";
 import { Field, GroupLabel, SelectField, Spinner, fieldClass, labelClass } from "@/components/site/form";
+import { SignInGate } from "@/components/site/SignInGate";
 import { CONTACT_EMAIL } from "@/components/site/links";
 import { IconArrowRight, IconCheck, IconClock, IconLock } from "@/components/Icon";
 import { fmt, initials, usd } from "@/lib/format";
 import { submitValuationLead } from "@/lib/actions/valuationLeads";
 import { submitListing } from "@/lib/actions/listings";
 import { cn } from "@/lib/utils";
+import { useAuthUser } from "@/lib/useAuthUser";
 
 // Pricing model (unchanged from the original tool).
 const NM: Record<string, number> = { finance: 1.4, tech: 1.3, health: 1.25, education: 1.2, entertainment: 1.0, gaming: 0.95, lifestyle: 0.9, food: 0.9, other: 1.0 };
@@ -129,6 +131,7 @@ function ErrorText({ children }: { children: React.ReactNode }) {
 }
 
 export default function ValuationClient() {
+  const user = useAuthUser();
   const [step, setStep] = useState<Step>("channel");
   const [url, setUrl] = useState("");
   const [fetching, setFetching] = useState(false);
@@ -465,7 +468,15 @@ export default function ValuationClient() {
             </div>
           )}
 
-          {step === "list" && ch && (
+          {step === "list" && ch && user === null && (
+            <SignInGate
+              next="/#submit"
+              title={`Create a free account to list ${ch.name}`}
+              sub="Listing needs an account so you can track it from review to sale. After signing up you'll land on our sell form, which pulls your channel's stats for you."
+            />
+          )}
+
+          {step === "list" && ch && user !== null && (
             <form onSubmit={submit} noValidate>
               <h2 className="text-[24px] font-normal tracking-[-0.025em] text-vx-ink">List {ch.name}</h2>
               <p className="mt-1.5 text-[15px] text-vx-body">Your channel qualifies. Add a few details and we&apos;ll list it to our verified buyers within 24 hours.</p>

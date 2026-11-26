@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import SignupClient from "./SignupClient";
 
@@ -6,5 +7,9 @@ export const metadata: Metadata = {
 };
 
 export default function SignupPage() {
-  return <SignupClient />;
+  return (
+    <Suspense fallback={null}>
+      <SignupClient />
+    </Suspense>
+  );
 }

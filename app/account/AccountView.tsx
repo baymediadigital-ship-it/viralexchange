@@ -21,7 +21,8 @@ const LISTING_STATUS: Record<string, { label: string; pill: string }> = {
   available: { label: "Live & available", pill: PILL.green },
   pending_sale: { label: "In negotiation", pill: PILL.amber },
   sold: { label: "Sold", pill: PILL.info },
-  withdrawn: { label: "Withdrawn", pill: PILL.muted },
+  withdrawn: { label: "Unlisted", pill: PILL.muted },
+  rejected: { label: "Not approved", pill: PILL.muted },
 };
 
 const APPLICATION_STATUS: Record<string, { label: string; pill: string }> = {

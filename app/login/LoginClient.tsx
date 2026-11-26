@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "@/lib/actions/auth";
+import { safeNext } from "@/lib/safeNext";
 import { AuthError, AuthField, AuthFooter, AuthShell, AuthSub, AuthSubmit, AuthTitle } from "@/components/AuthShell";
 
 export default function LoginClient() {
@@ -12,6 +13,8 @@ export default function LoginClient() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const next = safeNext(searchParams.get("next"));
+  const signupHref = next === "/account" ? "/signup" : `/signup?next=${encodeURIComponent(next)}`;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -23,7 +26,7 @@ export default function LoginClient() {
       setError(result.error);
       return;
     }
-    router.push(searchParams.get("next") || "/account");
+    router.push(next);
     router.refresh();
   }
 
@@ -38,7 +41,7 @@ export default function LoginClient() {
         <AuthSubmit loading={loading}>{loading ? "Logging in..." : "Log in"}</AuthSubmit>
       </form>
       <AuthFooter>
-        Don&apos;t have an account? <a href="/signup">Sign up</a>
+        Don&apos;t have an account? <a href={signupHref}>Sign up</a>
       </AuthFooter>
     </AuthShell>
   );

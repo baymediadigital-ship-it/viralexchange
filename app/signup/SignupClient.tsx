@@ -1,12 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { signUp } from "@/lib/actions/auth";
+import { safeNext } from "@/lib/safeNext";
 import { AuthError, AuthField, AuthFooter, AuthShell, AuthSub, AuthSubmit, AuthSuccess, AuthTitle } from "@/components/AuthShell";
 
 export default function SignupClient() {
   const router = useRouter();
+  const next = safeNext(useSearchParams().get("next"));
+  const loginHref = next === "/account" ? "/login" : `/login?next=${encodeURIComponent(next)}`;
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -18,7 +21,7 @@ export default function SignupClient() {
     e.preventDefault();
     setError("");
     setLoading(true);
-    const result = await signUp({ email, password, fullName });
+    const result = await signUp({ email, password, fullName, next });
     setLoading(false);
     if (result.error) {
       setError(result.error);
@@ -28,7 +31,7 @@ export default function SignupClient() {
       setNeedsConfirmation(true);
       return;
     }
-    router.push("/account");
+    router.push(next);
     router.refresh();
   }
 
@@ -36,9 +39,9 @@ export default function SignupClient() {
     return (
       <AuthShell>
         <AuthTitle>Check your email</AuthTitle>
-        <AuthSuccess>We sent a confirmation link to {email}. Click it to activate your account, then log in.</AuthSuccess>
+        <AuthSuccess>We sent a confirmation link to {email}. Click it to activate your account and you&apos;ll be taken straight back here.</AuthSuccess>
         <AuthFooter>
-          <a href="/login">Back to log in</a>
+          <a href={loginHref}>Back to log in</a>
         </AuthFooter>
       </AuthShell>
     );
@@ -66,7 +69,7 @@ export default function SignupClient() {
         <AuthSubmit loading={loading}>{loading ? "Creating account..." : "Sign up"}</AuthSubmit>
       </form>
       <AuthFooter>
-        Already have an account? <a href="/login">Log in</a>
+        Already have an account? <a href={loginHref}>Log in</a>
       </AuthFooter>
     </AuthShell>
   );

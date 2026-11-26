@@ -1,14 +1,23 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import { safeNext } from "@/lib/safeNext";
 
-export async function signUp(input: { email: string; password: string; fullName?: string }) {
+export async function signUp(input: { email: string; password: string; fullName?: string; next?: string }) {
   const supabase = await createClient();
+  // The confirmation email links back through /auth/callback, which then sends
+  // the new user to wherever they were headed (e.g. the sell form).
+  const origin = (await headers()).get("origin");
+  const next = safeNext(input.next);
   const { data, error } = await supabase.auth.signUp({
     email: input.email,
     password: input.password,
-    options: { data: { full_name: input.fullName || null } },
+    options: {
+      data: { full_name: input.fullName || null },
+      ...(origin ? { emailRedirectTo: `${origin}/auth/callback?next=${encodeURIComponent(next)}` } : {}),
+    },
   });
 
   if (error) return { error: error.message };
