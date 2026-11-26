@@ -36,29 +36,45 @@ async function send(mail: Mail) {
   }
 }
 
+// Dark mode for mail apps that honour prefers-color-scheme (Apple Mail, Outlook
+// for Mac, Hey). Inline styles stay the light default everywhere else; Gmail's
+// apps ignore this and auto-invert instead. Colors match the site's dark theme.
+const DARK_STYLES = `<style>
+:root{color-scheme:light dark;supported-color-schemes:light dark}
+@media (prefers-color-scheme: dark){
+.vx-bg{background:#101113!important}
+.vx-card{background:#16181b!important;border-color:#26292e!important}
+.vx-h,.vx-wm,.vx-v{color:#eceef0!important}
+.vx-p{color:#a9adb5!important}
+.vx-k,.vx-foot,.vx-foot a{color:#8a9099!important}
+.vx-rows,.vx-rows td{border-color:#26292e!important}
+.vx-btn{background:#eceef0!important;color:#101113!important}
+}
+</style>`;
+
 /** One plain, on-brand layout: heading, paragraphs, optional detail rows and a button. */
 function layout(opts: { heading: string; paragraphs: string[]; rows?: [string, string][]; cta?: { label: string; href: string } }) {
   const rows = opts.rows?.length
-    ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0;border:1px solid #e3e5e8;border-radius:10px;border-collapse:separate">${opts.rows
+    ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="vx-rows" style="margin:20px 0;border:1px solid #e3e5e8;border-radius:10px;border-collapse:separate">${opts.rows
         .map(
           ([k, v], i) =>
-            `<tr><td style="padding:10px 14px;font-size:13px;color:#6b717a;${i ? "border-top:1px solid #e3e5e8;" : ""}">${esc(k)}</td><td style="padding:10px 14px;font-size:14px;color:#1b1d21;text-align:right;${i ? "border-top:1px solid #e3e5e8;" : ""}">${esc(v)}</td></tr>`,
+            `<tr><td class="vx-k" style="padding:10px 14px;font-size:13px;color:#6b717a;${i ? "border-top:1px solid #e3e5e8;" : ""}">${esc(k)}</td><td class="vx-v" style="padding:10px 14px;font-size:14px;color:#1b1d21;text-align:right;${i ? "border-top:1px solid #e3e5e8;" : ""}">${esc(v)}</td></tr>`,
         )
         .join("")}</table>`
     : "";
   const cta = opts.cta
-    ? `<p style="margin:24px 0 0"><a href="${esc(opts.cta.href)}" style="display:inline-block;background:#1b1d21;color:#ffffff;text-decoration:none;font-size:14px;padding:11px 18px;border-radius:7px">${esc(opts.cta.label)}</a></p>`
+    ? `<p style="margin:24px 0 0"><a class="vx-btn" href="${esc(opts.cta.href)}" style="display:inline-block;background:#1b1d21;color:#ffffff;text-decoration:none;font-size:14px;padding:11px 18px;border-radius:7px">${esc(opts.cta.label)}</a></p>`
     : "";
-  return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;background:#f7f7f8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,Arial,sans-serif">
+  return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="supported-color-schemes" content="light dark">${DARK_STYLES}</head><body class="vx-bg" style="margin:0;background:#f7f7f8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,Arial,sans-serif">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:32px 16px">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px">
-<tr><td style="padding:0 4px 16px"><img src="${SITE_URL}/logo.jpg" width="28" height="28" alt="" style="border-radius:7px;vertical-align:middle"> <span style="font-size:15px;color:#1b1d21;vertical-align:middle;margin-left:6px">ViralExchange</span></td></tr>
-<tr><td style="background:#ffffff;border:1px solid #e3e5e8;border-radius:12px;padding:28px">
-<h1 style="margin:0 0 12px;font-size:21px;font-weight:500;letter-spacing:-0.02em;color:#1b1d21">${esc(opts.heading)}</h1>
-${opts.paragraphs.map((p) => `<p style="margin:0 0 12px;font-size:15px;line-height:1.6;color:#4a4f57">${esc(p)}</p>`).join("")}
+<tr><td style="padding:0 4px 16px"><img src="${SITE_URL}/logo.jpg" width="28" height="28" alt="" style="border-radius:7px;vertical-align:middle"> <span class="vx-wm" style="font-size:15px;color:#1b1d21;vertical-align:middle;margin-left:6px">ViralExchange</span></td></tr>
+<tr><td class="vx-card" style="background:#ffffff;border:1px solid #e3e5e8;border-radius:12px;padding:28px">
+<h1 class="vx-h" style="margin:0 0 12px;font-size:21px;font-weight:500;letter-spacing:-0.02em;color:#1b1d21">${esc(opts.heading)}</h1>
+${opts.paragraphs.map((p) => `<p class="vx-p" style="margin:0 0 12px;font-size:15px;line-height:1.6;color:#4a4f57">${esc(p)}</p>`).join("")}
 ${rows}${cta}
 </td></tr>
-<tr><td style="padding:16px 4px;font-size:12px;line-height:1.5;color:#a3a8af">ViralExchange · Every deal closes through escrow · <a href="${SITE_URL}" style="color:#a3a8af">viralexchange.io</a><br>We will never ask you to send money or login details by email.</td></tr>
+<tr><td class="vx-foot" style="padding:16px 4px;font-size:12px;line-height:1.5;color:#a3a8af">ViralExchange · Every deal closes through escrow · <a href="${SITE_URL}" style="color:#a3a8af">viralexchange.io</a><br>We will never ask you to send money or login details by email.</td></tr>
 </table></td></tr></table></body></html>`;
 }
 
