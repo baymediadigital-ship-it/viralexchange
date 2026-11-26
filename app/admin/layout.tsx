@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { buttonVariants } from "@/components/ui/button";
 import { Logo, PillNav } from "@/components/site/SiteNav";
 import { ThemeToggle } from "@/components/site/ThemeToggle";
-import { signOut } from "@/lib/actions/auth";
+import { AccountMenu } from "@/components/site/AccountMenu";
 
 export const metadata: Metadata = { title: "Admin", robots: { index: false, follow: false } };
 
@@ -20,11 +19,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <Link href="/listings" className={linkClass}>Live listings</Link>
           <Link href="/account" className={linkClass}>Account</Link>
           <ThemeToggle />
-          <form action={signOut}>
-            <button type="submit" className={buttonVariants({ variant: "brandOutline", size: "pillSm", className: "h-9 rounded-full px-4" })}>
-              Sign out
-            </button>
-          </form>
+          <AccountMenu />
         </div>
       </PillNav>
       {children}

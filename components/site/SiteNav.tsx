@@ -5,6 +5,7 @@ import { TELEGRAM_URL } from "./links";
 import { ThemeToggle } from "./ThemeToggle";
 import { SectionLink } from "./SectionLink";
 import { NavLink } from "./NavLink";
+import { AccountMenu } from "./AccountMenu";
 
 const linkClass = "rounded-full px-3 py-1.5 text-[14px] text-vx-muted transition-[color,background-color,scale] duration-150 hover:bg-vx-subtle hover:text-vx-ink active:scale-[0.97] active:duration-100 aria-[current=page]:text-vx-ink";
 
@@ -50,9 +51,12 @@ export function SiteNav() {
       </div>
       <div className="flex items-center gap-1">
         <ThemeToggle />
-        <SectionLink section="submit" className={buttonVariants({ variant: "brand", size: "pillSm", className: "h-9 rounded-full px-4" })}>
-          Sell a channel
+        {/* AccountMenu orders itself: "Log in" before this CTA, the avatar after it. */}
+        <SectionLink section="submit" className={buttonVariants({ variant: "brand", size: "pillSm", className: "order-2 h-9 rounded-full px-4" })}>
+          <span className="sm:hidden">Sell</span>
+          <span className="hidden sm:inline">Sell a channel</span>
         </SectionLink>
+        <AccountMenu />
       </div>
     </PillNav>
   );

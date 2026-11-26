@@ -38,6 +38,9 @@ export default function LoginClient() {
       <form onSubmit={handleSubmit}>
         <AuthField label="Email" id="email" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" required />
         <AuthField label="Password" id="password" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required />
+        <div className="-mt-2 mb-2 text-right">
+          <a href="/forgot-password" className="text-[13px] text-vx-muted underline-offset-4 hover:text-vx-ink hover:underline">Forgot password?</a>
+        </div>
         <AuthSubmit loading={loading}>{loading ? "Logging in..." : "Log in"}</AuthSubmit>
       </form>
       <AuthFooter>

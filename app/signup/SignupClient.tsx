@@ -62,8 +62,8 @@ export default function SignupClient() {
           autoComplete="new-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          placeholder="At least 6 characters"
-          minLength={6}
+          placeholder="At least 8 characters"
+          minLength={8}
           required
         />
         <AuthSubmit loading={loading}>{loading ? "Creating account..." : "Sign up"}</AuthSubmit>
