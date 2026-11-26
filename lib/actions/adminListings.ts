@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { emailDecisionIfReviewed, loadListingForDecision } from "@/lib/listingDecision";
 
 // Admin-only listing moderation. Runs with the admin's own session, so RLS
 // (listings_all_admin) and the status trigger both see a real admin; the
@@ -36,11 +37,13 @@ function refresh() {
 export async function setListingStatus(id: string, status: ListingStatus) {
   const supabase = await adminSession();
   if (!supabase) return { error: "Admins only." };
+  const before = await loadListingForDecision(supabase, id);
   const { error } = await supabase.from("listings").update({ status }).eq("id", id);
   if (error) {
     console.error("setListingStatus failed:", error);
     return { error: "Couldn't update the listing." };
   }
+  await emailDecisionIfReviewed(before, status);
   refresh();
   return { success: true };
 }
@@ -57,11 +60,13 @@ export async function updateListing(id: string, edits: ListingEdits, approve = f
     admin_notes: edits.admin_notes?.trim() || null,
   };
   if (approve) clean.status = "available";
+  const before = approve ? await loadListingForDecision(supabase, id) : null;
   const { error } = await supabase.from("listings").update(clean).eq("id", id);
   if (error) {
     console.error("updateListing failed:", error);
     return { error: "Couldn't save the changes." };
   }
+  if (approve && before) await emailDecisionIfReviewed({ ...before, asking_price_usd: clean.asking_price_usd ?? before.asking_price_usd }, "available");
   refresh();
   return { success: true };
 }

@@ -1,6 +1,7 @@
 import { timingSafeEqual } from "node:crypto";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { escapeHtml, tg } from "@/lib/telegram";
+import { emailDecisionIfReviewed, loadListingForDecision } from "@/lib/listingDecision";
 
 // Telegram webhook: handles taps on the Approve / Reject buttons sent by
 // notifyNewListing, plus /start so the owner can find their chat ID.
@@ -71,6 +72,8 @@ export async function POST(request: Request) {
     return Response.json({ ok: true });
   }
 
+  const before = await loadListingForDecision(supabase, id);
+
   // Only act on submissions still under review, so a stale button can't
   // re-open a rejected listing or un-sell a sold one.
   const { data, error } = await supabase
@@ -88,6 +91,7 @@ export async function POST(request: Request) {
       : "Already handled (it's no longer under review).";
 
   if (error) console.error("telegram listing update failed:", error);
+  if (data) await emailDecisionIfReviewed(before, ACTIONS[action].status);
 
   await tg("answerCallbackQuery", { callback_query_id: cq.id, text: outcome });
   if (cq.message) {

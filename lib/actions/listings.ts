@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { notifyNewListing, notifyPriceChange } from "@/lib/telegram";
+import { emailListingSubmitted } from "@/lib/email";
 
 export type SubmitListingInput = {
   channelName: string;
@@ -59,7 +60,7 @@ export async function submitListing(input: SubmitListingInput) {
     console.error("submitListing failed:", error);
     return { error: "Something went wrong submitting your channel. Please try again." };
   }
-  await notifyNewListing(listing);
+  await Promise.all([notifyNewListing(listing), emailListingSubmitted(listing, user.email ?? null)]);
   return { success: true };
 }
 

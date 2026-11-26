@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { emailAcquisitionApplication } from "@/lib/email";
 
 const BUDGET_LABEL_TO_CODE: Record<string, string> = {
   "$3,000 — $7,000": "3000_7000",
@@ -47,5 +48,14 @@ export async function submitAcquisitionApplication(input: SubmitAcquisitionAppli
     console.error("submitAcquisitionApplication failed:", error);
     return { error: "Something went wrong submitting your application. Please try again." };
   }
+  await emailAcquisitionApplication({
+    name: input.name.trim(),
+    email: input.email.trim(),
+    contact: input.contact?.trim() || null,
+    budgetLabel: input.budgetLabel,
+    niche: input.niche.trim(),
+    experience: input.experience.trim(),
+    goals: input.goals?.trim() || null,
+  });
   return { success: true };
 }
