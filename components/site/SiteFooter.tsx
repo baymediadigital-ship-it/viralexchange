@@ -27,6 +27,7 @@ export function SiteFooter() {
           <h4 className="font-mono text-[12px] text-vx-faint">Process</h4>
           <SectionLink section="process" className={colLink}>How it works</SectionLink>
           <SectionLink section="deals" className={colLink}>Closed deals</SectionLink>
+          <Link href="/guides" className={colLink}>Guides</Link>
         </div>
         <div className="flex flex-col gap-3">
           <h4 className="font-mono text-[12px] text-vx-faint">Contact</h4>

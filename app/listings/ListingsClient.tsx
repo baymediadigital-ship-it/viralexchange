@@ -1,35 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowUpRight, ShieldCheck } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { SiteNav } from "@/components/site/SiteNav";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { ListingsBrowser, PUBLIC_LISTING_FIELDS, type PublicListing } from "@/components/site/ListingsBrowser";
+import { ListingsBrowser, type PublicListing } from "@/components/site/ListingsBrowser";
 import { BUYERS_LOUNGE_OPEN, TELEGRAM_URL } from "@/components/site/links";
-import { createClient } from "@/lib/supabase/client";
 
-export default function ListingsClient() {
-  const [listings, setListings] = useState<PublicListing[] | null>(null);
-  const [failed, setFailed] = useState(false);
-
-  useEffect(() => {
-    createClient()
-      .from("listings_public")
-      .select(PUBLIC_LISTING_FIELDS)
-      .order("created_at", { ascending: false })
-      .then(({ data, error }) => {
-        if (error) {
-          console.error("listings load failed:", error);
-          setFailed(true);
-          setListings([]);
-          return;
-        }
-        setListings((data || []) as PublicListing[]);
-      });
-  }, []);
-
+export default function ListingsClient({ listings, failed }: { listings: PublicListing[]; failed: boolean }) {
   return (
     <div className="vx-page min-h-screen bg-vx-canvas text-vx-ink antialiased">
       <SiteNav />

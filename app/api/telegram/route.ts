@@ -1,4 +1,5 @@
 import { timingSafeEqual } from "node:crypto";
+import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { escapeHtml, tg } from "@/lib/telegram";
 import { emailDecisionIfReviewed, loadListingForDecision } from "@/lib/listingDecision";
@@ -91,7 +92,10 @@ export async function POST(request: Request) {
       : "Already handled (it's no longer under review).";
 
   if (error) console.error("telegram listing update failed:", error);
-  if (data) await emailDecisionIfReviewed(before, ACTIONS[action].status);
+  if (data) {
+    await emailDecisionIfReviewed(before, ACTIONS[action].status);
+    for (const path of ["/", "/listings", "/deals", "/admin"]) revalidatePath(path);
+  }
 
   await tg("answerCallbackQuery", { callback_query_id: cq.id, text: outcome });
   if (cq.message) {

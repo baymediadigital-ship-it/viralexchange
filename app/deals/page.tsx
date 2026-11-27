@@ -1,28 +1,35 @@
 import type { Metadata } from "next";
-import DealsClient from "./DealsClient";
+import DealsClient, { type Deal } from "./DealsClient";
+import { getPipeline, getPublicListings } from "@/lib/publicData";
+
+export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: "Deal Pipeline",
+  title: { absolute: "YouTube Channel Sales: Recent Deals & Prices | ViralExchange" },
   description:
-    "Live deal pipeline for ViralExchange — active listings, deals in progress, and recently closed YouTube channel sales.",
+    "Real YouTube channel sales and what they sold for, plus the deals in progress right now. A public record of every channel we have brokered.",
   alternates: { canonical: "/deals" },
   openGraph: {
     type: "website",
     url: "https://viralexchange.io/deals",
-    title: "Deal Pipeline — ViralExchange",
+    title: "YouTube Channel Sales & Deal Pipeline | ViralExchange",
     description:
-      "Live deal pipeline for ViralExchange — active listings, deals in progress, and recently closed YouTube channel sales.",
+      "Real YouTube channel sales and what they sold for, plus the deals in progress right now. A public record of every channel we have brokered.",
     images: ["/logo.jpg"],
   },
   twitter: {
     card: "summary",
-    title: "Deal Pipeline — ViralExchange",
+    title: "YouTube Channel Sales & Deal Pipeline | ViralExchange",
     description:
-      "Live deal pipeline for ViralExchange — active listings, deals in progress, and recently closed YouTube channel sales.",
+      "Real YouTube channel sales and what they sold for, plus the deals in progress right now. A public record of every channel we have brokered.",
     images: ["/logo.jpg"],
   },
 };
 
-export default function DealsPage() {
-  return <DealsClient />;
+export default async function DealsPage() {
+  const [listings, pipeline] = await Promise.all([getPublicListings(), getPipeline()]);
+  const rows = (pipeline ?? []) as Deal[];
+  // Live deals first (the actual pipeline), then closed sales; newest first within each.
+  const deals = [...rows.filter((d) => d.stage !== "closed"), ...rows.filter((d) => d.stage === "closed")];
+  return <DealsClient listings={listings?.rows ?? []} deals={deals} failed={!listings || !pipeline} />;
 }

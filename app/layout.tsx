@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, JetBrains_Mono, Inter, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { JsonLd, organizationJsonLd, websiteJsonLd } from "@/lib/seo";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-sans",
@@ -50,6 +51,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <JsonLd data={organizationJsonLd} />
+        <JsonLd data={websiteJsonLd} />
       </head>
       {/* Extensions like ColorZilla add attributes to <body> before React loads;
           ignore attribute mismatches on this one element only. */}

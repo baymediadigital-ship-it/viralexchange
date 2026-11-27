@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowUpRight, Check, Lock, Plus, ShieldCheck } from "lucide-react";
@@ -13,9 +13,9 @@ import { BUYERS_LOUNGE_OPEN, TELEGRAM_URL } from "@/components/site/links";
 import { fieldClass } from "@/components/site/form";
 import { Input } from "@/components/ui/input";
 import { fmt, tidyNiche, usd } from "@/lib/format";
-import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 import SellForm from "./SellForm";
+import { FAQ } from "@/lib/faq";
 
 const delay = (ms: number) => ({ "--d": `${ms}ms` }) as React.CSSProperties;
 
@@ -47,28 +47,6 @@ const STEPS = [
   { title: "Close through escrow", time: "Within 48 hours", desc: "The buyer funds escrow, you transfer the channel, and the funds are released to you." },
 ];
 
-const FAQ = [
-  {
-    q: "Do I pay anything upfront?",
-    a: "No. Listing is free and there are no upfront fees. We take a commission only when your channel sells.",
-  },
-  {
-    q: "How do I know I'll actually get paid?",
-    a: "Every deal closes through escrow. The buyer's funds are held by a neutral third party before you hand anything over, and are released to you once the transfer is complete.",
-  },
-  {
-    q: "Will buyers see my channel name?",
-    a: "Not at first. Buyers see the stats only. Your channel name and link are shared once a buyer is verified as serious and has signed an NDA.",
-  },
-  {
-    q: "How long does a sale take?",
-    a: "Listing takes a couple of minutes and we verify within 24 hours. Negotiation usually wraps up within 7 days, and escrow closes within 48 hours of an agreement.",
-  },
-  {
-    q: "How is my valuation worked out?",
-    a: "From real market multiples: subscribers, engagement, niche and monthly revenue. It takes about a minute and you don't need an account.",
-  },
-];
 
 /** Hairline-separated section on the shared 6xl grid. */
 function Section({ id, className, children }: { id?: string; className?: string; children: React.ReactNode }) {
@@ -484,46 +462,23 @@ function HeroValuation() {
   );
 }
 
-export default function HomeClient() {
-  const [stats, setStats] = useState<Stats | null>(null);
-  const [deals, setDeals] = useState<Deal[] | null>(null);
-  const [listings, setListings] = useState<Listing[]>([]);
-  const [pipeline, setPipeline] = useState<PipelineDeal[] | null>(null);
+export type HomeData = {
+  pipeline: (Deal & PipelineDeal)[] | null;
+  listings: Listing[];
+  listedCount: number;
+};
 
-  useEffect(() => {
-    const supabase = createClient();
-    Promise.all([
-      supabase
-        .from("listings_public")
-        .select("id,niche,subscribers,monthly_views,asking_price_usd", { count: "exact" })
-        .order("created_at", { ascending: false })
-        .limit(3),
-      supabase
-        .from("deals_public_pipeline")
-        .select("channel_name,niche,subscribers_snapshot,asking_price_usd,closed_price_usd,close_date,stage")
-        .neq("stage", "lost")
-        .order("created_at", { ascending: false }),
-    ])
-      .then(([listingsRes, dealsRes]) => {
-        if (listingsRes.error) throw listingsRes.error;
-        if (dealsRes.error) throw dealsRes.error;
-        const all = (dealsRes.data || []) as (Deal & PipelineDeal)[];
-        const closed = all.filter((d) => d.stage === "closed");
-        setDeals(closed);
-        setPipeline(all);
-        setListings((listingsRes.data || []) as Listing[]);
-        setStats({
-          sold: closed.length,
-          vol: closed.reduce((s, d) => s + (Number(d.closed_price_usd) || 0), 0),
-          listed: listingsRes.count || 0,
-        });
-      })
-      .catch((e) => {
-        console.error(e);
-        setDeals([]);
-        setPipeline([]);
-      });
-  }, []);
+// Data is loaded on the server (app/page.tsx) so it's in the HTML search
+// engines see.
+export default function HomeClient({ data }: { data: HomeData }) {
+  const pipeline: PipelineDeal[] = data.pipeline ?? [];
+  const deals: Deal[] = (data.pipeline ?? []).filter((d) => d.stage === "closed");
+  const listings = data.listings;
+  const stats: Stats = {
+    sold: deals.length,
+    vol: deals.reduce((s, d) => s + (Number(d.closed_price_usd) || 0), 0),
+    listed: data.listedCount,
+  };
 
   const named = (deals || []).filter((d) => d.channel_name);
   const topDeal = named.length ? named.reduce((a, b) => (Number(b.closed_price_usd) > Number(a.closed_price_usd) ? b : a)) : null;
@@ -744,6 +699,13 @@ export default function HomeClient() {
           <div className="vx-reveal">
             <Eyebrow index="06" label="FAQ" />
             <h2 className="mt-4 text-[34px] leading-[1.08] font-normal tracking-[-0.035em] text-vx-ink sm:text-[46px]">Good questions.</h2>
+            <p className="mt-4 max-w-sm text-[15px] leading-relaxed text-vx-body">
+              More in our{" "}
+              <Link href="/guides" className="text-vx-ink underline underline-offset-4 hover:text-vx-accent">
+                guides to buying and selling channels
+              </Link>
+              .
+            </p>
           </div>
           <div className="vx-reveal border-t border-vx-line">
             {FAQ.map((f) => (

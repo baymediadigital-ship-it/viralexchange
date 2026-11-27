@@ -1,19 +1,18 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { SiteNav } from "@/components/site/SiteNav";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { GradientText } from "@/components/site/Decor";
 import { Cell, Empty, RowSkeleton, headRow, tableShell } from "@/components/site/DataTable";
-import { PUBLIC_LISTING_FIELDS, type PublicListing } from "@/components/site/ListingsBrowser";
+import { type PublicListing } from "@/components/site/ListingsBrowser";
 import { IconArrowRight, IconCheck, IconLock } from "@/components/Icon";
-import { createClient } from "@/lib/supabase/client";
 import { fmt, nicheLabel, nicheShort, usd } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
-type Deal = {
+export type Deal = {
   id: string;
   channel_name: string | null;
   niche: string | null;
@@ -35,42 +34,9 @@ const stageOf = (key: string) => STAGES.find((s) => s.key === key) ?? STAGES[0];
 
 const DEAL_COLS = "md:grid-cols-[2fr_1fr_1fr_1fr_1fr]";
 
-export default function DealsClient() {
-  const [listings, setListings] = useState<PublicListing[] | null>(null);
-  const [deals, setDeals] = useState<Deal[] | null>(null);
-  const [failed, setFailed] = useState(false);
-
-  useEffect(() => {
-    const supabase = createClient();
-    Promise.all([
-      supabase
-        .from("listings_public")
-        .select(PUBLIC_LISTING_FIELDS)
-        .order("created_at", { ascending: false }),
-      supabase
-        .from("deals_public_pipeline")
-        .select("id,channel_name,niche,subscribers_snapshot,asking_price_usd,stage,closed_price_usd,close_date")
-        .neq("stage", "lost")
-        .order("created_at", { ascending: false }),
-    ])
-      .then(([l, d]) => {
-        if (l.error) throw l.error;
-        if (d.error) throw d.error;
-        setListings((l.data || []) as PublicListing[]);
-        // Live deals first (the actual pipeline), then closed sales; newest first within each.
-        const rows = (d.data || []) as Deal[];
-        setDeals([...rows.filter((x) => x.stage !== "closed"), ...rows.filter((x) => x.stage === "closed")]);
-      })
-      .catch((e) => {
-        console.error("deals page load failed:", e);
-        setFailed(true);
-        setListings([]);
-        setDeals([]);
-      });
-  }, []);
-
+export default function DealsClient({ listings, deals, failed }: { listings: PublicListing[]; deals: Deal[]; failed: boolean }) {
   const stats = useMemo(() => {
-    if (!listings || !deals) return null;
+    if (failed) return null;
     const closed = deals.filter((d) => d.stage === "closed");
     return {
       listed: listings.length,
@@ -78,7 +44,7 @@ export default function DealsClient() {
       closed: closed.length,
       vol: closed.reduce((s, d) => s + (Number(d.closed_price_usd) || 0), 0),
     };
-  }, [listings, deals]);
+  }, [failed, listings, deals]);
 
   const byStage = useMemo(() => STAGES.map((s) => ({ ...s, count: (deals || []).filter((d) => d.stage === s.key).length })), [deals]);
   const totalDeals = deals?.length ?? 0;

@@ -1,25 +1,34 @@
 import type { Metadata } from "next";
 import ListingsClient from "./ListingsClient";
+import { getPublicListings } from "@/lib/publicData";
+
+// Rendered on the server so search engines see the listings; refreshed every minute
+// and immediately when an admin approves or changes a listing.
+export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: "Browse YouTube Channels for Sale",
-  description: "Verified YouTube channels for sale. Browse by niche, subscribers and asking price. Every deal closes through escrow.",
+  title: { absolute: "YouTube Channels for Sale: Verified & Monetized | ViralExchange" },
+  description:
+    "Browse verified, monetized YouTube channels for sale. Filter by niche, subscribers and asking price. Stats come from YouTube and every deal closes through escrow.",
   alternates: { canonical: "/listings" },
   openGraph: {
     type: "website",
     url: "https://viralexchange.io/listings",
-    title: "Browse YouTube Channels for Sale — ViralExchange",
-    description: "Verified YouTube channels for sale. Browse by niche, subscribers and asking price. Every deal closes through escrow.",
+    title: "YouTube Channels for Sale | ViralExchange",
+    description:
+      "Browse verified, monetized YouTube channels for sale. Filter by niche, subscribers and asking price. Stats come from YouTube and every deal closes through escrow.",
     images: ["/logo.jpg"],
   },
   twitter: {
     card: "summary",
-    title: "Browse YouTube Channels for Sale — ViralExchange",
-    description: "Verified YouTube channels for sale. Every deal closes through escrow.",
+    title: "YouTube Channels for Sale | ViralExchange",
+    description:
+      "Browse verified, monetized YouTube channels for sale. Filter by niche, subscribers and asking price. Stats come from YouTube and every deal closes through escrow.",
     images: ["/logo.jpg"],
   },
 };
 
-export default function ListingsPage() {
-  return <ListingsClient />;
+export default async function ListingsPage() {
+  const res = await getPublicListings();
+  return <ListingsClient listings={res?.rows ?? []} failed={!res} />;
 }

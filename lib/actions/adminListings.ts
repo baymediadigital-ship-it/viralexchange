@@ -32,6 +32,10 @@ async function adminSession() {
 function refresh() {
   revalidatePath("/admin");
   revalidatePath("/account");
+  // Public pages are cached; refresh them so approvals and edits show at once.
+  revalidatePath("/");
+  revalidatePath("/listings");
+  revalidatePath("/deals");
 }
 
 export async function setListingStatus(id: string, status: ListingStatus) {

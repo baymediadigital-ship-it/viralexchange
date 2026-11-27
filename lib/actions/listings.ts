@@ -96,5 +96,8 @@ export async function updateMyAskingPrice(id: string, price: number) {
   const before = current.asking_price_usd === null ? null : Number(current.asking_price_usd);
   if (before !== price) await notifyPriceChange(current, before, price);
   revalidatePath("/account");
+  revalidatePath("/");
+  revalidatePath("/listings");
+  revalidatePath("/deals");
   return { success: true };
 }
