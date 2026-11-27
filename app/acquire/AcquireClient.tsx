@@ -8,7 +8,7 @@ import { SiteNav } from "@/components/site/SiteNav";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { GradientText, IconTile, TelegramIcon } from "@/components/site/Decor";
 import { Field, SelectField, Spinner, fieldClass, labelClass } from "@/components/site/form";
-import { TELEGRAM_URL } from "@/components/site/links";
+import { BUYERS_LOUNGE_OPEN, TELEGRAM_URL } from "@/components/site/links";
 import { IconArrowRight, IconCheck, IconLock, IconSearch, IconTrendingUp } from "@/components/Icon";
 import { createClient } from "@/lib/supabase/client";
 import { submitAcquisitionApplication } from "@/lib/actions/acquisitionApplications";
@@ -58,7 +58,8 @@ function H2({ children }: { children: React.ReactNode }) {
 
 export default function AcquireClient() {
   const [stats, setStats] = useState<{ sold: number; vol: number } | null>(null);
-  const [f, setF] = useState({ fname: "", lname: "", email: "", contact: "", budget: "", niche: "", experience: "", goals: "" });
+  const [f, setF] = useState({ fname: "", lname: "", email: "", contact: "", budget: "", niche: "", experience: "", goals: "", website: "" });
+  const [startedAt] = useState(() => Date.now());
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [done, setDone] = useState(false);
@@ -94,6 +95,8 @@ export default function AcquireClient() {
       niche: f.niche,
       experience: f.experience,
       goals: f.goals,
+      website: f.website,
+      startedAt,
     });
     setBusy(false);
     if (res.error) return setError(res.error);
@@ -339,17 +342,36 @@ export default function AcquireClient() {
                 </div>
                 <h2 className="mt-5 text-[26px] font-normal tracking-[-0.025em] text-vx-ink">Application received.</h2>
                 <p className="mx-auto mt-3 max-w-md text-[15px] leading-relaxed text-vx-body">
-                  We&apos;ll review it within 24 hours and reach out on your preferred contact. While you wait, join our private Buyers Lounge on Telegram. New
-                  verified listings go live there first.
+                  We&apos;ll review it within 24 hours and reach out on your preferred contact.
+                  {BUYERS_LOUNGE_OPEN
+                    ? " While you wait, join our private Buyers Lounge on Telegram. New verified listings go live there first."
+                    : " While you wait, have a look at the channels listed right now."}
                 </p>
-                <a href={TELEGRAM_URL} target="_blank" rel="noopener noreferrer" className={buttonVariants({ variant: "brand", size: "pill", className: "mt-7" })}>
-                  <TelegramIcon className="size-4" /> Join the Buyers Lounge
-                </a>
+                {BUYERS_LOUNGE_OPEN ? (
+                  <a href={TELEGRAM_URL} target="_blank" rel="noopener noreferrer" className={buttonVariants({ variant: "brand", size: "pill", className: "mt-7" })}>
+                    <TelegramIcon className="size-4" /> Join the Buyers Lounge
+                  </a>
+                ) : (
+                  <Link href="/listings" className={buttonVariants({ variant: "brand", size: "pill", className: "mt-7" })}>
+                    Browse listings
+                  </Link>
+                )}
               </div>
             ) : (
               <form onSubmit={submit} noValidate>
                 <h2 className="text-[26px] font-normal tracking-[-0.025em] text-vx-ink">Apply to acquire a channel</h2>
                 <p className="mt-1.5 text-[15px] text-vx-body">Takes 3 minutes. We review every application within 24 hours.</p>
+                {/* Honeypot: hidden from people, irresistible to bots. */}
+                <input
+                  type="text"
+                  name="website"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden
+                  value={f.website}
+                  onChange={set("website")}
+                  className="absolute -left-[9999px] h-0 w-0 opacity-0"
+                />
                 <div className="mt-7 grid gap-4 sm:grid-cols-2">
                   <Field id="f-fname" label="First name" autoComplete="given-name" placeholder="Your first name" value={f.fname} onChange={set("fname")} />
                   <Field id="f-lname" label="Last name" autoComplete="family-name" placeholder="Your last name" value={f.lname} onChange={set("lname")} />

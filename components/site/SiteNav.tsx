@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { TELEGRAM_URL } from "./links";
+import { BUYERS_LOUNGE_OPEN, TELEGRAM_URL } from "./links";
 import { ThemeToggle } from "./ThemeToggle";
 import { SectionLink } from "./SectionLink";
 import { NavLink } from "./NavLink";
@@ -47,7 +47,7 @@ export function SiteNav() {
         <NavLink href="/listings" className={linkClass}>Browse channels</NavLink>
         <NavLink href="/valuation" className={linkClass}>Free valuation</NavLink>
         <NavLink href="/deals" className={linkClass}>Pipeline</NavLink>
-        <a href={TELEGRAM_URL} target="_blank" rel="noopener noreferrer" className={linkClass}>Buyers Lounge</a>
+        {BUYERS_LOUNGE_OPEN && <a href={TELEGRAM_URL} target="_blank" rel="noopener noreferrer" className={linkClass}>Buyers Lounge</a>}
       </div>
       <div className="flex items-center gap-1">
         <ThemeToggle />

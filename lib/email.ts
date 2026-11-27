@@ -2,7 +2,7 @@
 // No-op until RESEND_API_KEY is set, and never throws: an email failure must
 // never fail the submission that triggered it.
 
-import { usd } from "@/lib/format";
+import { fmt, nicheShort, usd } from "@/lib/format";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://viralexchange.io";
 const FROM = process.env.EMAIL_FROM || "ViralExchange <deals@viralexchange.io>";
@@ -89,6 +89,7 @@ type ListingMail = {
   asking_price_usd?: number | null;
   seller_contact_name?: string | null;
   seller_contact_email?: string | null;
+  seller_notes?: string | null;
 };
 
 /** Seller confirmation + a copy to the admin inbox when a channel is submitted. */
@@ -120,6 +121,7 @@ export async function emailListingSubmitted(l: ListingMail, sellerEmail: string 
     ["Asking", asking],
     ["Seller", [l.seller_contact_name, l.seller_contact_email, sellerEmail].filter(Boolean).join(" · ") || "—"],
     ["Link", l.channel_url || "—"],
+    ...(l.seller_notes ? ([["Seller notes", l.seller_notes]] as [string, string][]) : []),
   ];
   await send({
     to: ADMIN,
@@ -195,5 +197,49 @@ export async function emailAcquisitionApplication(a: {
     subject: `New acquisition application: ${a.name} (${a.budgetLabel})`,
     html: layout({ heading: "New acquisition application", paragraphs: [], rows: adminRows }),
     text: plain("New acquisition application", [], adminRows),
+  });
+}
+
+/** Buyer confirmation + admin notification when someone expresses interest in a listing. */
+export async function emailListingInquiry(i: {
+  listing: { id: string; niche: string | null; subscribers: number | null; monthly_views: number | null; asking_price_usd: number | null };
+  name: string;
+  email: string;
+  budget: string | null;
+  message: string | null;
+}) {
+  const label = `Verified ${nicheShort(i.listing.niche)} channel`;
+  const rows: [string, string][] = [
+    ["Listing", label],
+    ["Subscribers", i.listing.subscribers ? fmt(i.listing.subscribers) : "—"],
+    ["Asking", i.listing.asking_price_usd ? usd(Number(i.listing.asking_price_usd)) : "Open to offers"],
+  ];
+  const heading = `Thanks, ${i.name}`;
+  const paragraphs = [
+    `We've got your interest in the ${label}. We'll be in touch within 24 hours.`,
+    "Next, we'll confirm who you are and ask you to sign an NDA. Then we share the channel name, link and full analytics. Every deal closes through escrow.",
+  ];
+  await send({
+    to: i.email,
+    replyTo: ADMIN,
+    subject: `Your interest in the ${label}`,
+    html: layout({ heading, paragraphs, rows }),
+    text: plain(heading, paragraphs, rows),
+  });
+  const adminRows: [string, string][] = [
+    ...rows,
+    ["Monthly views", i.listing.monthly_views ? fmt(i.listing.monthly_views) : "—"],
+    ["Listing ID", i.listing.id],
+    ["Buyer", i.name],
+    ["Email", i.email],
+    ["Budget", i.budget || "—"],
+    ["Message", i.message || "—"],
+  ];
+  await send({
+    to: ADMIN,
+    replyTo: i.email,
+    subject: `New buyer interest: ${label} (${i.name})`,
+    html: layout({ heading: "New buyer interest", paragraphs: [], rows: adminRows, cta: { label: "Open admin", href: `${SITE_URL}/admin` } }),
+    text: plain("New buyer interest", [], adminRows, `${SITE_URL}/admin`),
   });
 }

@@ -7,7 +7,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { SiteNav } from "@/components/site/SiteNav";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { ListingsBrowser, PUBLIC_LISTING_FIELDS, type PublicListing } from "@/components/site/ListingsBrowser";
-import { TELEGRAM_URL } from "@/components/site/links";
+import { BUYERS_LOUNGE_OPEN, TELEGRAM_URL } from "@/components/site/links";
 import { createClient } from "@/lib/supabase/client";
 
 export default function ListingsClient() {
@@ -16,9 +16,8 @@ export default function ListingsClient() {
 
   useEffect(() => {
     createClient()
-      .from("listings")
+      .from("listings_public")
       .select(PUBLIC_LISTING_FIELDS)
-      .eq("status", "available")
       .order("created_at", { ascending: false })
       .then(({ data, error }) => {
         if (error) {
@@ -61,13 +60,23 @@ export default function ListingsClient() {
           <ListingsBrowser listings={listings} failed={failed} />
 
           <div className="mt-12 grid gap-4 md:grid-cols-2">
-            <div className="rounded-xl border border-vx-line bg-vx-surface p-6">
-              <div className="text-[17px] tracking-[-0.02em] text-vx-ink">Want new listings first?</div>
-              <p className="mt-1.5 text-[14px] leading-relaxed text-vx-body">New channels go to our private Telegram the moment they&apos;re approved.</p>
-              <a href={TELEGRAM_URL} target="_blank" rel="noopener noreferrer" className={buttonVariants({ variant: "brandOutline", size: "pillSm", className: "mt-5" })}>
-                Join the Buyers Lounge <ArrowUpRight aria-hidden />
-              </a>
-            </div>
+            {BUYERS_LOUNGE_OPEN ? (
+              <div className="rounded-xl border border-vx-line bg-vx-surface p-6">
+                <div className="text-[17px] tracking-[-0.02em] text-vx-ink">Want new listings first?</div>
+                <p className="mt-1.5 text-[14px] leading-relaxed text-vx-body">New channels go to our private Telegram the moment they&apos;re approved.</p>
+                <a href={TELEGRAM_URL} target="_blank" rel="noopener noreferrer" className={buttonVariants({ variant: "brandOutline", size: "pillSm", className: "mt-5" })}>
+                  Join the Buyers Lounge <ArrowUpRight aria-hidden />
+                </a>
+              </div>
+            ) : (
+              <div className="rounded-xl border border-vx-line bg-vx-surface p-6">
+                <div className="text-[17px] tracking-[-0.02em] text-vx-ink">Looking for something specific?</div>
+                <p className="mt-1.5 text-[14px] leading-relaxed text-vx-body">Tell us your budget and niche, and we&apos;ll bring you matches as they&apos;re verified.</p>
+                <Link href="/acquire" className={buttonVariants({ variant: "brandOutline", size: "pillSm", className: "mt-5" })}>
+                  Tell us what you want
+                </Link>
+              </div>
+            )}
             <div className="rounded-xl border border-vx-line bg-vx-surface p-6">
               <div className="text-[17px] tracking-[-0.02em] text-vx-ink">Selling a channel?</div>
               <p className="mt-1.5 text-[14px] leading-relaxed text-vx-body">List it free. You only pay commission when it sells.</p>

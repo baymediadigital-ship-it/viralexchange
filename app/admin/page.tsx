@@ -16,7 +16,7 @@ export default async function AdminPage() {
   const { data, error } = await supabase
     .from("listings")
     .select(
-      "id,status,channel_name,channel_url,niche,sub_niche,subscribers,monthly_views,monthly_revenue_usd,engagement_rate,monetization,account_age_months,language,asking_price_usd,seller_contact_name,seller_contact_email,admin_notes,created_at,updated_at,seller:profiles(email,full_name)",
+      "id,status,channel_name,channel_url,niche,sub_niche,subscribers,monthly_views,monthly_revenue_usd,engagement_rate,monetization,account_age_months,language,asking_price_usd,seller_contact_name,seller_contact_email,seller_notes,admin_notes,created_at,updated_at,seller:profiles(email,full_name)",
     )
     .order("created_at", { ascending: false });
 

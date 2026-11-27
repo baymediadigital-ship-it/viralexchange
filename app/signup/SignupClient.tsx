@@ -68,6 +68,11 @@ export default function SignupClient() {
         />
         <AuthSubmit loading={loading}>{loading ? "Creating account..." : "Sign up"}</AuthSubmit>
       </form>
+      <p className="mt-4 text-center text-[12px] leading-relaxed text-vx-muted">
+        By creating an account you agree to our{" "}
+        <a href="/terms" className="underline underline-offset-2 hover:text-vx-ink">Terms</a> and{" "}
+        <a href="/privacy" className="underline underline-offset-2 hover:text-vx-ink">Privacy Policy</a>.
+      </p>
       <AuthFooter>
         Already have an account? <a href={loginHref}>Log in</a>
       </AuthFooter>

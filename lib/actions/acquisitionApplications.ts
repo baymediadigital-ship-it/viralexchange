@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { emailAcquisitionApplication } from "@/lib/email";
+import { looksLikeBot } from "@/lib/spam";
 
 const BUDGET_LABEL_TO_CODE: Record<string, string> = {
   "$3,000 — $7,000": "3000_7000",
@@ -18,9 +19,12 @@ export type SubmitAcquisitionApplicationInput = {
   niche: string;
   experience: string;
   goals?: string;
+  website?: string; // honeypot
+  startedAt?: number;
 };
 
 export async function submitAcquisitionApplication(input: SubmitAcquisitionApplicationInput) {
+  if (looksLikeBot(input)) return { success: true };
   if (!input.name?.trim()) return { error: "Please enter your first name." };
   if (!input.email?.includes("@")) return { error: "Please enter a valid email." };
   const budgetRange = BUDGET_LABEL_TO_CODE[input.budgetLabel];

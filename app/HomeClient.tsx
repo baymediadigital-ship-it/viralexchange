@@ -9,7 +9,7 @@ import { SiteNav } from "@/components/site/SiteNav";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Eyebrow, SectionHeader } from "@/components/site/SectionHeader";
 import { TelegramIcon } from "@/components/site/Decor";
-import { TELEGRAM_URL } from "@/components/site/links";
+import { BUYERS_LOUNGE_OPEN, TELEGRAM_URL } from "@/components/site/links";
 import { fieldClass } from "@/components/site/form";
 import { Input } from "@/components/ui/input";
 import { fmt, tidyNiche, usd } from "@/lib/format";
@@ -494,9 +494,8 @@ export default function HomeClient() {
     const supabase = createClient();
     Promise.all([
       supabase
-        .from("listings")
+        .from("listings_public")
         .select("id,niche,subscribers,monthly_views,asking_price_usd", { count: "exact" })
-        .eq("status", "available")
         .order("created_at", { ascending: false })
         .limit(3),
       supabase
@@ -694,23 +693,28 @@ export default function HomeClient() {
             <Eyebrow index="05" label="For buyers" />
             <h2 className="mt-4 text-[34px] leading-[1.08] font-normal tracking-[-0.035em] text-vx-ink sm:text-[46px]">Buyers see new channels first.</h2>
             <p className="mt-5 max-w-md text-[15px] leading-relaxed text-vx-body">
-              New listings go to our private Telegram the moment they&apos;re verified. Join free and be first in line.
+              {BUYERS_LOUNGE_OPEN
+                ? "New listings go to our private Telegram the moment they're verified. Join free and be first in line."
+                : "Every channel is checked before it's listed. Tell us your budget and niche, and we'll bring you matches as they're verified."}
             </p>
             <div className="mt-8 flex flex-wrap gap-2">
-              <a href={TELEGRAM_URL} target="_blank" rel="noopener noreferrer" className={buttonVariants({ variant: "brand", size: "pill" })}>
-                <TelegramIcon className="size-3.5" /> Join the Buyers Lounge
-              </a>
-              <Link href="/listings" className={buttonVariants({ variant: "brandOutline", size: "pill" })}>
-                Browse listings
-              </Link>
-              <Link href="/acquire" className={buttonVariants({ variant: "ghost", size: "pill", className: "text-vx-body hover:bg-vx-subtle hover:text-vx-ink" })}>
-                Apply to acquire
+              {BUYERS_LOUNGE_OPEN ? (
+                <a href={TELEGRAM_URL} target="_blank" rel="noopener noreferrer" className={buttonVariants({ variant: "brand", size: "pill" })}>
+                  <TelegramIcon className="size-3.5" /> Join the Buyers Lounge
+                </a>
+              ) : (
+                <Link href="/listings" className={buttonVariants({ variant: "brand", size: "pill" })}>
+                  Browse listings
+                </Link>
+              )}
+              <Link href={BUYERS_LOUNGE_OPEN ? "/listings" : "/acquire"} className={buttonVariants({ variant: "brandOutline", size: "pill" })}>
+                {BUYERS_LOUNGE_OPEN ? "Browse listings" : "Tell us what you want"}
               </Link>
             </div>
           </div>
 
           {listings.length > 0 && (
-            <Frame label={`Buyers Lounge · ${stats?.listed ?? listings.length} verified listings available`} className="vx-reveal">
+            <Frame label={`Live listings · ${stats?.listed ?? listings.length} verified ${(stats?.listed ?? listings.length) === 1 ? "channel" : "channels"} available`} className="vx-reveal">
               <ul className="divide-y divide-vx-line">
                 {listings.map((l) => (
                   <li key={l.id} className="flex items-center justify-between gap-4 px-5 py-4">
@@ -802,9 +806,15 @@ export default function HomeClient() {
             <Link href="/valuation" className={buttonVariants({ variant: "brand", size: "pill" })}>
               Get a free valuation <ArrowUpRight aria-hidden />
             </Link>
-            <a href={TELEGRAM_URL} target="_blank" rel="noopener noreferrer" className={buttonVariants({ variant: "brandOutline", size: "pill" })}>
-              Join the Buyers Lounge
-            </a>
+            {BUYERS_LOUNGE_OPEN ? (
+              <a href={TELEGRAM_URL} target="_blank" rel="noopener noreferrer" className={buttonVariants({ variant: "brandOutline", size: "pill" })}>
+                Join the Buyers Lounge
+              </a>
+            ) : (
+              <Link href="/listings" className={buttonVariants({ variant: "brandOutline", size: "pill" })}>
+                Browse listings
+              </Link>
+            )}
           </div>
         </div>
       </section>

@@ -1,10 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { TelegramIcon } from "./Decor";
-import { TELEGRAM_URL } from "./links";
+import { InterestDialog } from "./InterestDialog";
 import { fieldClass } from "./form";
 import { FadeScroller } from "./FadeScroller";
 import { Cell, Empty, RowSkeleton, headRow, tableShell } from "./DataTable";
@@ -12,7 +10,7 @@ import { IconLock, IconSearch } from "@/components/Icon";
 import { fmt, nicheLabel, nicheShort, usd } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
-/** Public listing row. No channel_name: listings stay anonymous until the deal stage. */
+/** Public listing row, read from the listings_public view (no channel name, link or seller details). */
 export type PublicListing = { id: string; niche: string | null; subscribers: number | null; monthly_views: number | null; asking_price_usd: number | null };
 
 export const PUBLIC_LISTING_FIELDS = "id,niche,subscribers,monthly_views,asking_price_usd";
@@ -100,7 +98,7 @@ export function ListingsBrowser({ listings, failed }: { listings: PublicListing[
       ) : failed ? (
         <Empty>We couldn&apos;t load listings. Refresh the page to try again.</Empty>
       ) : visible.length === 0 ? (
-        <Empty>{listings.length === 0 ? "No channels are listed right now. New ones land in the Buyers Lounge first." : "No listings match that filter."}</Empty>
+        <Empty>{listings.length === 0 ? "No channels are listed right now. New ones appear here as soon as they're verified." : "No listings match that filter."}</Empty>
       ) : (
         <ul className="divide-y divide-vx-line">
           {visible.map((r) => (
@@ -124,15 +122,7 @@ export function ListingsBrowser({ listings, failed }: { listings: PublicListing[
                 </span>
               </div>
               <div className="col-span-2 flex justify-end md:col-span-1">
-                <a
-                  href={TELEGRAM_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={buttonVariants({ variant: "brandOutline", size: "pillSm", className: "h-9 w-[152px] justify-center border-transparent px-4 text-[13px] ring-1 ring-vx-line" })}
-                >
-                  <TelegramIcon className="size-3.5 text-vx-accent" />
-                  Express interest
-                </a>
+                <InterestDialog listing={r} triggerClassName="h-9 w-[152px] justify-center border-transparent px-4 text-[13px] ring-1 ring-vx-line" />
               </div>
             </li>
           ))}

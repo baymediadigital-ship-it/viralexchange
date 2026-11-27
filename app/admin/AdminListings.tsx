@@ -27,6 +27,7 @@ export type AdminListing = {
   asking_price_usd: number | null;
   seller_contact_name: string | null;
   seller_contact_email: string | null;
+  seller_notes: string | null;
   admin_notes: string | null;
   created_at: string;
   seller: { email: string | null; full_name: string | null } | null;
@@ -180,6 +181,12 @@ function ListingCard({ listing: l }: { listing: AdminListing }) {
           .filter(Boolean)
           .join(" · ") || "No contact details"}
       </div>
+      {l.seller_notes && (
+        <p className="mt-2 text-[13px] whitespace-pre-line text-vx-body">
+          <span className="text-vx-muted">From the seller: </span>
+          {l.seller_notes}
+        </p>
+      )}
       {l.admin_notes && !editing && (
         <p className="mt-2 text-[13px] text-vx-body">
           <span className="text-vx-muted">Notes: </span>

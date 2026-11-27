@@ -103,6 +103,7 @@ export default function SellForm() {
       askingPriceUsd: f.price ? parseInt(f.price) : undefined,
       sellerContactName: f.name.trim() || user?.user_metadata?.full_name || undefined,
       sellerContactEmail: f.contact.trim() || user?.email || undefined,
+      sellerNotes: f.notes.trim() || undefined,
     });
     setSubmitting(false);
     if (result.error) {

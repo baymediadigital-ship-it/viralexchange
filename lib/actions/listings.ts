@@ -20,6 +20,7 @@ export type SubmitListingInput = {
   askingPriceUsd?: number;
   sellerContactName?: string;
   sellerContactEmail?: string;
+  sellerNotes?: string;
 };
 
 export async function submitListing(input: SubmitListingInput) {
@@ -52,8 +53,9 @@ export async function submitListing(input: SubmitListingInput) {
       asking_price_usd: input.askingPriceUsd ?? null,
       seller_contact_name: input.sellerContactName?.trim() || null,
       seller_contact_email: input.sellerContactEmail?.trim() || user.email || null,
+      seller_notes: input.sellerNotes?.trim().slice(0, 2000) || null,
     })
-    .select("id,channel_name,channel_url,niche,subscribers,monthly_views,monthly_revenue_usd,asking_price_usd,monetization,seller_contact_name,seller_contact_email")
+    .select("id,channel_name,channel_url,niche,subscribers,monthly_views,monthly_revenue_usd,asking_price_usd,monetization,seller_contact_name,seller_contact_email,seller_notes")
     .single();
 
   if (error || !listing) {

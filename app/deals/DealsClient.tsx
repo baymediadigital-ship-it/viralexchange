@@ -44,9 +44,8 @@ export default function DealsClient() {
     const supabase = createClient();
     Promise.all([
       supabase
-        .from("listings")
+        .from("listings_public")
         .select(PUBLIC_LISTING_FIELDS)
-        .eq("status", "available")
         .order("created_at", { ascending: false }),
       supabase
         .from("deals_public_pipeline")
